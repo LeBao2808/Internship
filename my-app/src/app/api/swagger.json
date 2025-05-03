@@ -1,0 +1,126 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "User API",
+      "version": "1.0.0",
+      "description": "API quản lý người dùng đơn giản"
+    },
+    "paths": {
+      "/api/user": {
+        "get": {
+          "summary": "Lấy danh sách người dùng",
+          "responses": {
+            "200": {
+              "description": "Thành công",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Tạo người dùng mới",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserInput" }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Đã tạo",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Cập nhật người dùng",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Cập nhật thành công",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            },
+            "404": {
+              "description": "Không tìm thấy người dùng"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Xoá người dùng",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string", "example": "664f6b6e2f8b2c001e8e7a1b" }
+                  },
+                  "required": ["id"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Xoá thành công",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": { "type": "boolean", "example": true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "_id": { "type": "string", "example": "664f6b6e2f8b2c001e8e7a1b" },
+            "name": { "type": "string", "example": "Nguyen Van A" },
+            "email": { "type": "string", "example": "a@email.com" }
+          }
+        },
+        "UserInput": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "example": "Nguyen Van C" },
+            "email": { "type": "string", "example": "c@email.com" }
+          },
+          "required": ["name", "email"]
+        }
+      }
+    }
+  }
+  
