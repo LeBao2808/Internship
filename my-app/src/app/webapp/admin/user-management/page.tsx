@@ -9,16 +9,19 @@ interface User {
   id?: number;
   name: string;
   email: string;
+  role?: string;
 }
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [form, setForm] = useState({ name: "", email: "" });
+  const [form, setForm] = useState({ name: "", email: "", role: "" });
+  const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     fetchUsers();
+    fetchRoles();
   }, []);
 
   const fetchUsers = async () => {
@@ -27,15 +30,21 @@ export default function UserManagementPage() {
     setUsers(data);
   };
 
+  const fetchRoles = async () => {
+    const res = await fetch("/api/role");
+    const data = await res.json();
+    setRoles(data.map((role: any) => ({ value: role._id || role.id, label: role.name })));
+  };
+
   const handleAddClick = () => {
     setEditingUser(null);
-    setForm({ name: "", email: "" });
+    setForm({ name: "", email: "", role: roles.length > 0 ? roles[0].value : "" });
     setIsModalOpen(true);
   };
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
-    setForm({ name: user.name, email: user.email });
+    setForm({ name: user.name, email: user.email, role: user.role || "" });
     setIsModalOpen(true);
   };
 
@@ -48,7 +57,7 @@ export default function UserManagementPage() {
     fetchUsers();
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<any>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -134,7 +143,22 @@ export default function UserManagementPage() {
           ]}
           onSubmit={handleSaveUser}
           submitLabel={editingUser ? "Cập nhật" : "Thêm mới"}
-        />
+        >
+          <div>
+            {roles.length > 0 && (
+              <React.Suspense fallback={null}>
+                {React.createElement(require("../../components/AdminSelect").default, {
+                  label: "Vai trò",
+                  name: "role",
+                  value: form.role,
+                  options: roles,
+                  onChange: (e: any) => setForm({ ...form, role: e.target.value }),
+                  required: true,
+                })}
+              </React.Suspense>
+            )}
+          </div>
+        </AdminForm>
       </AdminModal>
     </div>
   );

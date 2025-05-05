@@ -1,0 +1,195 @@
+{
+  "get": {
+    "summary": "Lấy danh sách người dùng",
+    "description": "Trả về danh sách tất cả người dùng trong hệ thống.",
+    "responses": {
+      "200": {
+        "description": "Thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": { "type": "string", "example": "abc123" },
+                      "name": { "type": "string", "example": "Nguyen Van A" },
+                      "email": { "type": "string", "example": "user@example.com" },
+                      "role": { "type": "string", "example": "admin" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "summary": "Tạo người dùng mới",
+    "description": "Tạo một người dùng mới với tên, email, mật khẩu và vai trò.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "example": "Nguyen Van A" },
+              "email": { "type": "string", "example": "user@example.com" },
+              "password": { "type": "string", "example": "123456" },
+              "role": { "type": "string", "example": "admin" }
+            },
+            "required": ["name", "email", "password"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Tạo thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "_id": { "type": "string", "example": "abc123" },
+                    "name": { "type": "string", "example": "Nguyen Van A" },
+                    "email": { "type": "string", "example": "user@example.com" },
+                    "role": { "type": "string", "example": "admin" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Lỗi xác thực hoặc thiếu thông tin",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Thiếu thông tin người dùng" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "put": {
+    "summary": "Cập nhật người dùng",
+    "description": "Cập nhật thông tin người dùng theo id.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "example": "abc123" },
+              "name": { "type": "string", "example": "Nguyen Van A" },
+              "email": { "type": "string", "example": "user@example.com" },
+              "role": { "type": "string", "example": "admin" }
+            },
+            "required": ["id"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Cập nhật thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "_id": { "type": "string", "example": "abc123" },
+                    "name": { "type": "string", "example": "Nguyen Van A" },
+                    "email": { "type": "string", "example": "user@example.com" },
+                    "role": { "type": "string", "example": "admin" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Không tìm thấy người dùng",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "User not found" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "delete": {
+    "summary": "Xoá người dùng",
+    "description": "Xoá người dùng theo id.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "example": "abc123" }
+            },
+            "required": ["id"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Xoá thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Không tìm thấy người dùng",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "User not found" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

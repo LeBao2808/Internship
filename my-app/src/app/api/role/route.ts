@@ -4,8 +4,12 @@ import Role from "../../api/models/Role";
 
 export async function GET() {
   await dbConnect();
-  const Roles = await Role.find();
-  return NextResponse.json(Roles);
+  try {
+    const Roles = await Role.find();
+    return NextResponse.json(Roles);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {

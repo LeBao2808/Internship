@@ -1,0 +1,189 @@
+{
+  "get": {
+    "summary": "Lấy danh sách vai trò",
+    "description": "Trả về danh sách tất cả các vai trò trong hệ thống.",
+    "responses": {
+      "200": {
+        "description": "Thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": { "type": "string", "example": "abc123" },
+                      "name": { "type": "string", "example": "Admin" },
+                      "description": { "type": "string", "example": "Quản trị hệ thống" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "summary": "Tạo vai trò mới",
+    "description": "Tạo một vai trò mới với tên và mô tả.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "example": "Admin" },
+              "description": { "type": "string", "example": "Quản trị hệ thống" }
+            },
+            "required": ["name"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Tạo thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "_id": { "type": "string", "example": "abc123" },
+                    "name": { "type": "string", "example": "Admin" },
+                    "description": { "type": "string", "example": "Quản trị hệ thống" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Lỗi xác thực hoặc thiếu thông tin",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Thiếu tên vai trò" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "put": {
+    "summary": "Cập nhật vai trò",
+    "description": "Cập nhật thông tin vai trò theo id.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "example": "abc123" },
+              "name": { "type": "string", "example": "Admin" },
+              "description": { "type": "string", "example": "Quản trị hệ thống" }
+            },
+            "required": ["id"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Cập nhật thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "_id": { "type": "string", "example": "abc123" },
+                    "name": { "type": "string", "example": "Admin" },
+                    "description": { "type": "string", "example": "Quản trị hệ thống" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Không tìm thấy vai trò",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Role not found" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "delete": {
+    "summary": "Xoá vai trò",
+    "description": "Xoá vai trò theo id.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "example": "abc123" }
+            },
+            "required": ["id"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Xoá thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Không tìm thấy vai trò",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Role not found" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

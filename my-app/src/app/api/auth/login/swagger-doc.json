@@ -1,0 +1,64 @@
+{
+  "post": {
+    "summary": "Đăng nhập",
+    "description": "Đăng nhập bằng email và mật khẩu. Trả về accessToken, refreshToken và thông tin user nếu thành công.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "email": { "type": "string", "example": "user@example.com" },
+              "password": { "type": "string", "example": "123456" }
+            },
+            "required": ["email", "password"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Đăng nhập thành công",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": { "type": "boolean", "example": true },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": { "type": "string", "example": "jwt-token" },
+                    "refreshToken": { "type": "string", "example": "refresh-token" },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "userId": { "type": "string", "example": "abc123" },
+                        "name": { "type": "string", "example": "Nguyen Van A" },
+                        "email": { "type": "string", "example": "user@example.com" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Lỗi xác thực hoặc thiếu thông tin",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Thiếu email hoặc mật khẩu" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

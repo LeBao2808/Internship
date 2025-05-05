@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
