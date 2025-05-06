@@ -5,20 +5,27 @@ import Role from "../../api/models/Role";
 export async function GET(request: Request) {
   await dbConnect();
   try {
-    const { search } = Object.fromEntries(new URL(request.url).searchParams);
-    let query = {};
-    if (search) {
-      // Tìm kiếm theo tên hoặc các trường khác nếu cần
-      query = {
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          // Thêm các trường khác nếu cần, ví dụ:
-          // { description: { $regex: search, $options: "i" } }
-        ]
-      };
-    }
-    const Roles = await Role.find(query);
-    return NextResponse.json(Roles);
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const skip = (page - 1) * limit;
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            // { description: { $regex: search, $options: "i" } }
+          ],
+        }
+      : {};
+
+    const [roles, total] = await Promise.all([
+      Role.find(query).skip(skip).limit(limit),
+      Role.countDocuments(query),
+    ]);
+
+    return NextResponse.json({ roles, total, page, limit });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -29,7 +36,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   try {
     const newRole = await Role.create(body);
-    return NextResponse.json(newRole, { status: 201 });
+    return NextResponse.json({ roles: [newRole] }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
@@ -41,7 +48,7 @@ export async function PUT(request: Request) {
   try {
     const updatedRole = await Role.findByIdAndUpdate(body.id, body, { new: true });
     if (!updatedRole) return NextResponse.json({ error: "Role not found" }, { status: 404 });
-    return NextResponse.json(updatedRole);
+    return NextResponse.json({ roles: [updatedRole] });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }

@@ -25,10 +25,10 @@ export default function RoleManagementPage() {
 
   const fetchRoles = async (query = "") => {
     let url = "/api/role";
-    if (query) url += `?query=${encodeURIComponent(query)}`;
+    if (query) url += `?search=${encodeURIComponent(query)}`;
     const res = await fetch(url);
     const data = await res.json();
-    setRoles(data);
+    setRoles(Array.isArray(data.roles) ? data.roles : []);
   };
 
   const handleAddClick = () => {

@@ -5,19 +5,27 @@ import User from "../../api/models/User";
 export async function GET(request: Request) {
   await dbConnect();
   try {
-    const { search } = Object.fromEntries(new URL(request.url).searchParams);
-    let query = {};
-    if (search) {
-      query = {
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          // Thêm các trường khác nếu cần, ví dụ:
-          // { email: { $regex: search, $options: "i" } }
-        ]
-      };
-    }
-    const users = await User.find(query);
-    return NextResponse.json(users);
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const skip = (page - 1) * limit;
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const [users, total] = await Promise.all([
+      User.find(query).skip(skip).limit(limit),
+      User.countDocuments(query),
+    ]);
+
+    return NextResponse.json({ users, total, page, limit });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

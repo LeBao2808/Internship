@@ -29,22 +29,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "40px auto", padding: 24, border: "1px solid #ccc", borderRadius: 8 }}>
-      <h2>Đăng nhập</h2>
+    <div style={{ maxWidth: 400, margin: "40px auto", padding: 24, border: "1px solid #ccc", borderRadius: 8, background: "#e3f2fd", color: "#111" }}>
+      <h2 style={{ color: "#111" }}>Đăng nhập</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 12 }}>
-          <label>Email:</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={{ width: "100%" }} />
+          <label style={{ color: "#111" }}>Email:</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={{ width: "100%", color: "#111" }} />
         </div>
         <div style={{ marginBottom: 12 }}>
-          <label>Mật khẩu:</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: "100%" }} />
+          <label style={{ color: "#111" }}>Mật khẩu:</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: "100%", color: "#111" }} />
         </div>
         {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
-        <button type="submit" style={{ width: "100%", padding: 8 }}>Đăng nhập</button>
+        <button type="submit" style={{ width: "100%", padding: 8, background: "#1976d2", color: "#111", border: "none", borderRadius: 4, fontWeight: 600 }}>Đăng nhập</button>
       </form>
-      <div style={{ marginTop: 16 }}>
-        Chưa có tài khoản? <a href="/webapp/user-management/register">Đăng ký</a>
+      <div style={{ marginTop: 16, color: "#111" }}>
+        Chưa có tài khoản? <a href="/webapp/user-management/register" style={{ color: "#1976d2", textDecoration: "underline" }}>Đăng ký</a>
       </div>
     </div>
   );

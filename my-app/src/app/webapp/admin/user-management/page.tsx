@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
+import Pagination from "../../components/Pagination";
 
 interface User {
   id?: number;
@@ -19,18 +20,22 @@ export default function UserManagementPage() {
   const [form, setForm] = useState({ name: "", email: "", role: "" });
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchUsers();
     fetchRoles();
   }, []);
 
-  const fetchUsers = async (query = "") => {
-    let url = "/api/user";
-    if (query) url += `?search=${encodeURIComponent(query)}`;
+  const fetchUsers = async (query = "", page = currentPage, size = pageSize) => {
+    let url = `/api/user?page=${page}&pageSize=${size}`;
+    if (query) url += `&search=${encodeURIComponent(query)}`;
     const res = await fetch(url);
     const data = await res.json();
-    setUsers(data.map((user: any) => ({ ...user, id: user.id || user._id })));
+    setUsers(data.users.map((user: any) => ({ ...user, id: user.id || user._id })));
+    setTotal(data.total);
   };
 
   const fetchRoles = async () => {
@@ -83,6 +88,11 @@ export default function UserManagementPage() {
     fetchUsers();
   };
 
+  useEffect(() => {
+    fetchUsers(search, currentPage, pageSize);
+    fetchRoles();
+  }, [currentPage, pageSize]);
+
   return (
     <div
       style={{
@@ -99,7 +109,8 @@ export default function UserManagementPage() {
         <form
           onSubmit={e => {
             e.preventDefault();
-            fetchUsers(search);
+            setCurrentPage(1);
+            fetchUsers(search, 1, pageSize);
           }}
           style={{ display: "flex", gap: 8 }}
         >
@@ -139,6 +150,16 @@ export default function UserManagementPage() {
         rows={users}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
+      />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(total / pageSize) || 1}
+        onPageChange={page => setCurrentPage(page)}
+        pageSize={pageSize}
+        onPageSizeChange={size => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
       />
       <AdminModal
         open={isModalOpen}
