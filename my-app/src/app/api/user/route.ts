@@ -2,10 +2,25 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../api/models/User";
 
-export async function GET() {
+export async function GET(request: Request) {
   await dbConnect();
-  const users = await User.find();
-  return NextResponse.json(users);
+  try {
+    const { search } = Object.fromEntries(new URL(request.url).searchParams);
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          // Thêm các trường khác nếu cần, ví dụ:
+          // { email: { $regex: search, $options: "i" } }
+        ]
+      };
+    }
+    const users = await User.find(query);
+    return NextResponse.json(users);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {

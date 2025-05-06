@@ -17,13 +17,16 @@ export default function RoleManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchRoles();
   }, []);
 
-  const fetchRoles = async () => {
-    const res = await fetch("/api/role");
+  const fetchRoles = async (query = "") => {
+    let url = "/api/role";
+    if (query) url += `?query=${encodeURIComponent(query)}`;
+    const res = await fetch(url);
     const data = await res.json();
     setRoles(data);
   };
@@ -86,7 +89,28 @@ export default function RoleManagementPage() {
       }}
     >
       <h1>Quản lý vai trò</h1>
-      <div style={{ textAlign: "right", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            fetchRoles(search);
+          }}
+          style={{ display: "flex", gap: 8 }}
+        >
+          <input
+            type="text"
+            placeholder="Tìm kiếm vai trò..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
+          />
+          <button
+            type="submit"
+            style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
+          >
+            Tìm kiếm
+          </button>
+        </form>
         <button
           onClick={handleAddClick}
           style={{

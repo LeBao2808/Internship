@@ -2,10 +2,22 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Role from "../../api/models/Role";
 
-export async function GET() {
+export async function GET(request: Request) {
   await dbConnect();
   try {
-    const Roles = await Role.find();
+    const { search } = Object.fromEntries(new URL(request.url).searchParams);
+    let query = {};
+    if (search) {
+      // Tìm kiếm theo tên hoặc các trường khác nếu cần
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          // Thêm các trường khác nếu cần, ví dụ:
+          // { description: { $regex: search, $options: "i" } }
+        ]
+      };
+    }
+    const Roles = await Role.find(query);
     return NextResponse.json(Roles);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

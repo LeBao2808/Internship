@@ -18,16 +18,19 @@ export default function UserManagementPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form, setForm] = useState({ name: "", email: "", role: "" });
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchUsers();
     fetchRoles();
   }, []);
 
-  const fetchUsers = async () => {
-    const res = await fetch("/api/user");
+  const fetchUsers = async (query = "") => {
+    let url = "/api/user";
+    if (query) url += `?search=${encodeURIComponent(query)}`;
+    const res = await fetch(url);
     const data = await res.json();
-    setUsers(data);
+    setUsers(data.map((user: any) => ({ ...user, id: user.id || user._id })));
   };
 
   const fetchRoles = async () => {
@@ -64,7 +67,7 @@ export default function UserManagementPage() {
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingUser) {
-      await fetch("/api/user", {
+      await fetch(`/api/user`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingUser.id, ...form }),
@@ -92,7 +95,28 @@ export default function UserManagementPage() {
       }}
     >
       <h1>Quản lý người dùng</h1>
-      <div style={{ textAlign: "right", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            fetchUsers(search);
+          }}
+          style={{ display: "flex", gap: 8 }}
+        >
+          <input
+            type="text"
+            placeholder="Tìm kiếm người dùng..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
+          />
+          <button
+            type="submit"
+            style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
+          >
+            Tìm kiếm
+          </button>
+        </form>
         <button
           onClick={handleAddClick}
           style={{
