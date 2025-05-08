@@ -17,6 +17,7 @@ export default function AdminLayout({
   const navItems = [
     { label: "Người dùng", href: "/webapp/admin/user-management" },
     { label: "Vai trò", href: "/webapp/admin/role-management" },
+    { label: "Blog", href: "/webapp/admin/blog-management" },
   ];
 
   return (
@@ -45,8 +46,7 @@ export default function AdminLayout({
         ))}
         <button
           onClick={() => {
-            signOut({ callbackUrl: "/webapp/admin/user-management/login" });
-            console.log("Đã đăng xuất");
+            signOut({ callbackUrl: "/webapp/admin/user-management/login", redirect:true });
             // window.location.href = "https://accounts.google.com/Logout";
           }}
           style={{

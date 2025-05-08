@@ -22,7 +22,7 @@ export default function RegisterPage() {
       });
       if (res.ok) {
         setSuccess("Đăng ký thành công! Đang chuyển hướng...");
-        setTimeout(() => router.push("/webapp/user-management/login"), 1500);
+        setTimeout(() => router.push("/webapp/authen/login"), 100);
       } else {
         const data = await res.json();
         setError(data.error || "Đăng ký thất bại");
@@ -53,7 +53,7 @@ export default function RegisterPage() {
         <button type="submit" style={{ width: "100%", padding: 8 }}>Đăng ký</button>
       </form>
       <div style={{ marginTop: 16 }}>
-        Đã có tài khoản? <a href="/webapp/user-management/login">Đăng nhập</a>
+        Đã có tài khoản? <a href="/webapp/authen/login">Đăng nhập</a>
       </div>
     </div>
   );

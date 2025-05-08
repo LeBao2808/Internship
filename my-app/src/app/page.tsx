@@ -1,7 +1,7 @@
 // import Image from "next/image";
 import { redirect } from "next/navigation";
 export default function Home() {
-  redirect("/webapp/admin/user-management/login");
+  redirect("/webapp/authen/login");
   return null;
 }
 

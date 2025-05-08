@@ -1,6 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { IBaseTimestamps } from "./BaseTimestamps";
+import { baseTimestamps } from "./BaseTimestamps";
 
-export interface IUser extends Document {
+export interface IUser extends Document, IBaseTimestamps {
+
   name: string;
   email: string;
   password?: string;
@@ -11,7 +14,8 @@ const UserSchema: Schema<IUser> = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String },
-  role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" }
+  role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" }, 
+  ...baseTimestamps
 });
 
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
