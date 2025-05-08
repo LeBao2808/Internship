@@ -15,20 +15,25 @@ export async function POST(req: NextRequest) {
 }
 
 // Sửa blog (cần truyền id trên query, ví dụ: /api/blog?id=xxx)
-export async function PUT(req: NextRequest) {
+export async function PUT(request: Request) {
   await dbConnect();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-  const { title, content } = await req.json();
-  if (!id) return NextResponse.json({ error: "Thiếu id" }, { status: 400 });
+  const body = await request.json();
+
   try {
-    const blog = await Blog.findByIdAndUpdate(id, { title, content, createdUpdate: new Date() }, { new: true });
-    if (!blog) return NextResponse.json({ error: "Không tìm thấy blog" }, { status: 404 });
-    return NextResponse.json(blog);
-  } catch (error) {
-    return NextResponse.json({ error: "Không thể cập nhật blog" }, { status: 400 });
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      body.id,
+      { ...body, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updatedBlog) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
+    return NextResponse.json(updatedBlog);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
+
 
 // Xóa blog (cần truyền id trên query, ví dụ: /api/blog?id=xxx)
 export async function DELETE(req: NextRequest) {

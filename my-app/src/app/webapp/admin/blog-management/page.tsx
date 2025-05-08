@@ -142,6 +142,7 @@ export default function BlogManagementPage() {
         columns={[
           { id: "title", label: "Tiêu đề" },
           { id: "user", label: "Tác giả" },
+          { id: "content", label: "Nội dung" },
         ]}
         rows={blogs.map(blog => ({
           ...blog,
@@ -170,7 +171,13 @@ export default function BlogManagementPage() {
               onChange: handleFormChange,
               required: true,
             },
-           
+            {
+              name: "content",
+              label: "Nội dung",
+              value: form.content,
+              onChange: handleFormChange,
+              required: true,
+            },
           ]}
           onSubmit={handleSaveBlog}
           submitLabel={editingBlog ? "Cập nhật" : "Thêm mới"}
