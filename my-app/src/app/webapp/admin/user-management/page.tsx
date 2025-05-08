@@ -41,8 +41,10 @@ export default function UserManagementPage() {
   const fetchRoles = async () => {
     const res = await fetch("/api/role");
     const data = await res.json();
-    setRoles(data.map((role: any) => ({ value: role._id || role.id, label: role.name })));
+    const rolesArray = Array.isArray(data.roles) ? data.roles : [];
+    setRoles(rolesArray.map((role: any) => ({ value: role._id || role.id, label: role.name })));
   };
+
 
   const handleAddClick = () => {
     setEditingUser(null);

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 // phần còn lại giữ nguyên
 
@@ -42,6 +43,25 @@ export default function AdminLayout({
             {item.label}
           </Link>
         ))}
+        <button
+          onClick={() => {
+            signOut({ callbackUrl: "/webapp/admin/user-management/login" });
+            console.log("Đã đăng xuất");
+            // window.location.href = "https://accounts.google.com/Logout";
+          }}
+          style={{
+            marginLeft: "auto",
+            background: "#d32f2f",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            padding: "8px 16px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Đăng xuất
+        </button>
       </nav>
       <main style={{ padding: 32 }}>{children}</main>
     </div>

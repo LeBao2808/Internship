@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -43,6 +44,13 @@ export default function LoginPage() {
         {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
         <button type="submit" style={{ width: "100%", padding: 8, background: "#1976d2", color: "#111", border: "none", borderRadius: 4, fontWeight: 600 }}>Đăng nhập</button>
       </form>
+      <button
+  onClick={() => signIn("google", { prompt: "select_account" })}
+  style={{ width: "100%", padding: 8, background: "#fff", color: "#111", border: "1px solid #1976d2", borderRadius: 4, fontWeight: 600, marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+>
+  <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style={{ width: 20, height: 20 }} />
+  Đăng nhập với Google
+</button>
       <div style={{ marginTop: 16, color: "#111" }}>
         Chưa có tài khoản? <a href="/webapp/user-management/register" style={{ color: "#1976d2", textDecoration: "underline" }}>Đăng ký</a>
       </div>

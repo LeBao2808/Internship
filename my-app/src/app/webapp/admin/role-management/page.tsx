@@ -130,7 +130,7 @@ export default function RoleManagementPage() {
           { id: "name", label: "Tên vai trò" },
           { id: "description", label: "Mô tả" },
         ]}
-        rows={roles}
+        rows={Array.isArray(roles) ? roles : []}
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
       />
