@@ -18,6 +18,8 @@ export default function BlogManagementPage() {
   const [form, setForm] = useState({ title: "", content: "", user: "" });
   const [users, setUsers] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [detailBlog, setDetailBlog] = useState<Blog | null>(null);
 
   useEffect(() => {
     fetchBlogs();
@@ -90,6 +92,12 @@ export default function BlogManagementPage() {
     fetchBlogs();
   };
 
+  // Hàm xử lý khi bấm nút xem chi tiết
+  const handleViewDetail = (blog: Blog) => {
+    setDetailBlog(blog);
+    setDetailModalOpen(true);
+  };
+
   return (
     <div
       style={{
@@ -153,6 +161,7 @@ export default function BlogManagementPage() {
         }))}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
+        onViewDetail={handleViewDetail} // Thêm dòng này
       />
       <AdminModal
         open={isModalOpen}
@@ -168,13 +177,6 @@ export default function BlogManagementPage() {
               name: "title",
               label: "Tiêu đề",
               value: form.title,
-              onChange: handleFormChange,
-              required: true,
-            },
-            {
-              name: "content",
-              label: "Nội dung",
-              value: form.content,
               onChange: handleFormChange,
               required: true,
             },
@@ -212,6 +214,57 @@ export default function BlogManagementPage() {
             />
           </div>
         </AdminForm>
+      </AdminModal>
+      {/* Modal xem chi tiết */}
+      <AdminModal
+        open={detailModalOpen}
+        title="Chi tiết bài viết"
+        onClose={() => setDetailModalOpen(false)}
+        onConfirm={null}
+        confirmLabel={null}
+        cancelLabel={null}// Thêm dòng này để modal rộng hơn
+      >
+        {detailBlog && (
+          <div
+            style={{
+              background: "#f9f9fb",
+              borderRadius: 8,
+              padding: 24,
+              boxShadow: "0 2px 8px #eee",
+              fontSize: 16,
+              color: "#222"
+            }}
+          >
+            <div style={{ marginBottom: 18 }}>
+              <span style={{ fontWeight: 700, fontSize: 20, color: "#1976d2" }}>Tiêu đề:</span>
+              <span style={{ marginLeft: 8 }}>{detailBlog.title}</span>
+            </div>
+            <div style={{ marginBottom: 18 }}>
+              <span style={{ fontWeight: 700 }}>Tác giả:</span>
+              <span style={{ marginLeft: 8 }}>{users.find(u => u.id === detailBlog.user)?.name || detailBlog.user}</span>
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <span style={{ fontWeight: 700 }}>Nội dung:</span>
+              <div
+                style={{
+                  whiteSpace: "pre-line",
+                  border: "1px solid #e0e0e0",
+                  padding: 12,
+                  borderRadius: 6,
+                  marginTop: 6,
+                  background: "#fff",
+                  color: "#333"
+                }}
+              >
+                {detailBlog.content}
+              </div>
+            </div>
+            <div>
+              <span style={{ fontWeight: 700 }}>Ngày tạo:</span>
+              <span style={{ marginLeft: 8 }}>{detailBlog.createdAt ? new Date(detailBlog.createdAt).toLocaleString() : ""}</span>
+            </div>
+          </div>
+        )}
       </AdminModal>
     </div>
   );

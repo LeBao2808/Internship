@@ -1,23 +1,25 @@
-"use client"; // Thêm dòng này ở đầu
+"use client";
 
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-
-// phần còn lại giữ nguyên
-
+import { useLanguage } from "../LanguageContext";
+import { useTranslation } from "react-i18next";
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { lang, setLang } = useLanguage();
+  const { t, i18n } = useTranslation();
 
   const navItems = [
-    { label: "Người dùng", href: "/webapp/admin/user-management" },
-    { label: "Vai trò", href: "/webapp/admin/role-management" },
-    { label: "Blog", href: "/webapp/admin/blog-management" },
+    { label: t("User"), href: "/webapp/admin/user-management" },
+    { label: t("Role"), href: "/webapp/admin/role-management" },
+    { label: t("Blog"), href: "/webapp/admin/blog-management" },
+    { label: t("Home"), href: "/webapp/UI/blog" },
   ];
 
   return (
@@ -47,7 +49,7 @@ export default function AdminLayout({
         <button
           onClick={() => {
             signOut({ callbackUrl: "/webapp/admin/user-management/login", redirect:true });
-            // window.location.href = "https://accounts.google.com/Logout";
+            window.location.href = "https://accounts.google.com/Logout";
           }}
           style={{
             marginLeft: "auto",
@@ -60,10 +62,15 @@ export default function AdminLayout({
             cursor: "pointer"
           }}
         >
-          Đăng xuất
+          {t("logout")}
+        </button>
+
+        <button onClick={() => i18n.changeLanguage(i18n.language === "vi" ? "en" : "vi")}>
+          {i18n.language === "vi" ? "English" : "Tiếng Việt"}
         </button>
       </nav>
       <main style={{ padding: 32 }}>{children}</main>
+    
     </div>
   );
 }
