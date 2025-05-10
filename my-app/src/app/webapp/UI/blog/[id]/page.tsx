@@ -35,17 +35,17 @@ export default function BlogDetailPage() {
     if (id) fetchBlog();
   }, [id]);
 
-  if (loading) return <div className="p-8 text-center">Đang tải...</div>;
-  if (!blog) return <div className="p-8 text-center">Không tìm thấy blog.</div>;
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
   return (
     <div className="max-w-2xl mx-auto p-8 bg-white rounded shadow mt-8">
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       <div className="mb-2 text-gray-500">
-        {blog.user && <span className="mr-4">Tác giả: {blog.user}</span>}
+        {blog.user && <span className="mr-4">Author: {blog.user}</span>}
         {blog.createdAt && (
           <span>
-            Ngày tạo: {new Date(blog.createdAt).toLocaleString()}
+            Created at: {new Date(blog.createdAt).toLocaleString()}
           </span>
         )}
       </div>

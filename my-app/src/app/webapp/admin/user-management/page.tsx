@@ -106,7 +106,7 @@ export default function UserManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Quản lý người dùng</h1>
+      <h1>User Management</h1>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -118,7 +118,7 @@ export default function UserManagementPage() {
         >
           <input
             type="text"
-            placeholder="Tìm kiếm người dùng..."
+            placeholder="Search user..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
@@ -127,7 +127,7 @@ export default function UserManagementPage() {
             type="submit"
             style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
           >
-            Tìm kiếm
+            Search
           </button>
         </form>
         <button
@@ -141,12 +141,12 @@ export default function UserManagementPage() {
             cursor: "pointer",
           }}
         >
-          Thêm người dùng
+          Add User
         </button>
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: "Tên người dùng" },
+          { id: "name", label: "User Name" },
           { id: "email", label: "Email" },
         ]}
         rows={users}
@@ -165,7 +165,7 @@ export default function UserManagementPage() {
       />
       <AdminModal
         open={isModalOpen}
-        title={editingUser ? "Chỉnh sửa người dùng" : "Thêm người dùng"}
+        title={editingUser ? "Edit User" : "Add User"}
         onClose={() => setIsModalOpen(false)}
         onConfirm={null}
         confirmLabel={null}
@@ -175,7 +175,7 @@ export default function UserManagementPage() {
           fields={[
             {
               name: "name",
-              label: "Tên người dùng",
+              label: "User Name",
               value: form.name,
               onChange: handleFormChange,
               required: true,
@@ -189,13 +189,13 @@ export default function UserManagementPage() {
             },
           ]}
           onSubmit={handleSaveUser}
-          submitLabel={editingUser ? "Cập nhật" : "Thêm mới"}
+          submitLabel={editingUser ? "Update" : "Create"}
         >
           <div>
             {roles.length > 0 && (
               <React.Suspense fallback={null}>
                 {React.createElement(require("../../components/AdminSelect").default, {
-                  label: "Vai trò",
+                  label: "Role",
                   name: "role",
                   value: form.role,
                   options: roles,

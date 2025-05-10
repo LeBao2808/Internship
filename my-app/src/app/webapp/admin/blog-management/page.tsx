@@ -109,7 +109,7 @@ export default function BlogManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Quản lý bài viết</h1>
+      <h1>Blog Management</h1>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -120,7 +120,7 @@ export default function BlogManagementPage() {
         >
           <input
             type="text"
-            placeholder="Tìm kiếm bài viết..."
+            placeholder="Search blog..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
@@ -129,7 +129,7 @@ export default function BlogManagementPage() {
             type="submit"
             style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
           >
-            Tìm kiếm
+            Search
           </button>
         </form>
         <button
@@ -143,29 +143,29 @@ export default function BlogManagementPage() {
             cursor: "pointer",
           }}
         >
-          Thêm bài viết
+          Add Blog
         </button>
       </div>
       <AdminTable
         columns={[
-          { id: "title", label: "Tiêu đề" },
-          { id: "user", label: "Tác giả" },
-          { id: "content", label: "Nội dung" },
+          { id: "title", label: "Title" },
+          { id: "user", label: "Author" },
+          { id: "content", label: "Content" },
         ]}
         rows={blogs.map(blog => ({
           ...blog,
           user:
             users.find(u => u.id === blog.user)?.name ||
             users.find(u => u.id === blog.user)?.email ||
-            blog.user // fallback nếu không tìm thấy
+            blog.user
         }))}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
-        onViewDetail={handleViewDetail} // Thêm dòng này
+        onViewDetail={handleViewDetail}
       />
       <AdminModal
         open={isModalOpen}
-        title={editingBlog ? "Chỉnh sửa bài viết" : "Thêm bài viết"}
+        title={editingBlog ? "Edit Blog" : "Add Blog"}
         onClose={() => setIsModalOpen(false)}
         onConfirm={null}
         confirmLabel={null}
@@ -175,21 +175,21 @@ export default function BlogManagementPage() {
           fields={[
             {
               name: "title",
-              label: "Tiêu đề",
+              label: "Title",
               value: form.title,
               onChange: handleFormChange,
               required: true,
             },
           ]}
           onSubmit={handleSaveBlog}
-          submitLabel={editingBlog ? "Cập nhật" : "Thêm mới"}
+          submitLabel={editingBlog ? "Update" : "Create"}
         >
 
 <div>
   {users.length > 0 && (
     <React.Suspense fallback={null}>
       {React.createElement(require("../../components/AdminSelect").default, {
-        label: "Người dùng",
+        label: "User",
         name: "user",
         value: form.user,
         options: users.map((user: any) => ({
@@ -204,7 +204,7 @@ export default function BlogManagementPage() {
 </div>
 
           <div style={{ marginTop: 12 }}>
-            <label>Nội dung:</label>
+            <label>Content:</label>
             <textarea
               name="content"
               value={form.content}
@@ -215,14 +215,14 @@ export default function BlogManagementPage() {
           </div>
         </AdminForm>
       </AdminModal>
-      {/* Modal xem chi tiết */}
+      {/* Detail Modal */}
       <AdminModal
         open={detailModalOpen}
-        title="Chi tiết bài viết"
+        title="Blog Detail"
         onClose={() => setDetailModalOpen(false)}
         onConfirm={null}
         confirmLabel={null}
-        cancelLabel={null}// Thêm dòng này để modal rộng hơn
+        cancelLabel={null}
       >
         {detailBlog && (
           <div
@@ -236,15 +236,15 @@ export default function BlogManagementPage() {
             }}
           >
             <div style={{ marginBottom: 18 }}>
-              <span style={{ fontWeight: 700, fontSize: 20, color: "#1976d2" }}>Tiêu đề:</span>
+              <span style={{ fontWeight: 700, fontSize: 20, color: "#1976d2" }}>Title:</span>
               <span style={{ marginLeft: 8 }}>{detailBlog.title}</span>
             </div>
             <div style={{ marginBottom: 18 }}>
-              <span style={{ fontWeight: 700 }}>Tác giả:</span>
+              <span style={{ fontWeight: 700 }}>Author:</span>
               <span style={{ marginLeft: 8 }}>{users.find(u => u.id === detailBlog.user)?.name || detailBlog.user}</span>
             </div>
             <div style={{ marginBottom: 10 }}>
-              <span style={{ fontWeight: 700 }}>Nội dung:</span>
+              <span style={{ fontWeight: 700 }}>Content:</span>
               <div
                 style={{
                   whiteSpace: "pre-line",
@@ -260,7 +260,7 @@ export default function BlogManagementPage() {
               </div>
             </div>
             <div>
-              <span style={{ fontWeight: 700 }}>Ngày tạo:</span>
+              <span style={{ fontWeight: 700 }}>Created At:</span>
               <span style={{ marginLeft: 8 }}>{detailBlog.createdAt ? new Date(detailBlog.createdAt).toLocaleString() : ""}</span>
             </div>
           </div>

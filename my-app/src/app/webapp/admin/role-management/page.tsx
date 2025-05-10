@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
+import Loader from "../Loader";
 
 interface Role {
   _id?: string;
@@ -18,7 +19,7 @@ export default function RoleManagementPage() {
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     fetchRoles();
   }, []);
@@ -88,7 +89,7 @@ export default function RoleManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Quản lý vai trò</h1>
+      <h1>Role Management</h1>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -99,7 +100,7 @@ export default function RoleManagementPage() {
         >
           <input
             type="text"
-            placeholder="Tìm kiếm vai trò..."
+            placeholder="Search role..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
@@ -108,7 +109,7 @@ export default function RoleManagementPage() {
             type="submit"
             style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
           >
-            Tìm kiếm
+            Search
           </button>
         </form>
         <button
@@ -122,13 +123,13 @@ export default function RoleManagementPage() {
             cursor: "pointer",
           }}
         >
-          Thêm vai trò
+          Add Role
         </button>
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: "Tên vai trò" },
-          { id: "description", label: "Mô tả" },
+          { id: "name", label: "Role Name" },
+          { id: "description", label: "Description" },
         ]}
         rows={Array.isArray(roles) ? roles : []}
         onEdit={handleEditRole}
@@ -136,7 +137,7 @@ export default function RoleManagementPage() {
       />
       <AdminModal
         open={isModalOpen}
-        title={editingRole ? "Chỉnh sửa vai trò" : "Thêm vai trò"}
+        title={editingRole ? "Edit Role" : "Add Role"}
         onClose={() => setIsModalOpen(false)}
         onConfirm={null}
         confirmLabel={null}
@@ -146,21 +147,21 @@ export default function RoleManagementPage() {
           fields={[
             {
               name: "name",
-              label: "Tên vai trò",
+              label: "Role Name",
               value: form.name,
               onChange: handleFormChange,
               required: true,
             },
             {
               name: "description",
-              label: "Mô tả",
+              label: "Description",
               value: form.description,
               onChange: handleFormChange,
               required: true,
             },
           ]}
           onSubmit={handleSaveRole}
-          submitLabel={editingRole ? "Cập nhật" : "Thêm mới"}
+          submitLabel={editingRole ? "Update" : "Create"}
         />
       </AdminModal>
     </div>

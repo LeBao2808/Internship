@@ -1,10 +1,13 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Loader from "../Loader";
 
 export default function MainPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    setLoading(true);
     // Kiểm tra trạng thái đăng nhập (ví dụ: kiểm tra token/session ở localStorage)
     // Nếu chưa đăng nhập thì chuyển hướng về trang đăng nhập
     // Ở đây chỉ là ví dụ đơn giản, thực tế nên kiểm tra token hợp lệ
@@ -12,13 +15,18 @@ export default function MainPage() {
     if (!isLoggedIn) {
       router.push("/webapp/user-management/login");
     }
+    setTimeout(() => setLoading(false), 600); // Giả lập hiệu ứng loading
   }, [router]);
 
   const handleLogout = () => {
+    setLoading(true);
     // Xoá token/session ở đây nếu có
-    router.push("/webapp/user-management/login");
+    setTimeout(() => {
+      router.push("/webapp/user-management/login");
+    }, 600);
   };
 
+  if (loading) return <Loader />;
   return (
     <div style={{ maxWidth: 600, margin: "40px auto", padding: 24, border: "1px solid #ccc", borderRadius: 8 }}>
       <h2>Chào mừng bạn đến trang chính!</h2>
