@@ -1,81 +1,79 @@
 "use client";
 
-
 import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 
-
-interface Role {
+interface Category {
   _id?: string;
   name: string;
   description: string;
 }
 
-export default function RoleManagementPage() {
-  const [roles, setRoles] = useState<Role[]>([]);
+export default function CategoryManagementPage() {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetchRoles();
+    fetchCategories();
   }, []);
 
-  const fetchRoles = async (query = "") => {
-    let url = "/api/role";
+  const fetchCategories = async (query = "") => {
+    let url = "/api/category";
     if (query) url += `?search=${encodeURIComponent(query)}`;
     const res = await fetch(url);
     const data = await res.json();
-    setRoles(Array.isArray(data.roles) ? data.roles : []);
+    setCategories(Array.isArray(data.categories) ? data.categories : []);
   };
 
   const handleAddClick = () => {
-    setEditingRole(null);
+    setEditingCategory(null);
     setForm({ name: "", description: "" });
     setIsModalOpen(true);
   };
 
-  const handleEditRole = (role: Role) => {
-    setEditingRole(role);
-    setForm({ name: role.name, description: role.description });
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setForm({ name: category.name, description: category.description });
     setIsModalOpen(true);
   };
 
-  const handleDeleteRole = async (role: Role) => {
-    await fetch("/api/role", {
+  const handleDeleteCategory = async (category: Category) => {
+    await fetch("/api/category", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: role._id }),
+      body: JSON.stringify({ id: category._id }),
     });
-    fetchRoles();
+    fetchCategories();
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSaveRole = async (e: React.FormEvent) => {
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingRole) {
+    if (editingCategory) {
       // Update
-      await fetch("/api/role", {
+      await fetch("/api/category", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingRole._id, ...form }),
+        body: JSON.stringify({ id: editingCategory._id, ...form }),
       });
     } else {
       // Create
-      await fetch("/api/role", {
+      await fetch("/api/category", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
     }
     setIsModalOpen(false);
-    fetchRoles();
+    fetchCategories();
   };
 
   return (
@@ -89,18 +87,18 @@ export default function RoleManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Role Management</h1>
+      <h1>Category Management</h1>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
             e.preventDefault();
-            fetchRoles(search);
+            fetchCategories(search);
           }}
           style={{ display: "flex", gap: 8 }}
         >
           <input
             type="text"
-            placeholder="Search role..."
+            placeholder="Search category..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
@@ -123,21 +121,21 @@ export default function RoleManagementPage() {
             cursor: "pointer",
           }}
         >
-          Add Role
+          Add Category
         </button>
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: "Role Name" },
+          { id: "name", label: "Category Name" },
           { id: "description", label: "Description" },
         ]}
-        rows={Array.isArray(roles) ? roles : []}
-        onEdit={handleEditRole}
-        onDelete={handleDeleteRole}
+        rows={Array.isArray(categories) ? categories : []}
+        onEdit={handleEditCategory}
+        onDelete={handleDeleteCategory}
       />
       <AdminModal
         open={isModalOpen}
-        title={editingRole ? "Edit Role" : "Add Role"}
+        title={editingCategory ? "Edit Category" : "Add Category"}
         onClose={() => setIsModalOpen(false)}
         onConfirm={null}
         confirmLabel={null}
@@ -147,7 +145,7 @@ export default function RoleManagementPage() {
           fields={[
             {
               name: "name",
-              label: "Role Name",
+              label: "Category Name",
               value: form.name,
               onChange: handleFormChange,
               required: true,
@@ -160,8 +158,8 @@ export default function RoleManagementPage() {
               required: true,
             },
           ]}
-          onSubmit={handleSaveRole}
-          submitLabel={editingRole ? "Update" : "Create"}
+          onSubmit={handleSaveCategory}
+          submitLabel={editingCategory ? "Update" : "Create"}
         />
       </AdminModal>
     </div>

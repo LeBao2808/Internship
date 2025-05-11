@@ -183,6 +183,7 @@ export default function BlogManagementPage() {
           ]}
           onSubmit={handleSaveBlog}
           submitLabel={editingBlog ? "Update" : "Create"}
+          onBack={() => setIsModalOpen(false)}
         >
 
 <div>
@@ -232,7 +233,13 @@ export default function BlogManagementPage() {
               padding: 24,
               boxShadow: "0 2px 8px #eee",
               fontSize: 16,
-              color: "#222"
+              color: "#222",
+              minHeight: 400,
+              minWidth: 400,
+              maxWidth: 400,
+              maxHeight: 700,
+              overflowY: "auto",
+              position: "relative"
             }}
           >
             <div style={{ marginBottom: 18 }}>
@@ -263,6 +270,45 @@ export default function BlogManagementPage() {
               <span style={{ fontWeight: 700 }}>Created At:</span>
               <span style={{ marginLeft: 8 }}>{detailBlog.createdAt ? new Date(detailBlog.createdAt).toLocaleString() : ""}</span>
             </div>
+          </div>
+        )}
+        {detailBlog && (
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 32 }}>
+            <button
+              style={{
+                background: "#e0e0e0",
+                color: "#222",
+                border: "none",
+                borderRadius: 4,
+                padding: "8px 24px",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: 16
+              }}
+              onClick={() => setDetailModalOpen(false)}
+            >Back</button>
+            <button
+              style={{
+                background: "#1976d2",
+                color: "#fff",
+                border: "none",
+                borderRadius: 4,
+                padding: "8px 24px",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: 16
+              }}
+              onClick={() => {
+                setDetailModalOpen(false);
+                setEditingBlog(detailBlog);
+                setForm({
+                  title: detailBlog.title,
+                  content: detailBlog.content,
+                  user: detailBlog.user
+                });
+                setIsModalOpen(true);
+              }}
+            >Edit</button>
           </div>
         )}
       </AdminModal>

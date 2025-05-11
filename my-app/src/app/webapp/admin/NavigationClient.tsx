@@ -15,6 +15,7 @@ export default function NavigationClient() {
     { label: t("User"), href: "/webapp/admin/user-management" },
     { label: t("Role"), href: "/webapp/admin/role-management" },
     { label: t("Blog"), href: "/webapp/admin/blog-management" },
+    { label: t("Category"), href: "/webapp/admin/category-management" },
     { label: t("Home"), href: "/webapp/UI/blog" },
   ];
 

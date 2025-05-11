@@ -14,6 +14,7 @@ interface AdminFormProps {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   submitLabel?: string;
   children?: React.ReactNode;
+  onBack?: () => void;
 }
 
 const AdminForm: React.FC<AdminFormProps> = ({
@@ -21,27 +22,37 @@ const AdminForm: React.FC<AdminFormProps> = ({
   fields,
   onSubmit,
   submitLabel = "Lưu",
-  children
+  children,
+  onBack
 }) => {
   return (
-    <Box component="form" onSubmit={onSubmit} sx={{ p: 3, border: "1px solid #eee", borderRadius: 2, maxWidth: 500, mx: "auto" }}>
-      {title && <Typography variant="h6" mb={2}>{title}</Typography>}
-      {fields.map((field, idx) => (
-        <TextField
-          key={field.name}
-          label={field.label}
-          name={field.name}
-          type={field.type || "text"}
-          value={field.value}
-          onChange={field.onChange}
-          required={field.required}
-          fullWidth
-          margin="normal"
-        />
-      ))}
-      {children}
-      <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>{submitLabel}</Button>
-    </Box>
+    <>
+      <Box component="form" onSubmit={onSubmit} sx={{ p: 3, border: "1px solid #eee", borderRadius: 2, maxWidth: 500, mx: "auto" }}>
+        {title && <Typography variant="h6" mb={2}>{title}</Typography>}
+        {fields.map((field, idx) => (
+          <TextField
+            key={field.name}
+            label={field.label}
+            name={field.name}
+            type={field.type || "text"}
+            value={field.value}
+            onChange={field.onChange}
+            required={field.required}
+            fullWidth
+            margin="normal"
+          />
+        ))}
+        {children}
+        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>{submitLabel}</Button>
+      </Box>
+      {onBack && (
+        <Box sx={{ maxWidth: 500, mx: "auto", mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Button onClick={onBack} variant="outlined" color="secondary">
+            Quay lại
+          </Button>
+        </Box>
+      )}
+    </>
   );
 };
 
