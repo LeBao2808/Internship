@@ -5,12 +5,12 @@ import dbConnect from "@/resources/lib/mongodb";
 // Thêm mới blog
 export async function POST(req: NextRequest) {
   await dbConnect();
-  const { title, content, user,image_url } = await req.json();
+const body = await req.json();
   try {
-    const blog = await Blog.create({ title, content, user,image_url });
-    return NextResponse.json(blog, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: "Không thể tạo blog" }, { status: 400 });
+    const newBlog = await Blog.create({...body, createdAt: new Date(), updatedAt: new Date() });
+    return NextResponse.json(newBlog, { status: 201 }); // Trả về một phản hồi thành công với status 201 và dữ liệu của blog mới
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
 
@@ -38,15 +38,12 @@ export async function PUT(request: Request) {
 // Xóa blog (cần truyền id trên query, ví dụ: /api/blog?id=xxx)
 export async function DELETE(req: NextRequest) {
   await dbConnect();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "Thiếu id" }, { status: 400 });
+  const body = await req.json();
   try {
-    const blog = await Blog.findByIdAndDelete(id);
-    if (!blog) return NextResponse.json({ error: "Không tìm thấy blog" }, { status: 404 });
-    return NextResponse.json({ message: "Đã xóa blog thành công" });
-  } catch (error) {
-    return NextResponse.json({ error: "Không thể xóa blog" }, { status: 400 });
+    await Blog.findByIdAndDelete(body.id);
+    return NextResponse.json({ message: "Blog deleted" }, { status: 200 }); // Trả về một phản hồi thành công với status 200 và thông điệp thành công
+  }catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
 

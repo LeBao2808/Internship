@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
       // Luôn chuyển hướng về trang user-management sau khi đăng nhập thành công
-      return "/webapp/admin/user-management";
+      return "/admin/user-management";
     },
   },
   // You can add more options like pages, callbacks, etc. here
