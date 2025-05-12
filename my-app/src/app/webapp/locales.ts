@@ -10,7 +10,7 @@ export const locales = {
     delete: "Xóa",
     save: "Lưu",
     cancel: "Hủy",
-    action : "Hành động",
+    action : "Action",
     // ... các chuỗi khác
   },
   en: {

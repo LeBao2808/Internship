@@ -5,9 +5,9 @@ import dbConnect from "@/resources/lib/mongodb";
 // Thêm mới blog
 export async function POST(req: NextRequest) {
   await dbConnect();
-  const { title, content, user } = await req.json();
+  const { title, content, user,image_url } = await req.json();
   try {
-    const blog = await Blog.create({ title, content, user });
+    const blog = await Blog.create({ title, content, user,image_url });
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Không thể tạo blog" }, { status: 400 });

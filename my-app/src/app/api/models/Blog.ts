@@ -7,6 +7,7 @@ export interface IBlog extends Document, IBaseTimestamps {
   content: string;
   user: mongoose.Schema.Types.ObjectId;
   category: mongoose.Schema.Types.ObjectId;
+  image_url: string; // Thêm dòng này
 }
 
 const BlogSchema: Schema<IBlog> = new Schema({
@@ -14,6 +15,7 @@ const BlogSchema: Schema<IBlog> = new Schema({
   content: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+  image_url: { type: String }, // Thêm dòng này
   ...baseTimestamps
 });
 

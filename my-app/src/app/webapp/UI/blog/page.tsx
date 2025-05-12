@@ -26,6 +26,25 @@ export default function BlogPage() {
   const [categories, setCategories] = useState<string[]>([]);
   const router = useRouter();
 
+  const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
+
+useEffect(() => {
+  const fetchUserNames = async () => {
+    const ids = Array.from(new Set(blogs.map(b => b.user).filter(Boolean)));
+    const newUserNames: { [key: string]: string } = { ...userNames };
+    for (const id of ids) {
+      if (!newUserNames[id]) {
+        const res = await fetch(`/api/user/${id}`);
+        const data = await res.json();
+        newUserNames[id] = data?.name || id;
+      }
+    }
+    setUserNames(newUserNames);
+  };
+  if (blogs.length > 0) fetchUserNames();
+  // eslint-disable-next-line
+}, [blogs]);
+
   // Lấy featured posts (giả lập: 3 bài đầu tiên)
   const featuredPosts = blogs.slice(0, 3);
   // Latest posts (giả lập: 3 bài mới nhất)
@@ -90,7 +109,7 @@ export default function BlogPage() {
     
     <div className="blog-home-bg min-h-screen py-10 px-2 md:px-0">
       
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
@@ -188,7 +207,7 @@ export default function BlogPage() {
                   <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">{blog.title}</h2>
                   {blog.user && (
                     <p className="text-sm text-gray-500 mb-1">
-                      <b>Tác giả:</b> {blog.user}
+                      <b>Tác giả:</b> {userNames[blog.user] || blog.user}
                     </p>
                   )}
                   {blog.createdAt && (

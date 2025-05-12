@@ -15,6 +15,7 @@ export default function BlogDetailPage() {
   const { id } = useParams();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authorName, setAuthorName] = useState<string>("");
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -24,6 +25,11 @@ export default function BlogDetailPage() {
         const data = await res.json();
         if (data && !data.error) {
           setBlog(data);
+          if (data.user) {
+            const userRes = await fetch(`/api/user/${data.user}`);
+            const userData = await userRes.json();
+            setAuthorName(userData?.name || "");
+          }
         } else {
           setBlog(null);
         }
@@ -39,17 +45,35 @@ export default function BlogDetailPage() {
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white rounded shadow mt-8">
-      <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
-      <div className="mb-2 text-gray-500">
-        {blog.user && <span className="mr-4">Author: {blog.user}</span>}
+    <div className="max-w-3xl mx-auto p-6 md:p-12 bg-white rounded-xl shadow-lg mt-12 mb-12">
+      {/* Ảnh đại diện blog nếu có */}
+      {blog.image_url && (
+        <div className="mb-8">
+          <img
+            src={blog.image_url}
+            alt={blog.title}
+            className="w-full h-72 object-cover rounded-lg shadow"
+          />
+        </div>
+      )}
+      <h1 className="text-4xl font-extrabold mb-4 text-gray-900 leading-tight">{blog.title}</h1>
+      <div className="flex items-center mb-6 text-gray-500 text-sm gap-4">
+        {blog.user && (
+          <span className="flex items-center gap-1">
+            <svg className="w-4 h-4 inline-block" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            {authorName || blog.user}
+          </span>
+        )}
         {blog.createdAt && (
-          <span>
-            Created at: {new Date(blog.createdAt).toLocaleString()}
+          <span className="flex items-center gap-1">
+            <svg className="w-4 h-4 inline-block" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            {new Date(blog.createdAt).toLocaleString()}
           </span>
         )}
       </div>
-      <div className="mt-6 text-lg">{blog.content}</div>
+      <div className="prose prose-lg max-w-none mt-8 text-gray-800 leading-relaxed">
+        {blog.content}
+      </div>
     </div>
   );
 }

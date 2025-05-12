@@ -51,7 +51,13 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                   }}
                   title={typeof row[col.id] === "string" ? row[col.id] : undefined}
                 >
-                  {typeof row[col.id] === "string"
+                  {col.id === "image_url" && typeof row[col.id] === "string" && row[col.id] ? (
+                    <img
+                      src={row[col.id]}
+                      alt="blog"
+                      style={{ maxWidth: 80, maxHeight: 60, objectFit: "cover", borderRadius: 4 }}
+                    />
+                  ) : typeof row[col.id] === "string"
                     ? truncate(row[col.id], 30)
                     : row[col.id]}
                 </TableCell>

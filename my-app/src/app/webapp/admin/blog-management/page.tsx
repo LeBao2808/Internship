@@ -9,13 +9,14 @@ interface Blog {
   title: string;
   content: string;
   user: string;
+  image_url: string;
 }
 
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
-  const [form, setForm] = useState({ title: "", content: "", user: "" });
+  const [form, setForm] = useState({ title: "", content: "", user: "", image_url: "" });
   const [users, setUsers] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -43,6 +44,7 @@ export default function BlogManagementPage() {
             id: user._id || user.id,
             name: user.name,
             email: user.email,
+            image_url: user.image_url,
           }))
         : []
     );
@@ -50,13 +52,18 @@ export default function BlogManagementPage() {
 
   const handleAddClick = () => {
     setEditingBlog(null);
-    setForm({ title: "", content: "", user: "" });
+    setForm({ title: "", content: "", user: "" , image_url: "",});
     setIsModalOpen(true);
   };
 
   const handleEditBlog = (blog: Blog) => {
     setEditingBlog(blog);
-    setForm({ title: blog.title, content: blog.content, user: blog.user });
+    setForm({
+      title: blog.title || "",
+      content: blog.content || "",
+      user: blog.user || "",
+      image_url: blog.image_url || ""
+    });
     setIsModalOpen(true);
   };
 
@@ -148,6 +155,7 @@ export default function BlogManagementPage() {
       </div>
       <AdminTable
         columns={[
+          { id: "image_url", label: "Image" },
           { id: "title", label: "Title" },
           { id: "user", label: "Author" },
           { id: "content", label: "Content" },
@@ -177,6 +185,13 @@ export default function BlogManagementPage() {
               name: "title",
               label: "Title",
               value: form.title,
+              onChange: handleFormChange,
+              required: true,
+            },
+            {
+              name: "image_url",
+              label: "Image URL",
+              value: form.image_url,
               onChange: handleFormChange,
               required: true,
             },
@@ -302,9 +317,10 @@ export default function BlogManagementPage() {
                 setDetailModalOpen(false);
                 setEditingBlog(detailBlog);
                 setForm({
-                  title: detailBlog.title,
-                  content: detailBlog.content,
-                  user: detailBlog.user
+                  title: detailBlog.title || "",
+                  content: detailBlog.content || "",
+                  user: detailBlog.user || "",
+                  image_url: detailBlog.image_url || ""
                 });
                 setIsModalOpen(true);
               }}

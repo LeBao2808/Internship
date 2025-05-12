@@ -10,6 +10,7 @@ interface AdminModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   loading?: boolean;
+  width?: React.CSSProperties;
 }
 
 const AdminModal: React.FC<AdminModalProps> = ({
@@ -20,10 +21,11 @@ const AdminModal: React.FC<AdminModalProps> = ({
   onConfirm,
   confirmLabel = "Xác nhận",
   cancelLabel = "Hủy",
-  loading = false
+  loading = false,
+  width,
 }) => {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth style={width}>
       {title && <DialogTitle>{title}</DialogTitle>}
       <DialogContent>{children}</DialogContent>
       <DialogActions>
