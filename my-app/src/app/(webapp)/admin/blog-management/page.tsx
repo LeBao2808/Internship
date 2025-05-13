@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
+import { Category } from "@mui/icons-material";
 
 interface Blog {
   _id?: string;
@@ -10,6 +11,7 @@ interface Blog {
   content: string;
   user: string;
   image_url: string;
+  category: string | { _id: string; name: string }; // <-- Update this line
   createdAt?: string;   // <-- Add this line
   updatedAt?: string;   // <-- (Optional) Add this line for consistency
 }
@@ -18,7 +20,7 @@ export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
-  const [form, setForm] = useState({ title: "", content: "", user: "", image_url: "" });
+  const [form, setForm] = useState({ title: "", content: "", user: "", image_url: "", category: "" });
   const [users, setUsers] = useState<{ id: string; name: string; email: string; image_url?: string }[]>([]);
   const [search, setSearch] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -30,11 +32,23 @@ export default function BlogManagementPage() {
   const [uploadingBlog, setUploadingBlog] = useState<Blog | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [previewUpload, setPreviewUpload] = useState<string | null>(null);
+  const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     fetchBlogs();
-    fetchUsers(); // Thêm dòng này để lấy danh sách user
+    fetchUsers();
+    fetchCategories(); // Thêm dòng này để lấy danh sách category
   }, []);
+
+  const fetchCategories = async () => {
+    const res = await fetch("/api/category");
+    const data = await res.json();
+    const arr = Array.isArray(data.categories) ? data.categories : [];
+    setCategories(arr.map((cat: any) => ({
+      value: cat._id || cat.id,
+      label: cat.name
+    })));
+  };
 
   const fetchBlogs = async (query = "") => {
     let url = "/api/blog";
@@ -50,18 +64,18 @@ export default function BlogManagementPage() {
     setUsers(
       Array.isArray(data.users)
         ? data.users.map((user: any) => ({
-            id: user._id || user.id,
-            name: user.name,
-            email: user.email,
-            image_url: user.image_url,
-          }))
+          id: user._id || user.id,
+          name: user.name,
+          email: user.email,
+          image_url: user.image_url,
+        }))
         : []
     );
   };
 
   const handleAddClick = () => {
     setEditingBlog(null);
-    setForm({ title: "", content: "", user: "" , image_url: "",});
+    setForm({ title: "", content: "", user: "", image_url: "", category: "" }); // Thêm category
     setIsModalOpen(true);
   };
 
@@ -71,7 +85,8 @@ export default function BlogManagementPage() {
       title: blog.title || "",
       content: blog.content || "",
       user: blog.user || "",
-      image_url: blog.image_url || ""
+      image_url: blog.image_url || "",
+      category: typeof blog.category === "object" && blog.category !== null ? blog.category._id : blog.category || ""
     });
     setIsModalOpen(true);
   };
@@ -93,52 +108,60 @@ export default function BlogManagementPage() {
     setIsUploadModalOpen(true);
   };
 
-const handleUploadImageSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!image || !blogId) {
-    setResult("Vui lòng chọn ảnh và nhập Blog ID");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("image", image);
-  formData.append("id", blogId);
-
-  try {
-    const res = await fetch("/api/blog/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setResult("Upload thành công: " + data.image_url);
-      setIsUploadModalOpen(false);      // Đóng modal
-      setPreviewUpload(null);           // Reset preview
-      fetchBlogs();                     // Cập nhật lại danh sách blog (và hình ảnh)
-    } else {
-      setResult("Lỗi: " + data.error);
+  const handleUploadImageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!image || !blogId) {
+      setResult("Vui lòng chọn ảnh và nhập Blog ID");
+      return;
     }
-  } catch (err) {
-    setResult("Lỗi kết nối server");
-  }
-};
+
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("id", blogId);
+
+    try {
+      const res = await fetch("/api/blog/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResult("Upload thành công: " + data.image_url);
+        setIsUploadModalOpen(false);      // Đóng modal
+        setPreviewUpload(null);           // Reset preview
+        fetchBlogs();                     // Cập nhật lại danh sách blog (và hình ảnh)
+      } else {
+        setResult("Lỗi: " + data.error);
+      }
+    } catch (err) {
+      setResult("Lỗi kết nối server");
+    }
+  };
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Đảm bảo image_url là string
+    const payload = {
+      ...form,
+      image_url: typeof form.image_url === "string" ? form.image_url : "",
+      category: typeof form.category === "object" && form.category !== null
+      ? (form.category as { _id: string })._id
+      : form.category
+    };
     if (editingBlog) {
       await fetch("/api/blog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingBlog._id, ...form }),
+        body: JSON.stringify({ id: editingBlog._id, ...payload }),
       });
     } else {
       await fetch("/api/blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
     }
     setIsModalOpen(false);
@@ -205,21 +228,28 @@ const handleUploadImageSubmit = async (e: React.FormEvent) => {
           { id: "title", label: "Title" },
           { id: "user", label: "Author" },
           { id: "content", label: "Content" },
+          { id: "category", label: "Category" }
         ]}
         rows={blogs.map(blog => ({
           ...blog,
           user:
-          users.find(u => u.id === blog.user)?.name ||
-          users.find(u => u.id === blog.user)?.email ||
-          blog.user,
-            image_url: (
-              <img
-                src={blog.image_url}
-                alt="blog"
-                style={{ width: 60, height: 40, objectFit: "cover", cursor: "pointer" }}
-                onClick={() => setPreviewImage(blog.image_url)}
-              />
-            )
+            users.find(u => u.id === blog.user)?.name ||
+            users.find(u => u.id === blog.user)?.email ||
+            blog.user,
+          category:
+            typeof blog.category === "object" && blog.category !== null && "name" in blog.category
+              ? blog.category.name
+              : categories.find(c => c.value === blog.category)?.label || blog.category,
+              image_url: (
+                blog.image_url
+                  ? <img
+                      src={blog.image_url}
+                      alt="blog"
+                      style={{ width: 60, height: 40, objectFit: "cover", cursor: "pointer" }}
+                      onClick={() => setPreviewImage(blog.image_url)}
+                    />
+                  : null
+              )
         }))}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
@@ -244,36 +274,53 @@ const handleUploadImageSubmit = async (e: React.FormEvent) => {
               onChange: handleFormChange,
               required: true,
             },
-            {
-              name: "image_url",
-              label: "Image URL",
-              value: form.image_url,
-              onChange: handleFormChange,
-              required: true,
-            },
+            // {
+            //   name: "image_url",
+            //   label: "Image URL",
+            //   value: form.image_url,
+            //   onChange: handleFormChange,
+            //   required: true,
+            // },
           ]}
           onSubmit={handleSaveBlog}
           submitLabel={editingBlog ? "Update" : "Create"}
-          // onBack={() => setIsModalOpen(false)}
+        // onBack={() => setIsModalOpen(false)}
         >
 
-<div>
-  {users.length > 0 && (
-    <React.Suspense fallback={null}>
-      {React.createElement(require("../../components/AdminSelect").default, {
-        label: "User",
-        name: "user",
-        value: form.user,
-        options: users.map((user: any) => ({
-          value: user.id,
-          label: user.name || user.email
-        })),
-        onChange: (e: any) => setForm({ ...form, user: e.target.value }),
-        required: true,
-      })}
-    </React.Suspense>
-  )}
-</div>
+          <div>
+            {users.length > 0 && (
+              <React.Suspense fallback={null}>
+                {React.createElement(require("../../components/AdminSelect").default, {
+                  label: "User",
+                  name: "user",
+                  value: form.user,
+                  options: users.map((user: any) => ({
+                    value: user.id,
+                    label: user.name || user.email
+                  })),
+                  onChange: (e: any) => setForm({ ...form, user: e.target.value }),
+                  required: true,
+                })}
+              </React.Suspense>
+
+            )}
+
+          </div>
+
+          <div>
+            {categories.length > 0 && (
+              <React.Suspense fallback={null}>
+                {React.createElement(require("../../components/AdminSelect").default, {
+                  label: "Category",
+                  name: "category",
+                  value: form.category,
+                  options: categories,
+                  onChange: (e: any) => setForm({ ...form, category: e.target.value }),
+                  required: true,
+                })}
+              </React.Suspense>
+            )}
+          </div>
 
           <div style={{ marginTop: 12 }}>
             <label>Content:</label>
@@ -321,12 +368,20 @@ const handleUploadImageSubmit = async (e: React.FormEvent) => {
               <span style={{ fontWeight: 700 }}>Author:</span>
               <span style={{ marginLeft: 8 }}>{users.find(u => u.id === detailBlog.user)?.name || detailBlog.user}</span>
             </div>
+            <div style={{ marginBottom: 18 }}>
+              <span style={{ fontWeight: 700 }}>Category:</span>
+              <span style={{ marginLeft: 8 }}>
+                {typeof detailBlog.category === "object" && detailBlog.category !== null
+                  ? detailBlog.category.name
+                  : categories.find(c => c.value === detailBlog.category)?.label || detailBlog.category}
+              </span>
+            </div>
             <div style={{ marginBottom: 10 }}>
               <span style={{ fontWeight: 700 }}>Content:</span>
               <div
                 style={{
-                  whiteSpace: "pre-line",
-                  border: "1px solid #e0e0e0",
+              whiteSpace: "pre-line",
+             border: "1px solid #e0e0e0",
                   padding: 12,
                   borderRadius: 6,
                   marginTop: 6,
@@ -376,7 +431,8 @@ const handleUploadImageSubmit = async (e: React.FormEvent) => {
                   title: detailBlog.title || "",
                   content: detailBlog.content || "",
                   user: detailBlog.user || "",
-                  image_url: detailBlog.image_url || ""
+                  image_url: detailBlog.image_url || "",
+                  category: typeof detailBlog.category === "object" && detailBlog.category !== null ? detailBlog.category._id : detailBlog.category || ""
                 });
                 setIsModalOpen(true);
               }}
@@ -387,7 +443,7 @@ const handleUploadImageSubmit = async (e: React.FormEvent) => {
 
       <AdminModal
         open={isUploadModalOpen}
-        title="Upload Ảnh Blog"
+        title="Uploah Blog"
         onClose={() => {
           setIsUploadModalOpen(false);
           setPreviewUpload(null);
@@ -435,21 +491,21 @@ const handleUploadImageSubmit = async (e: React.FormEvent) => {
       </AdminModal>
 
       <AdminModal
-    open={!!previewImage}
-    title="big size image"
-    onClose={() => setPreviewImage(null)}
-    onConfirm={undefined}
-    confirmLabel={undefined}
-    cancelLabel={undefined}
-  >
-    {previewImage && (
-      <img
-        src={previewImage}
-        alt="Preview"
-        style={{ maxWidth: "100%", maxHeight: "70vh", display: "block", margin: "0 auto" }}
-      />
-    )}
-  </AdminModal>
+        open={!!previewImage}
+        title="big size image"
+        onClose={() => setPreviewImage(null)}
+        onConfirm={undefined}
+        confirmLabel={undefined}
+        cancelLabel={undefined}
+      >
+        {previewImage && (
+          <img
+            src={previewImage}
+            alt="Preview"
+            style={{ maxWidth: "100%", maxHeight: "70vh", display: "block", margin: "0 auto" }}
+          />
+        )}
+      </AdminModal>
 
 
     </div>

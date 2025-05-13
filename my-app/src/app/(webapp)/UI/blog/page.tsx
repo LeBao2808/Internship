@@ -6,13 +6,17 @@ interface Blog {
   _id: string;
   title: string;
   content: string;
+  image_url?: string;
   user?: string;
   createdAt?: string;
   updatedAt?: string;
-  category?: string;
+  category?: Category;
   featured?: boolean;
 }
-
+interface Category {
+  _id: string;
+  name: string;
+}
 
 
 export default function BlogPage() {
@@ -23,7 +27,7 @@ export default function BlogPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
 
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
@@ -55,9 +59,9 @@ useEffect(() => {
       const res = await fetch("/api/category");
       const data = await res.json();
       if (Array.isArray(data)) {
-        setCategories(data.map((cat:any) => cat.name));
+        setCategories(data.map((cat:any) => ({ _id: cat._id, name: cat.name })));
       } else if (Array.isArray(data.categories)) {
-        setCategories(data.categories.map((cat:any) => cat.name));
+        setCategories(data.categories.map((cat:any) => ({ _id: cat._id, name: cat.name })));
       } else {
         setCategories([]);
       }
@@ -119,12 +123,12 @@ useEffect(() => {
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             A blog for beginners and aspiring developers to grow their coding skills.
           </p>
-          <div className="flex justify-center gap-4 mb-2 flex-wrap">
+          {/* <div className="flex justify-center gap-4 mb-2 flex-wrap">
             <button className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow" onClick={()=>setCategory(null)}>
               Explore the Blog
             </button>
             <button className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition shadow" onClick={()=>router.push('/UI/blog')}>Get Started</button>
-          </div>
+          </div> */}
         </div>
 
         {/* Featured Posts */}
@@ -136,7 +140,7 @@ useEffect(() => {
                 <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">{blog.title}</h3>
                 <div className="text-gray-600 mb-3 line-clamp-3">{blog.content?.slice(0, 90)}{blog.content && blog.content.length > 90 ? "..." : ""}</div>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {blog.category && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">{blog.category}</span>}
+                  {blog.category && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">{blog.category.name}</span>}
                 </div>
                 <button onClick={()=>router.push(`/UI/blog/${blog._id}`)} className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow">Read More</button>
               </div>
@@ -150,11 +154,11 @@ useEffect(() => {
           <div className="flex flex-wrap gap-3 mb-2">
             {categories.map((cat) => (
               <button
-                key={cat}
-                className={`px-4 py-2 border-2 rounded-lg font-medium transition ${category===cat ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-600 text-blue-600 hover:bg-blue-50'}`}
-                onClick={()=>{setCategory(cat); setPage(1);}}
+                key={cat._id}
+                className={`px-4 py-2 border-2 rounded-lg font-medium transition ${category===cat._id ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-600 text-blue-600 hover:bg-blue-50'}`}
+                onClick={()=>{setCategory(cat._id); setPage(1);}}
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>
@@ -201,7 +205,16 @@ useEffect(() => {
                 className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl border border-gray-100 hover:border-blue-400"
               >
                 <div className="h-48 w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
-                  <svg className="w-20 h-20 text-blue-400 opacity-40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" /></svg>
+                  {blog.image_url ? (
+                    <img
+                      src={blog.image_url}
+                      alt={blog.title}
+                      className="h-48 w-full object-cover"
+                      style={{ objectFit: "cover" }}
+                    />
+                  ) : (
+                    <svg className="w-20 h-20 text-blue-400 opacity-40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" /></svg>
+                  )}
                 </div>
                 <div className="flex-1 flex flex-col p-6">
                   <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">{blog.title}</h2>

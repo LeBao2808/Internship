@@ -1,7 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import Blog from "../models/Blog";
 import dbConnect from "@/resources/lib/mongodb";
+import Blog from "../../api/models/Blog";
 
+export async function GET(req: NextRequest) {
+  await dbConnect();
+  const { searchParams } = new URL(req.url);
+
+  const search = searchParams.get("search") || "";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const skip = (page - 1) * limit;
+  const category = searchParams.get("category");
+
+  let query: any = {};
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { content: { $regex: search, $options: "i" } }
+    ];
+  }
+  if (category) {
+    query.category = category;
+  }
+console.log(query);
+  // Lấy danh sách blog với phân trang và tìm kiếm theo tiêu đề hoặc nội dung blog
+  // Lấy danh sách blog với phân trang và tìm kiếm theo tiêu đề hoặc nội dung blog
+  try {
+    const [blogs, total] = await Promise.all([
+      Blog.find(query)
+        .skip(skip)
+        .limit(limit)
+        .populate("category", "name"), // Thêm dòng này để lấy name của category
+      Blog.countDocuments(query)
+    ]);
+    console.log(blogs);
+    return NextResponse.json({ blogs, total, page, limit });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
 // Thêm mới blog
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -18,7 +55,7 @@ const body = await req.json();
 export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
-
+console.log(body);
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(
       body.id,
@@ -44,34 +81,5 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: "Blog deleted" }, { status: 200 }); // Trả về một phản hồi thành công với status 200 và thông điệp thành công
   }catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-}
-
-export async function GET(request: Request) {
-  await dbConnect();
-  try {
-    const { searchParams } = new URL(request.url);
-    const search = searchParams.get("search") || "";
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
-    const skip = (page - 1) * limit;
-
-    const query = search
-      ? {
-          $or: [
-            { title: { $regex: search, $options: "i" } },
-            { content: { $regex: search, $options: "i" } }
-          ]
-        }
-      : {};
-
-    const [blogs, total] = await Promise.all([
-      Blog.find(query).skip(skip).limit(limit),
-      Blog.countDocuments(query)
-    ]);
-
-    return NextResponse.json({ blogs, total, page, limit });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 
 
 interface Role {
@@ -19,6 +20,8 @@ export default function RoleManagementPage() {
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<keyof Role>("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     fetchRoles();
@@ -78,6 +81,37 @@ export default function RoleManagementPage() {
     fetchRoles();
   };
 
+  // Hàm sort
+  const sortedRoles = [...roles].sort((a, b) => {
+    const aValue = a[sortBy] || "";
+    const bValue = b[sortBy] || "";
+    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Hàm render tiêu đề cột với icon sort
+  const renderColumnHeader = (col: { id: keyof Role; label: string }) => (
+    <span
+      className="flex items-center gap-1 cursor-pointer select-none"
+      onClick={() => {
+        if (sortBy === col.id) {
+          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        } else {
+          setSortBy(col.id);
+          setSortOrder("asc");
+        }
+      }}
+    >
+      {col.label}
+      {sortBy === col.id ? (
+        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+      ) : (
+        <FaSort className="opacity-50" />
+      )}
+    </span>
+  );
+
   return (
     <div
       style={{
@@ -128,10 +162,10 @@ export default function RoleManagementPage() {
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: "Role Name" },
-          { id: "description", label: "Description" },
+          { id: "name", label: renderColumnHeader({ id: "name", label: "Role Name" }) },
+          { id: "description", label: renderColumnHeader({ id: "description", label: "Description" }) },
         ]}
-        rows={Array.isArray(roles) ? roles : []}
+        rows={Array.isArray(sortedRoles) ? sortedRoles : []}
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
       />
