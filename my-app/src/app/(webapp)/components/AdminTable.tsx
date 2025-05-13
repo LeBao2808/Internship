@@ -6,7 +6,7 @@ import { useLanguage } from "../LanguageContext";
 
 interface Column {
   id: string;
-  label: string;
+  label: React.ReactNode; 
 }
 
 interface AdminTableProps {
@@ -56,7 +56,8 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                     <img
                       src={row[col.id]}
                       alt="blog"
-                      style={{ maxWidth: 80, maxHeight: 60, objectFit: "cover", borderRadius: 4 }}
+                      style={{width: 60, height: 40, objectFit: "cover", cursor: "pointer", border: "1px solid #eee", background: "#f5f5f5"  }}
+              
                     />
                   ) : typeof row[col.id] === "string"
                     ? truncate(row[col.id], 30)

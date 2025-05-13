@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
-
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 interface Category {
   _id?: string;
   name: string;
@@ -17,14 +17,18 @@ export default function CategoryManagementPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
-
+  const [sortBy, setSortBy] = useState<keyof Category>("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [sortBy, sortOrder]);
 
   const fetchCategories = async (query = "") => {
     let url = "/api/category";
+    const params = [];
     if (query) url += `?search=${encodeURIComponent(query)}`;
+    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
     setCategories(Array.isArray(data.categories) ? data.categories : []);
@@ -76,6 +80,27 @@ export default function CategoryManagementPage() {
     fetchCategories();
   };
 
+  const renderColumnHeader = (col: { id: keyof Category; label: string }) => (
+    <span
+      className="flex items-center gap-1 cursor-pointer select-none"
+      onClick={() => {
+        if (sortBy === col.id) {
+          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        } else {
+          setSortBy(col.id);
+          setSortOrder("asc");
+        }
+      }}
+    >
+      {col.label}
+      {sortBy === col.id ? (
+        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+      ) : (
+        <FaSort className="opacity-50" />
+      )}
+    </span>
+  );
+
   return (
     <div
       style={{
@@ -87,7 +112,7 @@ export default function CategoryManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Category Management</h1>
+      {/* <h1>Category Management</h1> */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -126,8 +151,8 @@ export default function CategoryManagementPage() {
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: "Category Name" },
-          { id: "description", label: "Description" },
+          { id: "name", label: renderColumnHeader({id: "name", label: "Name" }) },
+          { id: "description", label: renderColumnHeader({id: "description", label: "Description" }) },
         ]}
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}

@@ -7,6 +7,7 @@ export async function GET(request: Request) {
     try {
       const { searchParams } = new URL(request.url);
       const search = searchParams.get("search") || "";
+      const sortParam = searchParams.get("sort") || ""; 
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
       const skip = (page - 1) * limit;
@@ -20,8 +21,17 @@ export async function GET(request: Request) {
           }
         : {};
   
+
+        let sort: any = {};
+        if (sortParam) {
+          const [field, direction] = sortParam.split(":");
+          sort[field] = direction === "desc" ? -1 : 1;
+        } else {
+          sort = { name: 1 }; // Mặc định sort theo tên tăng dần
+        }
+
       const [categories, total] = await Promise.all([
-        Category.find(query).skip(skip).limit(limit),
+        Category.find(query).skip(skip).limit(limit).sort(sort),
         Category.countDocuments(query),
       ]);
   

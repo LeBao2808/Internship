@@ -5,7 +5,7 @@ import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import Pagination from "../../components/Pagination";
-
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 interface User {
   id?: number;
   name: string;
@@ -23,15 +23,20 @@ export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [sortBy, setSortBy] = useState<keyof User>("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     fetchUsers();
     fetchRoles();
-  }, []);
+  }, [sortBy, sortOrder]);
 
-  const fetchUsers = async (query = "", page = currentPage, size = pageSize) => {
-    let url = `/api/user?page=${page}&pageSize=${size}`;
+  const fetchUsers = async (query = "") => {
+    let url = `/api/user`;
+    const params = [];
     if (query) url += `&search=${encodeURIComponent(query)}`;
+    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
     setUsers(data.users.map((user: any) => ({ ...user, id: user.id || user._id })));
@@ -95,6 +100,28 @@ export default function UserManagementPage() {
     fetchRoles();
   }, [currentPage, pageSize]);
 
+
+  const renderColumnHeader = (col: { id: keyof User; label: string }) => (
+    <span
+      className="flex items-center gap-1 cursor-pointer select-none"
+      onClick={() => {
+        if (sortBy === col.id) {
+          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        } else {
+          setSortBy(col.id);
+          setSortOrder("asc");
+        }
+      }}
+    >
+      {col.label}
+      {sortBy === col.id ? (
+        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+      ) : (
+        <FaSort className="opacity-50" />
+      )}
+    </span>
+  );
+
   return (
     <div
       style={{
@@ -106,7 +133,7 @@ export default function UserManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>User Management</h1>
+      {/* <h1>User Management</h1> */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -146,8 +173,8 @@ export default function UserManagementPage() {
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: "User Name" },
-          { id: "email", label: "Email" },
+          { id: "name", label: renderColumnHeader({id: "name", label: "Name" }) },
+          { id: "email", label: renderColumnHeader({id: "email", label: "Email" })  },
         ]}
         rows={users}
         onEdit={handleEditUser}

@@ -4,6 +4,7 @@ import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { Category } from "@mui/icons-material";
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 
 interface Blog {
   _id?: string;
@@ -21,7 +22,7 @@ export default function BlogManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const [form, setForm] = useState({ title: "", content: "", user: "", image_url: "", category: "" });
-  const [users, setUsers] = useState<{ id: string; name: string; email: string; image_url?: string }[]>([]);
+  const [users, setUsers] = useState<{ id: string; name: string; email: string;}[]>([]);
   const [search, setSearch] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [detailBlog, setDetailBlog] = useState<Blog | null>(null);
@@ -33,12 +34,14 @@ export default function BlogManagementPage() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [previewUpload, setPreviewUpload] = useState<string | null>(null);
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+  const [sortBy, setSortBy] = useState<keyof Blog>("title");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     fetchBlogs();
     fetchUsers();
     fetchCategories(); // Thêm dòng này để lấy danh sách category
-  }, []);
+  }, [sortBy, sortOrder]);
 
   const fetchCategories = async () => {
     const res = await fetch("/api/category");
@@ -52,7 +55,10 @@ export default function BlogManagementPage() {
 
   const fetchBlogs = async (query = "") => {
     let url = "/api/blog";
+    const params = [];
     if (query) url += `?search=${encodeURIComponent(query)}`;
+    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
     setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
@@ -67,7 +73,7 @@ export default function BlogManagementPage() {
           id: user._id || user.id,
           name: user.name,
           email: user.email,
-          image_url: user.image_url,
+
         }))
         : []
     );
@@ -173,7 +179,26 @@ export default function BlogManagementPage() {
     setDetailBlog(blog);
     setDetailModalOpen(true);
   };
-
+  const renderColumnHeader = (col: { id: keyof Blog; label: string }) => (
+    <span
+      className="flex items-center gap-1 cursor-pointer select-none"
+      onClick={() => {
+        if (sortBy === col.id) {
+          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        } else {
+          setSortBy(col.id);
+          setSortOrder("asc");
+        }
+      }}
+    >
+      {col.label}
+      {sortBy === col.id ? (
+        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+      ) : (
+        <FaSort className="opacity-50" />
+      )}
+    </span>
+  );
   return (
     <div
       style={{
@@ -185,7 +210,7 @@ export default function BlogManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Blog Management</h1>
+      {/* <h1>Blog Management</h1> */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -224,11 +249,11 @@ export default function BlogManagementPage() {
       </div>
       <AdminTable
         columns={[
-          { id: "image_url", label: "Image" },
-          { id: "title", label: "Title" },
-          { id: "user", label: "Author" },
-          { id: "content", label: "Content" },
-          { id: "category", label: "Category" }
+          { id: "image_url",  label: renderColumnHeader({id: "image_url", label: "Image" })  },
+          { id: "title", label: renderColumnHeader({id: "title", label: "Title" }) },
+          { id: "user", label: renderColumnHeader({id: "user", label: "Author" }) },
+          { id: "content", label: renderColumnHeader({id: "content", label: "Content" }) },
+          { id: "category", label: renderColumnHeader({id: "category", label: "Category" }) }
         ]}
         rows={blogs.map(blog => ({
           ...blog,
@@ -240,21 +265,12 @@ export default function BlogManagementPage() {
             typeof blog.category === "object" && blog.category !== null && "name" in blog.category
               ? blog.category.name
               : categories.find(c => c.value === blog.category)?.label || blog.category,
-              image_url: (
-                blog.image_url
-                  ? <img
-                      src={blog.image_url}
-                      alt="blog"
-                      style={{ width: 60, height: 40, objectFit: "cover", cursor: "pointer" }}
-                      onClick={() => setPreviewImage(blog.image_url)}
-                    />
-                  : null
-              )
+        image_url: typeof blog.image_url === "string" ? blog.image_url : ""
         }))}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
-        onUpload={handleUploadImage}
+        // onUpload={handleUploadImage}
 
       />
       <AdminModal
@@ -264,8 +280,10 @@ export default function BlogManagementPage() {
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
+        width={{ width: 1000 }}
       >
         <AdminForm
+        
           fields={[
             {
               name: "title",
@@ -323,6 +341,48 @@ export default function BlogManagementPage() {
           </div>
 
           <div style={{ marginTop: 12 }}>
+            <label>Image:</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  const formData = new FormData();
+                  formData.append("image", file);
+                  if (editingBlog && editingBlog._id) {
+                    formData.append("id", editingBlog._id);
+                  }
+                  const res = await fetch("/api/blog/upload", {
+                    method: "POST",
+                    body: formData,
+                  });
+                  const data = await res.json();
+                  if (res.ok && data.image_url) {
+                    setForm({ ...form, image_url: data.image_url });
+                  } else {
+                    alert("Upload thất bại: " + (data.error || "Unknown error"));
+                  }
+                }
+              }}
+            />
+            {form.image_url && (
+              <img
+                src={form.image_url}
+                alt="Preview"
+                style={{
+                  marginTop: 8,
+                  maxWidth: 200,
+                  maxHeight: 120,
+                  borderRadius: 8,
+                  border: "1px solid #eee",
+                  display: "block"
+                }}
+              />
+            )}
+          </div>
+
+          <div style={{ marginTop: 12 }}>
             <label>Content:</label>
             <textarea
               name="content"
@@ -354,12 +414,26 @@ export default function BlogManagementPage() {
               color: "#222",
               minHeight: 400,
               minWidth: 400,
-              maxWidth: 400,
+              maxWidth: 1000,
               maxHeight: 700,
               overflowY: "auto",
               position: "relative"
             }}
           >
+             {detailBlog.image_url && (
+        <img
+          src={detailBlog.image_url}
+          alt="Blog"
+          style={{
+            width: "100%",
+            maxHeight: 200,
+            objectFit: "contain",
+            borderRadius: 8,
+            marginBottom: 18,
+            border: "1px solid #eee"
+          }}
+        />
+      )}
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontWeight: 700, fontSize: 20, color: "#1976d2" }}>Title:</span>
               <span style={{ marginLeft: 8 }}>{detailBlog.title}</span>
@@ -400,7 +474,7 @@ export default function BlogManagementPage() {
         )}
         {detailBlog && (
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 32 }}>
-            <button
+            {/* <button
               style={{
                 background: "#e0e0e0",
                 color: "#222",
@@ -412,7 +486,7 @@ export default function BlogManagementPage() {
                 fontSize: 16
               }}
               onClick={() => setDetailModalOpen(false)}
-            >Back</button>
+            >Back</button> */}
             <button
               style={{
                 background: "#1976d2",

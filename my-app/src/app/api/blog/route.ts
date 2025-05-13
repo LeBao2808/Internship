@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const skip = (page - 1) * limit;
   const category = searchParams.get("category");
+  const sortParam = searchParams.get("sort") || ""; // Thêm dòng này
 
   let query: any = {};
   if (search) {
@@ -22,18 +23,25 @@ export async function GET(req: NextRequest) {
   if (category) {
     query.category = category;
   }
-console.log(query);
-  // Lấy danh sách blog với phân trang và tìm kiếm theo tiêu đề hoặc nội dung blog
-  // Lấy danh sách blog với phân trang và tìm kiếm theo tiêu đề hoặc nội dung blog
+
+  // Xử lý sort
+  let sort: any = {};
+  if (sortParam) {
+    const [field, direction] = sortParam.split(":");
+    sort[field] = direction === "desc" ? -1 : 1;
+  } else {
+    sort = { createdAt: -1 }; // Mặc định sort theo createdAt mới nhất
+  }
+
   try {
     const [blogs, total] = await Promise.all([
       Blog.find(query)
         .skip(skip)
         .limit(limit)
-        .populate("category", "name"), // Thêm dòng này để lấy name của category
+        .sort(sort) // Thêm sort vào đây
+        .populate("category", "name"),
       Blog.countDocuments(query)
     ]);
-    console.log(blogs);
     return NextResponse.json({ blogs, total, page, limit });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -55,7 +63,7 @@ const body = await req.json();
 export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
-console.log(body);
+  console.log(body);
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(
       body.id,

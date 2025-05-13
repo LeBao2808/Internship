@@ -25,11 +25,14 @@ export default function RoleManagementPage() {
 
   useEffect(() => {
     fetchRoles();
-  }, []);
+  }, [sortBy, sortOrder]); // Thêm sortBy, sortOrder vào dependency
 
   const fetchRoles = async (query = "") => {
     let url = "/api/role";
-    if (query) url += `?search=${encodeURIComponent(query)}`;
+    const params = [];
+    if (query) params.push(`search=${encodeURIComponent(query)}`);
+    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
     setRoles(Array.isArray(data.roles) ? data.roles : []);
@@ -81,14 +84,7 @@ export default function RoleManagementPage() {
     fetchRoles();
   };
 
-  // Hàm sort
-  const sortedRoles = [...roles].sort((a, b) => {
-    const aValue = a[sortBy] || "";
-    const bValue = b[sortBy] || "";
-    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-    return 0;
-  });
+
 
   // Hàm render tiêu đề cột với icon sort
   const renderColumnHeader = (col: { id: keyof Role; label: string }) => (
@@ -123,7 +119,7 @@ export default function RoleManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      <h1>Role Management</h1>
+      {/* <h1>Role Management</h1> */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <form
           onSubmit={e => {
@@ -165,7 +161,7 @@ export default function RoleManagementPage() {
           { id: "name", label: renderColumnHeader({ id: "name", label: "Role Name" }) },
           { id: "description", label: renderColumnHeader({ id: "description", label: "Description" }) },
         ]}
-        rows={Array.isArray(sortedRoles) ? sortedRoles : []}
+        rows={Array.isArray(roles) ? roles : []} // Dùng roles trực tiếp, không dùng sortedRoles
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
       />

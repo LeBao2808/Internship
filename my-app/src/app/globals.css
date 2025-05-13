@@ -26,3 +26,14 @@ body {
   background: linear-gradient(120deg, #f0f4ff 0%, #e6ecfa 100%);
 }
 
+.MuiDialog-paper  {
+  width: 100%  !important;
+  max-width: 1000px !important;
+}
+
+/* .MuiDialog-container{
+  max-width: 1000px !important;
+} */
+.MuiDialog-root{
+  margin: 0 auto !important;
+}

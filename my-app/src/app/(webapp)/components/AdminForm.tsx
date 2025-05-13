@@ -27,7 +27,7 @@ const AdminForm: React.FC<AdminFormProps> = ({
 }) => {
   return (
     <>
-      <Box component="form" onSubmit={onSubmit} sx={{ p: 3, border: "1px solid #eee", borderRadius: 2, maxWidth: 500, mx: "auto" }}>
+      <Box component="form" onSubmit={onSubmit} sx={{ p: 3, border: "1px solid #eee", width: "100%", borderRadius: 2, maxWidth: 1000, mx: "auto" }}>
         {title && <Typography variant="h6" mb={2}>{title}</Typography>}
         {fields.map((field, idx) => (
           <TextField
