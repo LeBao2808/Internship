@@ -10,7 +10,7 @@ interface User {
   id?: number;
   name: string;
   email: string;
-  role: string;
+  role: string | { _id?: string; name: string }; // Allow role to be string or object
 }
 
 export default function UserManagementPage() {
@@ -27,8 +27,11 @@ export default function UserManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
-    fetchUsers();
     fetchRoles();
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
   }, [sortBy, sortOrder]);
 
   const fetchUsers = async (query = "") => {
@@ -59,7 +62,14 @@ export default function UserManagementPage() {
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
-    setForm({ name: user.name, email: user.email, role: user.role || "" });
+    setForm({
+      name: user.name,
+      email: user.email,
+      role:
+        typeof user.role === "object" && user.role !== null
+          ? user.role._id || user.role.name // Prefer id, fallback to name
+          : user.role || ""
+    });
     setIsModalOpen(true);
   };
 
@@ -96,7 +106,7 @@ export default function UserManagementPage() {
   };
 
   useEffect(() => {
-    fetchUsers(search, currentPage, pageSize);
+    fetchUsers(search);
     fetchRoles();
   }, [currentPage, pageSize]);
 
@@ -139,7 +149,7 @@ export default function UserManagementPage() {
           onSubmit={e => {
             e.preventDefault();
             setCurrentPage(1);
-            fetchUsers(search, 1, pageSize);
+            fetchUsers(search,);
           }}
           style={{ display: "flex", gap: 8 }}
         >
@@ -175,8 +185,12 @@ export default function UserManagementPage() {
         columns={[
           { id: "name", label: renderColumnHeader({id: "name", label: "Name" }) },
           { id: "email", label: renderColumnHeader({id: "email", label: "Email" })  },
+          { id: "role", label: renderColumnHeader({id: "role", label: "Role" })  },
         ]}
-        rows={users}
+        rows={users.map(user => ({
+          ...user,
+          role: typeof user.role === "object" && user.role !== null ? user.role.name : user.role
+        }))}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
       />

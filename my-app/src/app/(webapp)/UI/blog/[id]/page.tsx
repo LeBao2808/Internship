@@ -43,7 +43,9 @@ export default function BlogDetailPage() {
     if (id) fetchBlog();
   }, [id]);
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) return    <div className="flex justify-center items-center h-40">
+  <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></span>
+</div>;
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
   return (

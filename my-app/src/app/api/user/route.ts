@@ -30,7 +30,11 @@ export async function GET(request: Request) {
       }
 
     const [users, total] = await Promise.all([
-      User.find(query).skip(skip).limit(limit).sort(sort),
+      User.find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort(sort)
+        .populate("role", "name"), // Thêm dòng này để chỉ lấy trường name của role
       User.countDocuments(query),
     ]);
 

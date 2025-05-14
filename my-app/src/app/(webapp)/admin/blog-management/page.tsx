@@ -10,7 +10,7 @@ interface Blog {
   _id?: string;
   title: string;
   content: string;
-  user: string;
+  user: string ;
   image_url: string;
   category: string | { _id: string; name: string }; // <-- Update this line
   createdAt?: string;   // <-- Add this line
@@ -341,45 +341,67 @@ export default function BlogManagementPage() {
           </div>
 
           <div style={{ marginTop: 12 }}>
-            <label>Image:</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                if (e.target.files && e.target.files[0]) {
-                  const file = e.target.files[0];
-                  const formData = new FormData();
-                  formData.append("image", file);
-                  if (editingBlog && editingBlog._id) {
-                    formData.append("id", editingBlog._id);
-                  }
-                  const res = await fetch("/api/blog/upload", {
-                    method: "POST",
-                    body: formData,
-                  });
-                  const data = await res.json();
-                  if (res.ok && data.image_url) {
-                    setForm({ ...form, image_url: data.image_url });
-                  } else {
-                    alert("Upload thất bại: " + (data.error || "Unknown error"));
-                  }
-                }
-              }}
-            />
-            {form.image_url && (
-              <img
-                src={form.image_url}
-                alt="Preview"
+            <label style={{ fontWeight: 600, marginBottom: 6, display: "block" }}>Image:</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <label
+                htmlFor="blog-image-upload"
                 style={{
-                  marginTop: 8,
-                  maxWidth: 200,
-                  maxHeight: 120,
-                  borderRadius: 8,
-                  border: "1px solid #eee",
-                  display: "block"
+                  background: "#1976d2",
+                  color: "#fff",
+                  padding: "8px 20px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  boxShadow: "0 2px 8px #e3e3e3",
+                  transition: "background 0.2s"
                 }}
-              />
-            )}
+                onMouseOver={e => (e.currentTarget.style.background = "#1251a3")}
+                onMouseOut={e => (e.currentTarget.style.background = "#1976d2")}
+              >
+                Chọn ảnh
+                <input
+                  id="blog-image-upload"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={async (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      const file = e.target.files[0];
+                      const formData = new FormData();
+                      formData.append("image", file);
+                      if (editingBlog && editingBlog._id) {
+                        formData.append("id", editingBlog._id);
+                      }
+                      const res = await fetch("/api/blog/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.image_url) {
+                        setForm({ ...form, image_url: data.image_url });
+                      } else {
+                        alert("Upload thất bại: " + (data.error || "Unknown error"));
+                      }
+                    }
+                  }}
+                />
+              </label>
+              {form.image_url && (
+                <img
+                  src={form.image_url}
+                  alt="Preview"
+                  style={{
+                    maxWidth: 120,
+                    maxHeight: 80,
+                    borderRadius: 8,
+                    border: "1px solid #eee",
+                    boxShadow: "0 2px 8px #e3e3e3",
+                    background: "#fafbfc",
+                    objectFit: "cover"
+                  }}
+                />
+              )}
+            </div>
           </div>
 
           <div style={{ marginTop: 12 }}>
