@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { useLanguage } from "../LanguageContext";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { CiLogin } from "react-icons/ci";
 
 export default function NavigationClient() {
   const pathname = usePathname();
@@ -23,6 +24,8 @@ export default function NavigationClient() {
   return (
     <nav
       style={{
+        position:"relative",
+        height: 64,
         display: "flex",
         gap: 16,
         padding: "16px 32px",
@@ -71,8 +74,8 @@ export default function NavigationClient() {
 
        .nav-home-btn {
           margin-left: auto;
-          background:rgb(235, 22, 121);
-          color: #fff;
+          background:#fff;
+          color: #1976d2;
           border: none;
           border-radius: 6px;
           padding: 8px 18px;
@@ -80,10 +83,12 @@ export default function NavigationClient() {
           cursor: pointer;
        }
           .nav-home-btn:hover {
-          background:rgb(207, 18, 103);
+          background:rgb(214, 214, 214);
           box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
           }
       `}</style>
+ 
+      <img src="/logo.png" alt="Logo" style={{ width: "auto", height: "100px" }} />
       {navItems.map((item) => (
         <Link
           key={item.href}
@@ -103,16 +108,20 @@ export default function NavigationClient() {
           }}
           className="nav-home-btn"
         >
-          Home
+          Visit your blog
         </button>
         <button
           onClick={() => {
-            signOut({ callbackUrl: "/admin/user-management/login", redirect:true });
-            window.location.href = "https://accounts.google.com/Logout";
+            signOut({ callbackUrl: "/authen/login", redirect:true });
+            // window.location.href = "https://accounts.google.com/Logout";
           }}
           className="nav-logout-btn"
         >
-          {t("logout")}
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+</svg>
+
+
         </button>
       
       </div>

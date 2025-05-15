@@ -38,9 +38,13 @@ export default function BlogManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
-    fetchBlogs();
     fetchUsers();
-    fetchCategories(); // Thêm dòng này để lấy danh sách category
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchBlogs();
+   // Thêm dòng này để lấy danh sách category
   }, [sortBy, sortOrder]);
 
   const fetchCategories = async () => {
@@ -92,7 +96,10 @@ export default function BlogManagementPage() {
       content: blog.content || "",
       user: blog.user || "",
       image_url: blog.image_url || "",
-      category: typeof blog.category === "object" && blog.category !== null ? blog.category._id : blog.category || ""
+      category:
+       typeof blog.category === "object" && blog.category !== null 
+       ? blog.category._id || blog.category.name 
+       : blog. category ||""
     });
     setIsModalOpen(true);
   };

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 interface Blog {
   _id: string;
@@ -12,6 +13,7 @@ interface Blog {
   updatedAt?: string;
   category?: Category;
   featured?: boolean;
+  slug?: string;
 }
 interface Category {
   _id: string;
@@ -19,7 +21,7 @@ interface Category {
 }
 
 
-export default function BlogPage() {
+export default function BlogPage({blog }: {blog: any}) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -29,9 +31,10 @@ export default function BlogPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
-
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
-
+  const savedSearch = localStorage.getItem("blog_search") || "";
 useEffect(() => {
   const fetchUserNames = async () => {
     const ids = Array.from(new Set(blogs.map(b => b.user).filter(Boolean)));
@@ -79,6 +82,8 @@ useEffect(() => {
         limit: limit.toString(),
         ...(category ? { category } : {})
       });
+   
+    
       const res = await fetch(`/api/blog?${params.toString()}`);
       const data = await res.json();
       setBlogs(data.blogs || []);
@@ -90,17 +95,31 @@ useEffect(() => {
     setLoading(false);
   };
 
+  const handleViewDetail = () => {
 
+    router.push(`/blog/${blog.slug}`);
+
+  };
+
+ 
 
 
   useEffect(() => {
+    // This code only runs on the client
+    // const savedSearch = typeof window !== "undefined" ? localStorage.getItem("blog_search") || "" : "";
+    // setSearch(savedSearch);
+    // if (typeof window !== "undefined") {
+    //   localStorage.removeItem("blog_search");
+    // }
     fetchCategories();
   }, []);
 
   useEffect(() => {
+  
     fetchBlogs();
+    
     // eslint-disable-next-line
-  }, [search, page, category]);
+  }, [search, page, category,router]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -142,7 +161,10 @@ useEffect(() => {
                 <div className="flex flex-wrap gap-2 mb-4">
                   {blog.category && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">{blog.category.name}</span>}
                 </div>
-                <button onClick={()=>router.push(`/UI/blog/${blog._id}`)} className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow">Read More</button>
+                <button 
+                onClick={()=>router.push(`/UI/blog/${blog.slug}`)}
+                // onClick={handleViewDetail}
+                 className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow">Read More</button>
               </div>
             ))}
           </div>

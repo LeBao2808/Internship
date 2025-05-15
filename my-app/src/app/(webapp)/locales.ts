@@ -24,7 +24,7 @@ export const locales = {
     save: "Save",
     cancel: "Cancel",
     action : "Action",
-    logout: "Logout",
+    Logout: "Logout",
     // ... các chuỗi khác
   }
 };

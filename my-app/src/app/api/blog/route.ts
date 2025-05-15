@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
+import slugify from "slugify";
 
 export async function GET(req: NextRequest) {
   await dbConnect();
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
   await dbConnect();
 const body = await req.json();
   try {
-    const newBlog = await Blog.create({...body, createdAt: new Date(), updatedAt: new Date() });
+    const newBlog = await Blog.create({...body,slug:slugify(body.title), createdAt: new Date(), updatedAt: new Date() });
     return NextResponse.json(newBlog, { status: 201 }); // Trả về một phản hồi thành công với status 201 và dữ liệu của blog mới
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

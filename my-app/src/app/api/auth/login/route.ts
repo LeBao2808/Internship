@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
   const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
   // Lưu refresh token vào database (nếu muốn quản lý đăng xuất hoặc thu hồi token)
-  user.refreshToken = refreshToken;
+  // user.refreshToken = refreshToken;
   await user.save();
   // Thiết lập cookie chứa accessToken
   const response = NextResponse.json({ accessToken, refreshToken, user: { userId: user._id, name: user.name, email: user.email } });

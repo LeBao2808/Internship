@@ -8,14 +8,37 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account", // luôn chọn tài khoản
+        },
+      },
     }),
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // Luôn chuyển hướng về trang user-management sau khi đăng nhập thành công
-      return "/admin/user-management";
+     //this is the default behavior
+     // Allows relative callback URLs
+     if (url.startsWith("/")) return `${baseUrl}${url}`
+     // Allows callback URLs on the same origin
+     else if (new URL(url).origin === baseUrl) return url
+    //  return baseUrl
+    return "/admin/user-management";
+    //Youcan add and modify it your usecase here
+   }
+ },
+
+ cookies: {
+  sessionToken: {
+    name: `next-auth.session-token`, // không có __Secure-
+    options: {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      secure: false, // ⚠️ rất quan trọng khi dev local
     },
   },
+},
   // You can add more options like pages, callbacks, etc. here
 };
 
