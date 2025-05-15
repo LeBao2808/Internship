@@ -5,6 +5,7 @@ import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { Category } from "@mui/icons-material";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import Pagination from "../../components/Pagination";
 
 interface Blog {
   _id?: string;
@@ -36,7 +37,9 @@ export default function BlogManagementPage() {
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
   const [sortBy, setSortBy] = useState<keyof Blog>("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
+  const [currentPage, setCurrentPage] = useState(1);
+    const [total, setTotal] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -46,6 +49,11 @@ export default function BlogManagementPage() {
     fetchBlogs();
    // Thêm dòng này để lấy danh sách category
   }, [sortBy, sortOrder]);
+
+ useEffect(() => {
+    fetchBlogs(search);
+  }, [currentPage, pageSize]);
+
 
   const fetchCategories = async () => {
     const res = await fetch("/api/category");
@@ -66,6 +74,7 @@ export default function BlogManagementPage() {
     const res = await fetch(url);
     const data = await res.json();
     setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
+        setTotal(data.total);
   };
 
   const fetchUsers = async () => {
@@ -279,6 +288,17 @@ export default function BlogManagementPage() {
         onViewDetail={handleViewDetail}
         // onUpload={handleUploadImage}
 
+      />
+
+           <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(total / pageSize) || 1}
+        onPageChange={page => setCurrentPage(page)}
+        pageSize={pageSize}
+        onPageSizeChange={size => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
       />
       <AdminModal
         open={isModalOpen}
