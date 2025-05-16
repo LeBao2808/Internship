@@ -42,14 +42,14 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === 1 ? "#eee" : "#fff", cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
       >
-        Đầu
+       First page
       </button>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === 1 ? "#eee" : "#fff", cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
       >
-        Trước
+        Before
       </button>
       {getPages().map((page) => (
         <button
@@ -74,14 +74,14 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === totalPages ? "#eee" : "#fff", cursor: currentPage === totalPages ? "not-allowed" : "pointer" }}
       >
-        Sau
+       After 
       </button>
       <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
         style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === totalPages ? "#eee" : "#fff", cursor: currentPage === totalPages ? "not-allowed" : "pointer" }}
       >
-        Cuối
+        Last page
       </button>
       {onPageSizeChange && (
         <select

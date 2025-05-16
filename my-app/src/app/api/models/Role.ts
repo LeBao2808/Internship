@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { IBaseTimestamps } from "./BaseTimestamps";
 
-export interface IRole extends Document {
+export interface IRole extends Document, IBaseTimestamps {
   name: string;
   description?: string;
 }

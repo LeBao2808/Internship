@@ -12,11 +12,11 @@ interface Blog {
   category?: string;
   createdAt?: string;
   updatedAt?: string;
+  slug?: string;
 }
 
-export default function BlogDetailPage({ params }: { params: Promise<{ slug: string }> })
-{
-    const { slug } = use(params);
+export default function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const { id } = useParams();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
         if (Array.isArray(data.blogs)) {
           setLatestBlogs(data.blogs.filter((b: Blog) => b._id !== id)); // Exclude current blog
         }
-      } catch {}
+      } catch { }
     };
     fetchRelatedBlogs();
   }, [blog?.category, id]);
@@ -69,19 +69,11 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
 
   return (
     <BlogLayout>
-      <div className="max-w-7xl mx-auto flex flex-col gap-8 mt-12 mb-12">
+      <div className="max-w-6xl mx-auto flex flex-col gap-8 mt-12 mb-12">
         {/* Nội dung blog */}
         <div className="flex-1">
           <div className="bg-white rounded-xl shadow-lg p-6 md:p-12">
-            {blog.image_url && (
-              <div className="mb-8">
-                <img
-                  src={blog.image_url}
-                  alt={blog.title}
-                  className="w-full h-auto aspect-[8/5] object-cover rounded-lg shadow"
-                />
-              </div>
-            )}
+
             <h1 className="text-4xl font-extrabold mb-4 text-gray-900 leading-tight">{blog.title}</h1>
             <div className="flex items-center mb-6 text-gray-500 text-sm gap-4">
               {blog.user && (
@@ -97,21 +89,31 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
                 </span>
               )}
             </div>
-            <div className="prose prose-lg max-w-none mt-8 text-gray-800 leading-relaxed">
-              {blog.content}
-            </div>
+
+            {blog.image_url && (
+              <div className="mb-8">
+                <img
+                  src={blog.image_url}
+                  alt={blog.title}
+                  className="w-full h-auto aspect-[8/5] object-cover rounded-lg shadow"
+                />
+              </div>
+            )}
+
+            <div className="prose prose-lg max-w-none mt-8 text-gray-800 leading-relaxed"
+             dangerouslySetInnerHTML={{ __html: blog.content }} />
           </div>
         </div>
       </div>
       {/* Thanh trượt bài viết cùng category */}
-      <div className="max-w-7xl mx-auto mt-8">
+      <div className="max-w-6xl mx-auto mt-8">
         <h2 className="text-xl font-bold mb-4 text-blue-700">Related articles </h2>
         <div className="flex overflow-x-auto gap-4 pb-2 " >
           {latestBlogs.length > 0 ? (
             latestBlogs.map((item) => (
               <a
-                key={item._id}
-                href={`/UI/blog/${item._id}`}
+                key={item.slug}
+                href={`/UI/blog/${item.slug}`}
                 className="min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-40"
               >
                 {item.image_url && (

@@ -25,7 +25,7 @@ export default function BlogPage({blog }: {blog: any}) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(6);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
@@ -34,7 +34,7 @@ export default function BlogPage({blog }: {blog: any}) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
-  const savedSearch = localStorage.getItem("blog_search") || "";
+  // const savedSearch = localStorage.getItem("blog_search") || "";
 useEffect(() => {
   const fetchUserNames = async () => {
     const ids = Array.from(new Set(blogs.map(b => b.user).filter(Boolean)));
@@ -153,18 +153,26 @@ useEffect(() => {
         {/* Featured Posts */}
         <div className="mb-12">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">Featured Posts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" >
             {featuredPosts.map((blog, idx) => (
-              <div key={blog._id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group">
+              <div key={blog._id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer" 
+              onClick={()=>router.push(`/UI/blog/${blog.slug}`)}>
                 <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">{blog.title}</h3>
-                <div className="text-gray-600 mb-3 line-clamp-3">{blog.content?.slice(0, 90)}{blog.content && blog.content.length > 90 ? "..." : ""}</div>
+                <div className="text-gray-600 mb-3 line-clamp-3"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      blog.content && blog.content.length > 90
+                        ? blog.content.slice(0, 90) + "..."
+                        : blog.content || ""
+                  }}
+                />
                 <div className="flex flex-wrap gap-2 mb-4">
                   {blog.category && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">{blog.category.name}</span>}
                 </div>
                 <button 
                 onClick={()=>router.push(`/UI/blog/${blog.slug}`)}
                 // onClick={handleViewDetail}
-                 className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow">Read More</button>
+                 className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer">Read More</button>
               </div>
             ))}
           </div>
@@ -176,7 +184,7 @@ useEffect(() => {
           <div className="flex flex-wrap gap-3 mb-2">
             <button
               key="all"
-              className={`px-4 py-2 border-2 rounded-lg font-medium transition ${!category ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-600 text-blue-600 hover:bg-blue-50'}`}
+              className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${!category ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-600 text-blue-600 hover:bg-blue-50'}`}
               onClick={() => { setCategory(null); setPage(1); }}
             >
               All Category
@@ -184,7 +192,7 @@ useEffect(() => {
             {categories.map((cat) => (
               <button
                 key={cat._id}
-                className={`px-4 py-2 border-2 rounded-lg font-medium transition ${category === cat._id ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-600 text-blue-600 hover:bg-blue-50'}`}
+                className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${category === cat._id ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-600 text-blue-600 hover:bg-blue-50'}`}
                 onClick={() => { setCategory(cat._id); setPage(1); }}
               >
                 {cat.name}
@@ -198,7 +206,7 @@ useEffect(() => {
           <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
           <div className="bg-white rounded-xl shadow divide-y divide-gray-200">
             {latestPosts.map((blog) => (
-              <div key={blog._id} className="flex items-center px-6 py-4 hover:bg-blue-50 transition cursor-pointer" onClick={()=>router.push(`/UI/blog/${blog._id}`)}>
+              <div key={blog._id} className="flex items-center px-6 py-4 hover:bg-blue-50 transition cursor-pointer" onClick={()=>router.push(`/UI/blog/${blog.slug}`)}>
                 <svg className="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <div className="flex-1">
                   <div className="font-semibold text-gray-900">{blog.title}</div>
@@ -227,11 +235,12 @@ useEffect(() => {
         ) : blogs.length === 0 ? (
           <div className="text-center text-gray-500 py-12 text-lg">Không tìm thấy bài viết nào.</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8" >
             {blogs.map((blog) => (
               <div
+              onClick={() => router.push(`/UI/blog/${blog.slug}`)}
                 key={blog._id}
-                className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl border border-gray-100 hover:border-blue-400"
+                className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl border border-gray-100 hover:border-blue-400 cursor-pointer"
               >
                 <div className="h-auto w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
                   {blog.image_url ? (
@@ -257,12 +266,17 @@ useEffect(() => {
                       Đăng lúc: {new Date(blog.createdAt).toLocaleString()}
                     </p>
                   )}
-                  <div className="text-gray-600 mb-4 line-clamp-3">
-                    {blog.content?.slice(0, 120)}{blog.content && blog.content.length > 120 ? "..." : ""}
-                  </div>
+                  <div className="text-gray-600 mb-4 line-clamp-3"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        blog.content && blog.content.length > 120
+                          ? blog.content.slice(0, 120) + "..."
+                          : blog.content || "" 
+                    }}
+                  />
                   <button
-                    onClick={() => router.push(`/UI/blog/${blog._id}`)}
-                    className="mt-auto px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow"
+                    onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                    className="mt-auto px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
                   >
                     Read more
                   </button>

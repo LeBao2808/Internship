@@ -1,11 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { Category } from "@mui/icons-material";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 interface Blog {
   _id?: string;
@@ -21,6 +23,7 @@ interface Blog {
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpload, setIsUpload] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const [form, setForm] = useState({ title: "", content: "", user: "", image_url: "", category: "" });
   const [users, setUsers] = useState<{ id: string; name: string; email: string;}[]>([]);
@@ -38,8 +41,10 @@ export default function BlogManagementPage() {
   const [sortBy, setSortBy] = useState<keyof Blog>("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
-    const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(0);
+  const textareaRef = useRef(null);
   const [pageSize, setPageSize] = useState(10);
+  
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -51,8 +56,8 @@ export default function BlogManagementPage() {
   }, [sortBy, sortOrder]);
 
  useEffect(() => {
-    fetchBlogs(search);
-  }, [currentPage, pageSize]);
+    fetchBlogs(search, currentPage, pageSize);
+  }, [currentPage, pageSize, search, sortBy, sortOrder]);
 
 
   const fetchCategories = async () => {
@@ -65,16 +70,18 @@ export default function BlogManagementPage() {
     })));
   };
 
-  const fetchBlogs = async (query = "") => {
+  const fetchBlogs = async (query = "", page = 1, size = 10) => {
     let url = "/api/blog";
     const params = [];
-    if (query) url += `?search=${encodeURIComponent(query)}`;
+    if (query) params.push(`search=${encodeURIComponent(query)}`);
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (page) params.push(`page=${page}`);
+    if (size) params.push(`pageSize=${size}`);
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
     setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
-        setTotal(data.total);
+    setTotal(data.total);
   };
 
   const fetchUsers = async () => {
@@ -93,12 +100,14 @@ export default function BlogManagementPage() {
   };
 
   const handleAddClick = () => {
+    setIsUpload(false);
     setEditingBlog(null);
     setForm({ title: "", content: "", user: "", image_url: "", category: "" }); // Thêm category
     setIsModalOpen(true);
   };
 
   const handleEditBlog = (blog: Blog) => {
+    setIsUpload(true);
     setEditingBlog(blog);
     setForm({
       title: blog.title || "",
@@ -231,7 +240,8 @@ export default function BlogManagementPage() {
         <form
           onSubmit={e => {
             e.preventDefault();
-            fetchBlogs(search);
+            setCurrentPage(1);
+            fetchBlogs(search, 1, pageSize);
           }}
           style={{ display: "flex", gap: 8 }}
         >
@@ -367,7 +377,7 @@ export default function BlogManagementPage() {
             )}
           </div>
 
-          <div style={{ marginTop: 12 }}>
+          {editingBlog && <div style={{ marginTop: 12 }} >
             <label style={{ fontWeight: 600, marginBottom: 6, display: "block" }}>Image:</label>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <label
@@ -430,8 +440,8 @@ export default function BlogManagementPage() {
               )}
             </div>
           </div>
-
-          <div style={{ marginTop: 12 }}>
+}
+          {/* <div style={{ marginTop: 12 }}>
             <label>Content:</label>
             <textarea
               name="content"
@@ -439,6 +449,18 @@ export default function BlogManagementPage() {
               onChange={handleFormChange}
               required
               style={{ width: "100%", minHeight: 100, marginTop: 4, borderRadius: 4, border: "1px solid #ccc", padding: 8 }}
+            />
+          </div> */}
+
+          <div style={{ marginTop: 12 }}>
+            <label>Content:</label>
+            <CKEditor
+              editor={ClassicEditor as any}
+              data={form.content}
+              onChange={(_event, editor) => {
+                const data = editor.getData();
+                setForm({ ...form, content: data });
+              }}
             />
           </div>
         </AdminForm>
@@ -511,8 +533,9 @@ export default function BlogManagementPage() {
                   background: "#fff",
                   color: "#333"
                 }}
+                dangerouslySetInnerHTML={{ __html: detailBlog.content }} 
               >
-                {detailBlog.content}
+                {/* {detailBlog.content} */}
               </div>
             </div>
             <div>

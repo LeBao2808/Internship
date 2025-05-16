@@ -55,7 +55,6 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                       whiteSpace: "nowrap",
                       cursor: typeof row[col.id] === "string" && row[col.id].length > 30 ? "pointer" : "default"
                     }}
-                    title={typeof row[col.id] === "string" ? row[col.id] : undefined}
                   >
                     {col.id === "image_url" && typeof row[col.id] === "string" && row[col.id] ? (
                       <img
@@ -63,6 +62,11 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                         alt="blog"
                         style={{width: 60, height: 40, objectFit: "cover", cursor: "pointer", border: "1px solid #eee", background: "#f5f5f5"}}
                         onClick={() => setPreviewImage(row[col.id])}
+                      />
+                    ) : col.id === "content" && typeof row[col.id] === "string" ? (
+                      <div
+                        style={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                        dangerouslySetInnerHTML={{ __html: truncate(row[col.id],30) }}
                       />
                     ) : typeof row[col.id] === "string"
                       ? truncate(row[col.id], 30)

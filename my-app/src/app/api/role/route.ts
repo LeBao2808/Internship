@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   await dbConnect();
   const body = await request.json();
   try {
-    const newRole = await Role.create(body);
+    const newRole = await Role.create({ ...body, createdAt: new Date() });
     return NextResponse.json({ roles: [newRole] }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -48,7 +48,11 @@ export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
   try {
-    const updatedRole = await Role.findByIdAndUpdate(body.id, body, { new: true });
+    const updatedRole = await Role.findByIdAndUpdate(
+      body.id,
+      { ...body, updatedAt: new Date() },
+      { new: true }
+    );
     if (!updatedRole) return NextResponse.json({ error: "Role not found" }, { status: 404 });
     return NextResponse.json({ roles: [updatedRole] });
   } catch (error: any) {
@@ -60,6 +64,7 @@ export async function DELETE(request: Request) {
   await dbConnect();
   const body = await request.json();
   try {
+    await Role.findByIdAndUpdate(body.id, {...body,createdDelete: new Date() }, { new: true });
     await Role.findByIdAndDelete(body.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
