@@ -22,6 +22,7 @@ export default function LoginPage() {
       } else {
         const data = await res.json();
         setError(data.error || "Đăng nhập thất bại");
+        console.error(data.error); // log the error message to the console for debugging purpose
       }
     } catch (err) {
       setError("Lỗi kết nối máy chủ");

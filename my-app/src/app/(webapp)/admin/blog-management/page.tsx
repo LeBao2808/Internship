@@ -139,35 +139,35 @@ export default function BlogManagementPage() {
     setIsUploadModalOpen(true);
   };
 
-  const handleUploadImageSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!image || !blogId) {
-      setResult("Vui lòng chọn ảnh và nhập Blog ID");
-      return;
-    }
+  // const handleUploadImageSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!image || !blogId) {
+  //     setResult("Vui lòng chọn ảnh và nhập Blog ID");
+  //     return;
+  //   }
 
-    const formData = new FormData();
-    formData.append("image", image);
-    formData.append("id", blogId);
+  //   const formData = new FormData();
+  //   formData.append("image", image);
+  //   formData.append("id", blogId);
 
-    try {
-      const res = await fetch("/api/blog/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setResult("Upload thành công: " + data.image_url);
-        setIsUploadModalOpen(false);      // Đóng modal
-        setPreviewUpload(null);           // Reset preview
-        fetchBlogs();                     // Cập nhật lại danh sách blog (và hình ảnh)
-      } else {
-        setResult("Lỗi: " + data.error);
-      }
-    } catch (err) {
-      setResult("Lỗi kết nối server");
-    }
-  };
+  //   try {
+  //     const res = await fetch("/api/blog/upload", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       setResult("Upload thành công: " + data.image_url);
+  //       setIsUploadModalOpen(false);      // Đóng modal
+  //       setPreviewUpload(null);           // Reset preview
+  //       fetchBlogs();                     // Cập nhật lại danh sách blog (và hình ảnh)
+  //     } else {
+  //       setResult("Lỗi: " + data.error);
+  //     }
+  //   } catch (err) {
+  //     setResult("Lỗi kết nối server");
+  //   }
+  // };
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -606,7 +606,7 @@ export default function BlogManagementPage() {
         )}
       </AdminModal>
 
-      <AdminModal
+      {/* <AdminModal
         open={isUploadModalOpen}
         title="Uploah Blog"
         onClose={() => {
@@ -653,7 +653,7 @@ export default function BlogManagementPage() {
             <div className="mt-2 text-center text-sm text-green-600">{result}</div>
           )}
         </form>
-      </AdminModal>
+      </AdminModal> */}
 
       <AdminModal
         open={!!previewImage}

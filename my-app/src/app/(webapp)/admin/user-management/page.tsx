@@ -11,13 +11,14 @@ interface User {
   name: string;
   email: string;
   role: string | { _id?: string; name: string }; // Allow role to be string or object
+  image: string;
 }
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", role: "" });
+  const [form, setForm] = useState({ name: "", email: "", role: "", image: ""});
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,7 +57,7 @@ export default function UserManagementPage() {
 
   const handleAddClick = () => {
     setEditingUser(null);
-    setForm({ name: "", email: "", role: roles.length > 0 ? roles[0].value : "" });
+    setForm({ name: "", email: "", role: roles.length > 0 ? roles[0].value : "", image: ""});
     setIsModalOpen(true);
   };
 
@@ -65,6 +66,7 @@ export default function UserManagementPage() {
     setForm({
       name: user.name,
       email: user.email,
+      image: user.image || "",
       role:
         typeof user.role === "object" && user.role !== null
           ? user.role._id || user.role.name // Prefer id, fallback to name
@@ -88,17 +90,23 @@ export default function UserManagementPage() {
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
+
+const payload = {
+  ...form ,
+  image: typeof form.image === "string" ? form.image : "",
+};
+
     if (editingUser) {
       await fetch(`/api/user`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingUser.id, ...form }),
+        body: JSON.stringify({ id: editingUser.id, ...payload }),
       });
     } else {
       await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
     }
     setIsModalOpen(false);
@@ -186,10 +194,12 @@ export default function UserManagementPage() {
           { id: "name", label: renderColumnHeader({id: "name", label: "Name" }) },
           { id: "email", label: renderColumnHeader({id: "email", label: "Email" })  },
           { id: "role", label: renderColumnHeader({id: "role", label: "Role" })  },
+          { id: "image",  label: renderColumnHeader({id: "image", label: "Image" })  },
         ]}
         rows={users.map(user => ({
           ...user,
-          role: typeof user.role === "object" && user.role !== null ? user.role.name : user.role
+          role: typeof user.role === "object" && user.role !== null ? user.role.name : user.role,
+              image: typeof user.image === "string" ? user.image : "",
         }))}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
@@ -232,6 +242,70 @@ export default function UserManagementPage() {
           onSubmit={handleSaveUser}
           submitLabel={editingUser ? "Update" : "Create"}
         >
+                {editingUser && <div style={{ marginTop: 12 }} >
+            <label style={{ fontWeight: 600, marginBottom: 6, display: "block" }}>Image:</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <label
+                htmlFor="user-image-upload"
+                style={{
+                  background: "#1976d2",
+                  color: "#fff",
+                  padding: "8px 20px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  boxShadow: "0 2px 8px #e3e3e3",
+                  transition: "background 0.2s"
+                }}
+                onMouseOver={e => (e.currentTarget.style.background = "#1251a3")}
+                onMouseOut={e => (e.currentTarget.style.background = "#1976d2")}
+              >
+                Chọn ảnh
+                <input
+                  id="user-image-upload"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={async (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      const file = e.target.files[0];
+                      const formData = new FormData();
+                      formData.append("image", file);
+                      if (editingUser && editingUser.id) {
+                        formData.append("id", editingUser.id.toString());
+                      }
+                      const res = await fetch("/api/user/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.image) {
+                        setForm({ ...form, image: data.image });
+                      } else {
+                        alert("Upload thất bại: " + (data.error || "Unknown error"));
+                      }
+                    }
+                  }}
+                />
+              </label>
+              {form.image && (
+                <img
+                  src={form.image}
+                  alt="Preview"
+                  style={{
+                    maxWidth: 120,
+                    maxHeight: 80,
+                    borderRadius: 8,
+                    border: "1px solid #eee",
+                    boxShadow: "0 2px 8px #e3e3e3",
+                    background: "#fafbfc",
+                    objectFit: "cover"
+                  }}
+                />
+              )}
+            </div>
+          </div>
+}
           <div>
             {roles.length > 0 && (
               <React.Suspense fallback={null}>

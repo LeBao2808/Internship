@@ -3,6 +3,7 @@ import dbConnect from "@/resources/lib/mongodb";
 import User from "@/app/api/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import Role from "../../models/Role";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "access_secret";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "refresh_secret";
@@ -27,14 +28,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Mật khẩu không đúng" }, { status: 400 });
   }
   // Tạo access token và refresh token
-  const payload = { userId: user._id, name: user.name, email: user.email };
+  const payload = { userId: user._id, name: user.name, email: user.email, role: user.role, image_url: user.image };
   const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
   const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+  
   // Lưu refresh token vào database (nếu muốn quản lý đăng xuất hoặc thu hồi token)
   // user.refreshToken = refreshToken;
-  await user.save();
+  // await user.save();
   // Thiết lập cookie chứa accessToken
-  const response = NextResponse.json({ accessToken, refreshToken, user: { userId: user._id, name: user.name, email: user.email } });
+  const response = NextResponse.json({ sessionToken: accessToken, user: { userId: user._id, name: user.name, email: user.email,role: user.role , image_url: user.image } });
   response.cookies.set("accessToken", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -42,6 +44,15 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: 60 * 15 // 15 phút
   });
+
+  response.cookies.set("next-auth.session-token", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 15 // 15 phút
+  });
+
   response.cookies.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

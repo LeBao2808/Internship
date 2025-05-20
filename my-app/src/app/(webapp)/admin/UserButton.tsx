@@ -3,11 +3,12 @@ import { useSession } from "next-auth/react";
 import React, { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
 
+
 export default function UserButton() {
   const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputerscience.com%2Fxlasu%2Ffaculties%2Ffaculty.php%3Fid%3D16&psig=AOvVaw1AGntHOW-1HuJFhS_rzTdX&ust=1747793387203000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDgk_L7sI0DFQAAAAAdAAAAABAE';
+const imageUrl = '/uploads/BlueHead.png';
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -25,8 +26,10 @@ const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputer
     };
   }, [show]);
 
-  if (status === "loading") return null;
-  if (!session) return null;
+  // if (status === "loading") return null;
+  // if (!session) return null;
+// hoặc refreshToken; // hoặc refreshToken
+
 
   return (
     <div style={{ position: "relative", display: "inline-block" }} ref={dropdownRef} >
@@ -42,7 +45,6 @@ const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputer
   height={40}
   className="rounded-full"
 />
-
 
       </button>
       {show && (
@@ -65,7 +67,8 @@ const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputer
               style={{ marginTop: 12, width: "100%" }} className="nav-view-btn"
           >View Detail</button>
           <button
-            onClick={() => {
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
               signOut({ callbackUrl: "/authen/login", redirect: true });
             }}
             className="nav-logout-btn"

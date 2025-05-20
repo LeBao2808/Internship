@@ -56,7 +56,7 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                       cursor: typeof row[col.id] === "string" && row[col.id].length > 30 ? "pointer" : "default"
                     }}
                   >
-                    {col.id === "image_url" && typeof row[col.id] === "string" && row[col.id] ? (
+                    {(col.id === "image_url" || col.id === "image")&& typeof row[col.id] === "string" && row[col.id] ? (
                       <img
                         src={row[col.id]}
                         alt="blog"
