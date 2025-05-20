@@ -8,7 +8,7 @@ import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
+import { useRouter } from "next/navigation";
 interface Blog {
   _id?: string;
   title: string;
@@ -44,7 +44,7 @@ export default function BlogManagementPage() {
   const [total, setTotal] = useState(0);
   const textareaRef = useRef(null);
   const [pageSize, setPageSize] = useState(10);
-  
+  const router = useRouter();
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -259,6 +259,7 @@ export default function BlogManagementPage() {
             Search
           </button>
         </form>
+        <div className="btn-add flex gap-x-4">
         <button
           onClick={handleAddClick}
           style={{
@@ -272,6 +273,24 @@ export default function BlogManagementPage() {
         >
           Add Blog
         </button>
+
+           <button
+          onClick={() => {
+            router.push("/UI/blog");
+          }}
+          style={{
+            padding: "8px 16px",
+            background: "#1976d2",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            cursor: "pointer",
+          }}
+        >
+          Visit your blog
+        </button>
+        </div>
+        
       </div>
       <AdminTable
         columns={[

@@ -7,6 +7,7 @@ import { useLanguage } from "../LanguageContext";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { CiLogin } from "react-icons/ci";
+import UserButton from "./UserButton";
 
 export default function NavigationClient() {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export default function NavigationClient() {
   ];
 
   return (
+    
     <nav
       style={{
         position:"relative",
@@ -86,7 +88,23 @@ export default function NavigationClient() {
           background:rgb(214, 214, 214);
           box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
           }
+
+               .nav-view-btn {
+          margin-left: auto;
+          background:#rgb(168, 155, 137);
+          color: #1976d2;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+       }
+          .nav-view-btn:hover {
+          background:rgb(230, 231, 220);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+          }
       `}</style>
+         
  
       <img src="/logo.png" alt="Logo" style={{ width: "auto", height: "100px" }} />
       {navItems.map((item) => (
@@ -102,15 +120,17 @@ export default function NavigationClient() {
       ))}
       <div style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
 
-      <button
+      {/* <button
           onClick={() => {
             router.push("/UI/blog");
           }}
           className="nav-home-btn"
         >
           Visit your blog
-        </button>
-        <button
+        </button> */}
+        <UserButton  />
+
+        {/* <button
           onClick={() => {
             signOut({ callbackUrl: "/authen/login", redirect:true });
             // window.location.href = "https://accounts.google.com/Logout";
@@ -122,8 +142,7 @@ export default function NavigationClient() {
 </svg>
 
 
-        </button>
-      
+        </button> */}
       </div>
       {/* <button onClick={() => i18n.changeLanguage(i18n.language === "vi" ? "en" : "vi")}
         style={{marginLeft:8,background:"#fff",color:"#1976d2",border:"none",borderRadius:4,padding:"8px 16px",fontWeight:600,cursor:"pointer"}}>

@@ -49,5 +49,12 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7 // 7 ngày
   });
+  // response.cookies.set("next-auth.session-token", accessToken, {
+  //   httpOnly: true,
+  //   secure: process.env.NODE_ENV === "production",
+  //   sameSite: "lax",
+  //   path: "/",
+  //   maxAge: 60 * 15 // 15 phút
+  // });
   return response;
 }
