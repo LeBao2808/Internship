@@ -68,6 +68,7 @@ export async function GET(request: Request) {
     await dbConnect();
     const body = await request.json();
     try {
+      Category.findByIdAndUpdate(body.id,{...body, deletedAt: new Date(), deleted: true});
       await Category.findByIdAndDelete(body.id);
       return NextResponse.json({ success: true });
     } catch (error: any) {

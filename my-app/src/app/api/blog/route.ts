@@ -86,6 +86,7 @@ export async function DELETE(req: NextRequest) {
   await dbConnect();
   const body = await req.json();
   try {
+    Blog.findByIdAndUpdate(...body.id,{...body ,deletedAt: new Date(), isDeleted:true});
     await Blog.findByIdAndDelete(body.id);
     return NextResponse.json({ message: "Blog deleted" }, { status: 200 }); // Trả về một phản hồi thành công với status 200 và thông điệp thành công
   }catch (error: any) {

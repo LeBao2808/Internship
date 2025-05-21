@@ -71,6 +71,7 @@ export async function DELETE(request: Request) {
   await dbConnect();
   const body = await request.json();
   try {
+    User.findByIdAndUpdate(body.id, {...body, deletedAt: new Date(), isDeleted: true});
     await User.findByIdAndDelete(body.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {

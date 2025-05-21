@@ -106,7 +106,9 @@ export default function NavigationClient() {
       `}</style>
          
  
-      <img src="/logo.png" alt="Logo" style={{ width: "auto", height: "100px" }} />
+      <img src="/logo.png" alt="Logo" style={{ width: "auto", height: "100px", cursor:"pointer" }} onClick={ () =>
+        router.push("/admin")
+      } />
       {navItems.map((item) => (
         <Link
           key={item.href}

@@ -2,6 +2,7 @@
 import { useSession } from "next-auth/react";
 import React, { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 
 export default function UserButton() {
@@ -9,6 +10,7 @@ export default function UserButton() {
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 const imageUrl = '/uploads/BlueHead.png';
+const router = useRouter();
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -65,6 +67,13 @@ const imageUrl = '/uploads/BlueHead.png';
           {/* <strong>Tên user:</strong> {session.user?.name || session.user?.email} */}
           <button 
               style={{ marginTop: 12, width: "100%" }} className="nav-view-btn"
+              onClick={() => {
+                // Giả sử bạn có userId trong session.user.userId
+                if (session?.user) {
+                
+                  router.push(`/admin/viewdetail-user`);
+                }
+              }}
           >View Detail</button>
           <button
             onClick={async () => {

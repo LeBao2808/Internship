@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
      // Allows callback URLs on the same origin
      else if (new URL(url).origin === baseUrl) return url
     //  return baseUrl
-    return "/admin/user-management";
+    return "/admin";
     //Youcan add and modify it your usecase here
    }
  },

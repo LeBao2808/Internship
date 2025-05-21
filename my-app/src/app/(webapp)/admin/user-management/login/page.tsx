@@ -18,7 +18,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password })
       });
       if (res.ok) {
-        router.push("/admin/user-management");
+        router.push("/admin");
       } else {
         const data = await res.json();
         setError(data.error || "Đăng nhập thất bại");

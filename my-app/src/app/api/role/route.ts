@@ -64,7 +64,7 @@ export async function DELETE(request: Request) {
   await dbConnect();
   const body = await request.json();
   try {
-    await Role.findByIdAndUpdate(body.id, {...body,createdDelete: new Date() }, { new: true });
+    await Role.findByIdAndUpdate(body.id, {...body,createdDelete: new Date(), isDelete: new Date() }, { new: true });
     await Role.findByIdAndDelete(body.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
