@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../api/models/User";
-
+import Role from "../../api/models/Role";
+require('../../api/models/Role');
+ 
 export async function GET(request: Request) {
   await dbConnect();
   try {
@@ -26,7 +28,7 @@ export async function GET(request: Request) {
         const [field, direction] = sortParam.split(":");
         sort[field] = direction === "desc" ? -1 : 1;
       } else {
-        sort = { name: 1 }; // Mặc định sort theo tên tăng dần
+        sort = { name: 1 }; 
       }
 
     const [users, total] = await Promise.all([
@@ -34,10 +36,10 @@ export async function GET(request: Request) {
         .skip(skip)
         .limit(limit)
         .sort(sort)
-        .populate("role", "name"), // Thêm dòng này để chỉ lấy trường name của role
+        .populate("role", "name"), 
       User.countDocuments(query),
     ]);
-
+  console.log(users);
     return NextResponse.json({ users, total, page, limit });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

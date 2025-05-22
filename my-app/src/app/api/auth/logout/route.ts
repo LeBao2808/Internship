@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  // Danh sách tên cookie cần xóa (bạn có thể mở rộng nếu cần)
+  // List of cookies to delete
   const cookiesToDelete = ["accessToken", "refreshToken", "next-auth.session-token"];
 
-  const response = NextResponse.json({ message: "Đã xóa cookies" });
+  const response = NextResponse.json({ message: "Cookies deleted" });
 
   cookiesToDelete.forEach((cookieName) => {
     response.cookies.set(cookieName, "", {
@@ -12,7 +12,7 @@ export async function POST() {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: new Date(0), // Hết hạn ngay lập tức
+      expires: new Date(0), // Expires immediately
     });
   });
 

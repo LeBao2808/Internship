@@ -52,7 +52,7 @@ export async function GET() {
   } catch (e) {
     return NextResponse.json({ images: [] });
   }
-  // Trả về đường dẫn public cho từng ảnh
+  // Returns the public link for each image
   const images = files.map(file => "/uploads/" + file);
   return NextResponse.json({ images });
 }

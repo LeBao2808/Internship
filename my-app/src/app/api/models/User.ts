@@ -3,13 +3,11 @@ import { IBaseTimestamps } from "./BaseTimestamps";
 import { baseTimestamps } from "./BaseTimestamps";
 
 export interface IUser extends Document, IBaseTimestamps {
-
   name: string;
   email: string;
   password?: string;
   image: string;
-  role?: mongoose.Schema.Types.ObjectId;
-  category?: mongoose.Schema.Types.ObjectId;
+  role: mongoose.Schema.Types.ObjectId;
 }
 
 const UserSchema: Schema<IUser> = new Schema({

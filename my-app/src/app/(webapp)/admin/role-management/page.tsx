@@ -1,12 +1,10 @@
 "use client";
 
-
 import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
-
 
 interface Role {
   _id?: string;
@@ -84,8 +82,6 @@ export default function RoleManagementPage() {
     fetchRoles();
   };
 
-
-
   // Hàm render tiêu đề cột với icon sort
   const renderColumnHeader = (col: { id: keyof Role; label: string }) => (
     <span
@@ -101,7 +97,11 @@ export default function RoleManagementPage() {
     >
       {col.label}
       {sortBy === col.id ? (
-        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+        sortOrder === "asc" ? (
+          <FaSortUp />
+        ) : (
+          <FaSortDown />
+        )
       ) : (
         <FaSort className="opacity-50" />
       )}
@@ -120,9 +120,16 @@ export default function RoleManagementPage() {
       }}
     >
       {/* <h1>Role Management</h1> */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
         <form
-          onSubmit={e => {
+          onSubmit={(e) => {
             e.preventDefault();
             fetchRoles(search);
           }}
@@ -132,12 +139,24 @@ export default function RoleManagementPage() {
             type="text"
             placeholder="Search role..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              padding: 8,
+              borderRadius: 4,
+              border: "1px solid #ccc",
+              minWidth: 220,
+            }}
           />
           <button
             type="submit"
-            style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
+            style={{
+              padding: "8px 16px",
+              background: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
           >
             Search
           </button>
@@ -158,8 +177,17 @@ export default function RoleManagementPage() {
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: renderColumnHeader({ id: "name", label: "Role Name" }) },
-          { id: "description", label: renderColumnHeader({ id: "description", label: "Description" }) },
+          {
+            id: "name",
+            label: renderColumnHeader({ id: "name", label: "Role Name" }),
+          },
+          {
+            id: "description",
+            label: renderColumnHeader({
+              id: "description",
+              label: "Description",
+            }),
+          },
         ]}
         rows={Array.isArray(roles) ? roles : []} // Dùng roles trực tiếp, không dùng sortedRoles
         onEdit={handleEditRole}

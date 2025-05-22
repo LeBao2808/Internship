@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
-import User from "../../../api/models/User";// Đảm bảo đường dẫn đúng
+import User from "../../../api/models/User";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   await dbConnect();

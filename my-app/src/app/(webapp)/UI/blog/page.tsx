@@ -8,7 +8,7 @@ interface Blog {
   title: string;
   content: string;
   image_url?: string;
-  user?: string;
+  user?: string |{_id :string , name:string};
   createdAt?: string;
   updatedAt?: string;
   category?: Category;
@@ -37,7 +37,9 @@ export default function BlogPage({blog }: {blog: any}) {
   // const savedSearch = localStorage.getItem("blog_search") || "";
 useEffect(() => {
   const fetchUserNames = async () => {
-    const ids = Array.from(new Set(blogs.map(b => b.user).filter(Boolean)));
+    const ids = Array.from(new Set(blogs.map(b =>typeof b.user === "object" && b.user !== null && "_id" in b.user
+      ? b.user._id
+      : b.user || "").filter(Boolean)));
     const newUserNames: { [key: string]: string } = { ...userNames };
     for (const id of ids) {
       if (id && !newUserNames[id]) {
@@ -258,7 +260,9 @@ useEffect(() => {
                   <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">{blog.title}</h2>
                   {blog.user && (
                     <p className="text-sm text-gray-500 mb-1">
-                      <b>Tác giả:</b> {userNames[blog.user] || blog.user}
+                      <b>Tác giả:</b> {typeof blog.user === "object" && blog.user !== null && "name" in blog.user
+                        ? blog.user.name
+                        : userNames[blog.user as string] || blog.user}
                     </p>
                   )}
                   {blog.createdAt && (

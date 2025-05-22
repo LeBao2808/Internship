@@ -16,7 +16,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
       if (res.ok) {
         router.push("/admin");
@@ -35,21 +35,25 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold text-blue-900 mb-6">Đăng nhập</h2>
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <div>
-            <label className="block text-blue-700 font-semibold mb-1">Email:</label>
+            <label className="block text-blue-700 font-semibold mb-1">
+              Email:
+            </label>
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 rounded-lg border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-50 text-gray-900"
             />
           </div>
           <div>
-            <label className="block text-blue-700 font-semibold mb-1">Mật khẩu:</label>
+            <label className="block text-blue-700 font-semibold mb-1">
+              Mật khẩu:
+            </label>
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-3 py-2 rounded-lg border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-50 text-gray-900"
             />
@@ -66,12 +70,19 @@ export default function LoginPage() {
           onClick={() => signIn("google", { callbackUrl: "/admin" })}
           className="w-full py-2 mt-4 bg-white border border-blue-700 text-blue-900 rounded-lg font-semibold flex items-center justify-center gap-2 shadow hover:bg-blue-50 transition"
         >
-          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="w-5 h-5" />
+          <img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="Google"
+            className="w-5 h-5"
+          />
           Đăng nhập với Google
         </button>
         <div className="mt-6 text-blue-900">
           Chưa có tài khoản?{" "}
-          <a href="/authen/register" className="text-blue-700 underline hover:text-blue-900">
+          <a
+            href="/authen/register"
+            className="text-blue-700 underline hover:text-blue-900"
+          >
             Đăng ký
           </a>
         </div>

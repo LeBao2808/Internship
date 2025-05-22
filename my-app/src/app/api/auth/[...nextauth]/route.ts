@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "select_account", // luôn chọn tài khoản
+          prompt: "select_account", // select_account is the default behavior
         },
       },
     }),
