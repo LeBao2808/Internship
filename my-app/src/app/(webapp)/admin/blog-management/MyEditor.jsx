@@ -4,9 +4,11 @@ import React from "react";
 
 const Editor = ({
   onChange,
+  value
 }) => {
   return (
     <CKEditor
+      data = {value}
       editor={ClassicEditor}
       onBlur={(_event, editor) => {
         const data = editor.getData();

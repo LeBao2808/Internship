@@ -27,7 +27,7 @@ export async function GET(request: Request) {
           const [field, direction] = sortParam.split(":");
           sort[field] = direction === "desc" ? -1 : 1;
         } else {
-          sort = { name: 1 }; // Mặc định sort theo tên tăng dần
+          sort = { name: 1 }; // Default sort by latest createdAt
         }
 
       const [categories, total] = await Promise.all([

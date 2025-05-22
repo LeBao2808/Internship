@@ -5,9 +5,12 @@ import Role from "../../api/models/Role";
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
-
+  try {
   const search = searchParams.get("search") || "";
-  const sortParam = searchParams.get("sort") || ""; // Lấy tham số sort
+  const sortParam = searchParams.get("sort") || ""; 
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);      
+  const skip = (page - 1) * limit;
   let query: any = {};
   if (search) {
     query.$or = [
@@ -22,12 +25,14 @@ export async function GET(req: NextRequest) {
     const [field, direction] = sortParam.split(":");
     sort[field] = direction === "desc" ? -1 : 1;
   } else {
-    sort = { name: 1 }; // Mặc định sort theo tên tăng dần
+    sort = { name: 1 }; 
   }
+  const [roles, total] = await Promise.all([
+    Role.find(query).skip(skip).limit(limit).sort(sort),
+    Role.countDocuments(query),
+  ]);
 
-  try {
-    const roles = await Role.find(query).sort(sort);
-    return NextResponse.json({ roles });
+  return NextResponse.json({roles, total, page, limit });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

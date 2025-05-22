@@ -32,7 +32,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 w-full">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-blue-900 mb-6">Đăng nhập</h2>
+        <h2 className="text-2xl font-bold text-blue-900 mb-6">Sign In</h2>
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <div>
             <label className="block text-blue-700 font-semibold mb-1">
@@ -48,7 +48,7 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="block text-blue-700 font-semibold mb-1">
-              Mật khẩu:
+              Password:
             </label>
             <input
               type="password"
@@ -63,7 +63,7 @@ export default function LoginPage() {
             type="submit"
             className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition"
           >
-            Đăng nhập
+            Login
           </button>
         </form>
         <button
@@ -75,15 +75,15 @@ export default function LoginPage() {
             alt="Google"
             className="w-5 h-5"
           />
-          Đăng nhập với Google
+          Sign in Google
         </button>
         <div className="mt-6 text-blue-900">
-          Chưa có tài khoản?{" "}
+          Don't have an account?{" "}
           <a
             href="/authen/register"
             className="text-blue-700 underline hover:text-blue-900"
           >
-            Đăng ký
+            Sign up now.
           </a>
         </div>
       </div>

@@ -5,6 +5,7 @@ import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { useMessageStore } from "../../components/messageStore";
 
 interface Role {
   _id?: string;
@@ -20,6 +21,7 @@ export default function RoleManagementPage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<keyof Role>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const { setMessage } = useMessageStore();
 
   useEffect(() => {
     fetchRoles();
@@ -54,6 +56,7 @@ export default function RoleManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: role._id }),
     });
+    setMessage("Delete role Successful!", "error");
     fetchRoles();
   };
 
@@ -70,6 +73,7 @@ export default function RoleManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingRole._id, ...form }),
       });
+      setMessage("Edit role Successful!", "success");
     } else {
       // Create
       await fetch("/api/role", {
@@ -77,6 +81,7 @@ export default function RoleManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+      setMessage("Add role Successful!", "success");
     }
     setIsModalOpen(false);
     fetchRoles();

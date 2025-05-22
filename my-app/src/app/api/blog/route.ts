@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-// Thêm mới blog
+
 export async function POST(req: NextRequest) {
   await dbConnect();
 const body = await req.json();

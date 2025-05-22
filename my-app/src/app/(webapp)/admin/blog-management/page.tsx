@@ -10,6 +10,8 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import AdminSelect from "../../components/AdminSelect";
+import { useMessageStore } from "../../components/messageStore";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 interface Blog {
@@ -111,13 +113,23 @@ export default function BlogManagementPage() {
     );
   };
 
-  const handleAddClick = () => {
-    setIsUpload(false);
+  const hanleClose = () => {
+    setIsModalOpen(false);
     setEditingBlog(null);
-    setForm({ title: "", content: "", user: "", image_url: "", category: "" }); // Thêm category
-    setIsModalOpen(true);
+    setForm({
+      title: "",
+      content: "",
+      user: "",
+      image_url: "",
+      category: "",
+    });
   };
 
+  const handleAddClick = () => {
+    setIsUpload(false);
+
+    setIsModalOpen(true);
+  };
   const handleEditBlog = (blog: Blog) => {
     setIsUpload(true);
     setEditingBlog(blog);
@@ -248,16 +260,25 @@ export default function BlogManagementPage() {
   const EditorFormat = useMemo(
     () => (
       <Editor
-        // value={form.content}
+        value={editingBlog ? editingBlog.content : form.content}
         onChange={(data: any) => {
-          // const data = editor.getData();
           console.log("Editor is ready to use!", data);
-          setForm({ ...form, content: data });
+          if (editingBlog) {
+            setEditingBlog({
+              ...editingBlog,
+              content: data,
+            });
+          } else {
+            console.log("form", form);
+            setForm({ ...form, content: data });
+          }
         }}
       />
     ),
-    []
+    [editingBlog?.content, form.content]
   );
+  console.log(editingBlog);
+
   return (
     <div
       style={{
@@ -402,7 +423,7 @@ export default function BlogManagementPage() {
       <AdminModal
         open={isModalOpen}
         title={editingBlog ? "Edit Blog" : "Add Blog"}
-        onClose={() => setIsModalOpen(false)}
+        onClose={hanleClose}
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
@@ -431,7 +452,7 @@ export default function BlogManagementPage() {
         >
           <div>
             <React.Suspense fallback={null}>
-              {React.createElement(
+              {/* {React.createElement(
                 require("../../components/AdminSelect").default,
                 {
                   label: "User",
@@ -445,14 +466,26 @@ export default function BlogManagementPage() {
                     setForm({ ...form, user: e.target.value }),
                   required: true,
                 }
-              )}
+              )} */}
+              <AdminSelect
+                label="User"
+                name="user"
+                value={form.user}
+                options={users.map((user: any) => ({
+                  value: user.id,
+                  label: user.name || user.email,
+                }))}
+                onChange={(e: any) =>
+                  setForm({ ...form, user: e.target.value })
+                }
+              />
             </React.Suspense>
           </div>
 
           <div>
             {categories.length > 0 && (
               <React.Suspense fallback={null}>
-                {React.createElement(
+                {/* {React.createElement(
                   require("../../components/AdminSelect").default,
                   {
                     label: "Category",
@@ -463,7 +496,16 @@ export default function BlogManagementPage() {
                       setForm({ ...form, category: e.target.value }),
                     required: true,
                   }
-                )}
+                )} */}
+                <AdminSelect
+                  label="Category"
+                  name="category"
+                  value={form.category}
+                  options={categories}
+                  onChange={(e: any) =>
+                    setForm({ ...form, category: e.target.value })
+                  }
+                />
               </React.Suspense>
             )}
           </div>

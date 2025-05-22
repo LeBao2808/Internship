@@ -91,11 +91,11 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 w-full">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-blue-900 mb-6">Đăng Kí</h2>
+        <h2 className="text-2xl font-bold text-blue-900 mb-6">Sign Up</h2>
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <div className="">
             <label className="block text-blue-700 font-semibold mb-1">
-              Họ tên:
+              Name:
             </label>
             <input
               type="text"
@@ -120,7 +120,7 @@ export default function RegisterPage() {
           </div>
           <div>
             <label className="block text-blue-700 font-semibold mb-1">
-              Mật khẩu:
+              Password:
             </label>
             <input
               type="password"
@@ -143,15 +143,15 @@ export default function RegisterPage() {
             type="submit"
             className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition"
           >
-            Đăng kí
+            Sign Up
           </button>
           <div style={{ marginTop: 16 }}>
-            Đã có tài khoản?{" "}
+            Already have an account?{" "}
             <a
               href="/authen/login"
               className="text-blue-700 underline hover:text-blue-900"
             >
-              Đăng nhập
+              Sign In
             </a>
           </div>
         </form>

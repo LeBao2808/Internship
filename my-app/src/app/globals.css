@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@tailwind utilities;
+
 
 :root {
   --background: #ffffff;
@@ -39,4 +41,21 @@ body {
 }
 .ck-editor__editable_inline {
   min-height: 250px;
+}
+
+
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-progress {
+  animation-name: progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }

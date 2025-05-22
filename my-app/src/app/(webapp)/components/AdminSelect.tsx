@@ -1,5 +1,11 @@
 import React from "react";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+} from "@mui/material";
 
 interface Option {
   value: string | number;
@@ -11,22 +17,27 @@ interface AdminSelectProps {
   name: string;
   value: string | number;
   options: Option[];
-  onChange: (e: React.ChangeEvent<{ value: unknown }>) => void;
+  onChange: (e: SelectChangeEvent) => void;
   required?: boolean;
 }
 
-const AdminSelect: React.FC<AdminSelectProps> = ({ label, name, value, options, onChange, required }) => {
+const AdminSelect: React.FC<AdminSelectProps> = ({
+  label,
+  name,
+  value,
+  options,
+  onChange,
+  required,
+}) => {
+  console.log(value);
   return (
     <FormControl fullWidth margin="normal" required={required}>
       <InputLabel>{label}</InputLabel>
-      <Select
-        label={label}
-        name={name}
-        value={value}
-        onChange={onChange}
-      >
+      <Select label={label} name={name} value={value} onChange={onChange}>
         {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
         ))}
       </Select>
     </FormControl>
