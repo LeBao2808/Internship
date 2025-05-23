@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
 import slugify from "slugify";
+import { z } from 'zod';
+
+const BlogSchema = z.object({
+  // title: z.string().trim().max(200).regex(/^[\p{L}0-9\s]+$/u, 'Name must not contain special characters').optional()
+  // .optional(),
+});
 
 export async function GET(req: NextRequest) {
   await dbConnect();
@@ -53,6 +59,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   await dbConnect();
 const body = await req.json();
+const parsed = BlogSchema.safeParse(body);
+
+if (!parsed.success) {
+  return NextResponse.json(
+    { error: parsed.error.format() },
+    { status: 400 }
+  );
+}
   try {
     const newBlog = await Blog.create({...body,slug:slugify(body.title).toLowerCase(), createdAt: new Date(), updatedAt: new Date() });
     return NextResponse.json(newBlog, { status: 201 }); 
@@ -66,10 +80,20 @@ export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
   console.log(body);
+  const parsed = BlogSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.format() },
+      { status: 400 }
+    );
+  }
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(
       body.id,
-      { ...body, updatedAt: new Date() },
+      { ...body,
+         updatedAt: new Date() 
+        },
       { new: true }
     );
     if (!updatedBlog) {
@@ -87,8 +111,8 @@ export async function DELETE(req: NextRequest) {
   await dbConnect();
   const body = await req.json();
   try {
-    await Blog.findByIdAndUpdate(body.id,{...body ,deletedAt: new Date(), isDeleted:true});
-    // await Blog.findByIdAndDelete(body.id);
+    // await Blog.findByIdAndUpdate(body.id,{...body ,deletedAt: new Date(), isDeleted:true});
+    await Blog.findByIdAndDelete(body.id);
     return NextResponse.json({ message: "Blog deleted" }, { status: 200 }); 
   }catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

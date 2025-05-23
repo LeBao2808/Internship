@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useState } from "react";
 import { useMessageStore } from "../components/messageStore";
 
 export default function MessageToast() {
   const { message, type, show, clearMessage } = useMessageStore();
-  const duration = 3000; // 3 giây
-
+  const duration = 3000;
+  const [visible, setVisible] = useState(true);
   useEffect(() => {
     if (show) {
       const timer = setTimeout(() => {
@@ -18,6 +19,7 @@ export default function MessageToast() {
 
   if (!show) return null;
 
+  if (!visible) return null;
   const bgColor = {
     success: "bg-green-500",
     error: "bg-red-500",
@@ -29,30 +31,31 @@ export default function MessageToast() {
       <div
         className={`fixed bottom-30 right-5 z-50 w-72 rounded shadow ${bgColor} text-white`}
       >
-        <div className="px-4 py-2">{message}</div>
+        <div className="flex justify-between items-center">
+          <div className="px-4 py-2">{message}</div>
+          {/* <button onClick={() => setVisible(false)} className="">
+            X
+          </button> */}
+        </div>
+
         {/* progress bar */}
-        <div className="h-1 bg-white bg-opacity-30 overflow-hidden relative">
+        <div
+          className={`h-1 ${bgColor} bg-opacity-30 overflow-hidden relative`}
+        >
           <div
-            className="progress-bar"
-            style={{ animationDuration: `${duration}ms` }}
+            className="absolute left-0 top-0 h-full bg-white"
+            style={{
+              width: "100%",
+              animationName: "shrinkBar",
+              animationDuration: `${duration}ms`,
+              animationTimingFunction: "linear",
+              animationFillMode: "forwards",
+            }}
           />
         </div>
       </div>
 
-      {/* CSS nội bộ */}
-      <style jsx>{`
-        .progress-bar {
-          position: absolute;
-          left: 0;
-          top: 0;
-          height: 100%;
-          width: 100%;
-          background-color: white;
-          animation-name: shrinkBar;
-          animation-timing-function: linear;
-          animation-fill-mode: forwards;
-        }
-
+      <style>{`
         @keyframes shrinkBar {
           from {
             width: 100%;

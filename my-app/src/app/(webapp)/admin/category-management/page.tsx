@@ -5,6 +5,8 @@ import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { useMessageStore } from "../../components/messageStore";
+
 interface Category {
   _id?: string;
   name: string;
@@ -19,6 +21,7 @@ export default function CategoryManagementPage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<keyof Category>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const { setMessage } = useMessageStore();
   useEffect(() => {
     fetchCategories();
   }, [sortBy, sortOrder]);
@@ -28,6 +31,7 @@ export default function CategoryManagementPage() {
     const params = [];
     if (query) url += `?search=${encodeURIComponent(query)}`;
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    ``;
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
@@ -52,6 +56,7 @@ export default function CategoryManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: category._id }),
     });
+    setMessage("Delete Catelogy Successful!", "error");
     fetchCategories();
   };
 
@@ -68,6 +73,7 @@ export default function CategoryManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingCategory._id, ...form }),
       });
+      setMessage("Edit Catelogy Successful!", "success");
     } else {
       // Create
       await fetch("/api/category", {
@@ -75,6 +81,7 @@ export default function CategoryManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+      setMessage("Add Catelogy Successful!", "success");
     }
     setIsModalOpen(false);
     fetchCategories();
@@ -94,7 +101,11 @@ export default function CategoryManagementPage() {
     >
       {col.label}
       {sortBy === col.id ? (
-        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+        sortOrder === "asc" ? (
+          <FaSortUp />
+        ) : (
+          <FaSortDown />
+        )
       ) : (
         <FaSort className="opacity-50" />
       )}
@@ -113,9 +124,16 @@ export default function CategoryManagementPage() {
       }}
     >
       {/* <h1>Category Management</h1> */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
         <form
-          onSubmit={e => {
+          onSubmit={(e) => {
             e.preventDefault();
             fetchCategories(search);
           }}
@@ -125,12 +143,24 @@ export default function CategoryManagementPage() {
             type="text"
             placeholder="Search category..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ padding: 8, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              padding: 8,
+              borderRadius: 4,
+              border: "1px solid #ccc",
+              minWidth: 220,
+            }}
           />
           <button
             type="submit"
-            style={{ padding: "8px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
+            style={{
+              padding: "8px 16px",
+              background: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
           >
             Search
           </button>
@@ -151,8 +181,17 @@ export default function CategoryManagementPage() {
       </div>
       <AdminTable
         columns={[
-          { id: "name", label: renderColumnHeader({id: "name", label: "Name" }) },
-          { id: "description", label: renderColumnHeader({id: "description", label: "Description" }) },
+          {
+            id: "name",
+            label: renderColumnHeader({ id: "name", label: "Name" }),
+          },
+          {
+            id: "description",
+            label: renderColumnHeader({
+              id: "description",
+              label: "Description",
+            }),
+          },
         ]}
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}

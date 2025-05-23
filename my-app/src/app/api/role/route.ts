@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Role from "../../api/models/Role";
+import { z } from 'zod';
+
+
+
+const RoleSchema = z.object({
+  name: z.string().min(3, 'name limit 3 characters')
+  .regex(/^[\p{L}0-9\s]+$/u, 'Name must not contain special characters'),
+  description: z.string().max(200).optional(),
+});
 
 export async function GET(req: NextRequest) {
   await dbConnect();
@@ -41,6 +50,16 @@ export async function GET(req: NextRequest) {
 export async function POST(request: Request) {
   await dbConnect();
   const body = await request.json();
+
+  const parsed = RoleSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.format() },
+      { status: 400 }
+    );
+  }
+
+
   try {
     const newRole = await Role.create({ ...body, createdAt: new Date() });
     return NextResponse.json({ roles: [newRole] }, { status: 201 });
@@ -52,6 +71,14 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
+  const parsed = RoleSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.format() },
+      { status: 400 }
+    );
+  }
   try {
     const updatedRole = await Role.findByIdAndUpdate(
       body.id,
@@ -69,7 +96,7 @@ export async function DELETE(request: Request) {
   await dbConnect();
   const body = await request.json();
   try {
-    await Role.findByIdAndUpdate(body.id, {...body,createdDelete: new Date(), isDelete: new Date() }, { new: true });
+    // await Role.findByIdAndUpdate(body.id, {...body,createdDelete: new Date(), isDelete: new Date() }, { new: true });
     await Role.findByIdAndDelete(body.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {

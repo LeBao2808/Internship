@@ -22,6 +22,8 @@ interface Blog {
   image_url: string;
   category: string | { _id: string; name: string };
   createdAt?: string;
+  namecategory?: string;
+  nameuser?: string;
   updatedAt?: string;
 }
 
@@ -60,6 +62,18 @@ export default function BlogManagementPage() {
   const textareaRef = useRef(null);
   const [pageSize, setPageSize] = useState(10);
   const router = useRouter();
+  const [page, setPage] = useState(1);
+  const { setMessage } = useMessageStore();
+  const [visibleColumns, setVisibleColumns] = useState([
+    "image_url",
+    "title",
+    "user",
+    "content",
+    "category",
+    // "nameuser", // Ẩn mặc định
+    // "namecategory", // Ẩn mặc định
+  ]);
+
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -86,7 +100,15 @@ export default function BlogManagementPage() {
     );
   };
 
-  const fetchBlogs = async (query = "", page = 1, size = 10) => {
+  const handleToggleColumn = (colId: string) => {
+    setVisibleColumns((prev) =>
+      prev.includes(colId)
+        ? prev.filter((id) => id !== colId)
+        : [...prev, colId]
+    );
+  };
+
+  const fetchBlogs = async (query = "", page = currentPage, size = 10) => {
     let url = "/api/blog";
     const params = [];
     if (query) params.push(`search=${encodeURIComponent(query)}`);
@@ -133,17 +155,23 @@ export default function BlogManagementPage() {
   const handleEditBlog = (blog: Blog) => {
     setIsUpload(true);
     setEditingBlog(blog);
+    console.log("blog", blog);
+
     setForm({
       title: blog.title || "",
       content: blog.content || "",
       user:
-        typeof blog.user === "object" && blog.user !== null
+        typeof blog.user === "object"
           ? blog.user._id
+          : typeof blog.user === "object" && blog.user !== null
+          ? blog.user || blog.user
           : blog.user || "",
       image_url: blog.image_url || "",
       category:
         typeof blog.category === "object" && blog.category !== null
-          ? blog.category._id || blog.category.name
+          ? blog.category._id
+          : typeof blog.category === "object" && blog.category !== null
+          ? blog.category || blog.category
           : blog.category || "",
     });
     setIsModalOpen(true);
@@ -155,6 +183,7 @@ export default function BlogManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: blog._id }),
     });
+    setMessage("Delete Blog Successful!", "error");
     fetchBlogs();
   };
   const handleUploadImage = (blog: Blog) => {
@@ -199,7 +228,7 @@ export default function BlogManagementPage() {
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
+  console.log(form);
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
     // Đảm bảo image_url là string
@@ -217,12 +246,14 @@ export default function BlogManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingBlog._id, ...payload }),
       });
+      setMessage("Edit Blog Successful!", "success");
     } else {
       await fetch("/api/blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      setMessage("Add Blog Successful!", "success");
     }
     setIsModalOpen(false);
     fetchBlogs();
@@ -262,7 +293,9 @@ export default function BlogManagementPage() {
       <Editor
         value={editingBlog ? editingBlog.content : form.content}
         onChange={(data: any) => {
-          console.log("Editor is ready to use!", data);
+          // console.log("Editor is ready to use!", data);
+          // console.log("editingBlog", editingBlog);
+          // console.log("form", form);
           if (editingBlog) {
             setEditingBlog({
               ...editingBlog,
@@ -275,9 +308,9 @@ export default function BlogManagementPage() {
         }}
       />
     ),
-    [editingBlog?.content, form.content]
+    [editingBlog, form]
   );
-  console.log(editingBlog);
+  // console.log(editingBlog);
 
   return (
     <div
@@ -302,8 +335,7 @@ export default function BlogManagementPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            setCurrentPage(1);
-            fetchBlogs(search, 1, pageSize);
+            fetchBlogs(search, currentPage, pageSize);
           }}
           style={{ display: "flex", gap: 8 }}
         >
@@ -375,17 +407,28 @@ export default function BlogManagementPage() {
             id: "title",
             label: renderColumnHeader({ id: "title", label: "Title" }),
           },
+          // {
+          //   id: "user",
+          //   label: renderColumnHeader({ id: "user", label: "Author" }),
+          // },
           {
-            id: "user",
-            label: renderColumnHeader({ id: "user", label: "Author" }),
+            id: "nameuser",
+            label: renderColumnHeader({ id: "nameuser", label: "Name Author" }),
           },
           {
             id: "content",
             label: renderColumnHeader({ id: "content", label: "Content" }),
           },
+          // {
+          //   id: "category",
+          //   label: renderColumnHeader({ id: "category", label: "Category" }),
+          // },
           {
-            id: "category",
-            label: renderColumnHeader({ id: "category", label: "Category" }),
+            id: "namecategory",
+            label: renderColumnHeader({
+              id: "namecategory",
+              label: "Name Category",
+            }),
           },
         ]}
         rows={blogs.map((blog) => ({
@@ -394,19 +437,36 @@ export default function BlogManagementPage() {
             typeof blog.user === "object" &&
             blog.user !== null &&
             "name" in blog.user
+              ? blog.user._id
+              : blog.user,
+
+          nameuser:
+            typeof blog.user === "object" &&
+            blog.user !== null &&
+            "name" in blog.user
               ? blog.user.name
               : blog.user,
+
           category:
+            typeof blog.category === "object" &&
+            blog.category !== null &&
+            "name" in blog.category
+              ? blog.category._id
+              : blog.category,
+
+          namecategory:
             typeof blog.category === "object" &&
             blog.category !== null &&
             "name" in blog.category
               ? blog.category.name
               : blog.category,
+
           image_url: typeof blog.image_url === "string" ? blog.image_url : "",
         }))}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
+
         // onUpload={handleUploadImage}
       />
 
@@ -417,7 +477,7 @@ export default function BlogManagementPage() {
         pageSize={pageSize}
         onPageSizeChange={(size) => {
           setPageSize(size);
-          setCurrentPage(1);
+          // setCurrentPage(1);
         }}
       />
       <AdminModal

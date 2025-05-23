@@ -29,7 +29,7 @@ const AdminSelect: React.FC<AdminSelectProps> = ({
   onChange,
   required,
 }) => {
-  console.log(value);
+  // console.log(value);
   return (
     <FormControl fullWidth margin="normal" required={required}>
       <InputLabel>{label}</InputLabel>

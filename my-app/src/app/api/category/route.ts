@@ -1,6 +1,13 @@
 import {  NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Category from "../models/Category";
+import { z } from 'zod';
+
+const CategorySchema = z.object({
+  name: z.string().min(3, 'name limit 3 characters')
+  .regex(/^[\p{L}0-9\s]+$/u, 'Name must not contain special characters'),
+  description: z.string().max(200).optional(),
+});
 
 export async function GET(request: Request) {
     await dbConnect();
@@ -44,6 +51,13 @@ export async function GET(request: Request) {
   export async function POST(request: Request) {
     await dbConnect();
     const body = await request.json();
+    const parsed = CategorySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.format() },
+        { status: 400 }
+      );
+    }
     try {
       const newCategory = await Category.create(body);
       return NextResponse.json({ categories: [newCategory] }, { status: 201 });
@@ -55,6 +69,14 @@ export async function GET(request: Request) {
   export async function PUT(request: Request) {
     await dbConnect();
     const body = await request.json();
+    const parsed = CategorySchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.format() },
+        { status: 400 }
+      );
+    }
     try {
       const updatedCategory = await Category.findByIdAndUpdate(body.id, body, { new: true });
       if (!updatedCategory) return NextResponse.json({ error: "Category not found" }, { status: 404 });

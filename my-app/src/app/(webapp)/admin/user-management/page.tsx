@@ -7,12 +7,14 @@ import AdminForm from "../../components/AdminForm";
 import Pagination from "../../components/Pagination";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import AdminSelect from "../../components/AdminSelect";
+import { useMessageStore } from "../../components/messageStore";
 interface User {
   id?: number;
   name: string;
   email: string;
   role: Role; // Allow role to be string or object
   image: string;
+  nameRole: string;
 }
 interface Role {
   _id?: number;
@@ -36,7 +38,7 @@ export default function UserManagementPage() {
   const [sortBy, setSortBy] = useState<keyof User>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [user, setUserEdit] = useState<User | null>(null); // Add this line
-
+  const { setMessage } = useMessageStore();
   useEffect(() => {
     fetchRoles();
   }, []);
@@ -92,7 +94,7 @@ export default function UserManagementPage() {
       name: user.name,
       email: user.email,
       image: user.image || "",
-      role: user?.role?._id?.toString() || "",
+      role: user?.nameRole || "",
     });
     setIsModalOpen(true);
   };
@@ -103,6 +105,7 @@ export default function UserManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: user.id }),
     });
+    setMessage("Delete User Successful!", "error");
     fetchUsers();
   };
 
@@ -124,12 +127,14 @@ export default function UserManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingUser.id, ...payload }),
       });
+      setMessage("Edit User Successful!", "success");
     } else {
       await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      setMessage("Add User Successful!", "success");
     }
     setIsModalOpen(false);
     fetchUsers();
@@ -251,6 +256,10 @@ export default function UserManagementPage() {
             id: "image",
             label: renderColumnHeader({ id: "image", label: "Image" }),
           },
+          // {
+          //   id: "nameRole",
+          //   label: renderColumnHeader({ id: "nameRole", label: "Name Role " }),
+          // },
         ]}
         rows={users.map((user) => ({
           ...user,
@@ -259,6 +268,10 @@ export default function UserManagementPage() {
               ? user.role.name || user.role._id || ""
               : user.role || "",
           image: typeof user.image === "string" ? user.image : "",
+          nameRole:
+            typeof user.role === "object" && user.role !== null
+              ? user.role._id || user.role._id || ""
+              : user.role || "",
         }))}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
