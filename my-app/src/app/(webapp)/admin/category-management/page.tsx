@@ -16,6 +16,7 @@ interface Category {
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalDelete, setIsModalDelete] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
@@ -48,6 +49,11 @@ export default function CategoryManagementPage() {
     setEditingCategory(category);
     setForm({ name: category.name, description: category.description });
     setIsModalOpen(true);
+  };
+
+  const handleDeleteModalCategory = (category: Category) => {
+    setEditingCategory(category);
+    setIsModalDelete(true);
   };
 
   const handleDeleteCategory = async (category: Category) => {
@@ -195,7 +201,7 @@ export default function CategoryManagementPage() {
         ]}
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}
-        onDelete={handleDeleteCategory}
+        onDelete={handleDeleteModalCategory}
       />
       <AdminModal
         open={isModalOpen}
@@ -226,6 +232,23 @@ export default function CategoryManagementPage() {
           submitLabel={editingCategory ? "Update" : "Create"}
         />
       </AdminModal>
+
+      {isModalDelete && (
+        <AdminModal
+          open={isModalDelete}
+          title="Delete Category"
+          onClose={() => setIsModalDelete(false)}
+          onConfirm={() => {
+            handleDeleteCategory(editingCategory!);
+            setIsModalDelete(false);
+          }}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          isDelete={true}
+        >
+          <h2>Are you sure you want to delete this Category?</h2>
+        </AdminModal>
+      )}
     </div>
   );
 }

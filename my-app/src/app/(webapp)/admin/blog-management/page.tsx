@@ -60,19 +60,13 @@ export default function BlogManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const textareaRef = useRef(null);
+  const [isModalDelete, setIsModalDelete] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const router = useRouter();
   const [page, setPage] = useState(1);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { setMessage } = useMessageStore();
-  const [visibleColumns, setVisibleColumns] = useState([
-    "image_url",
-    "title",
-    "user",
-    "content",
-    "category",
-    // "nameuser", // Ẩn mặc định
-    // "namecategory", // Ẩn mặc định
-  ]);
 
   useEffect(() => {
     fetchUsers();
@@ -97,14 +91,6 @@ export default function BlogManagementPage() {
         value: cat._id || cat.id,
         label: cat.name,
       }))
-    );
-  };
-
-  const handleToggleColumn = (colId: string) => {
-    setVisibleColumns((prev) =>
-      prev.includes(colId)
-        ? prev.filter((id) => id !== colId)
-        : [...prev, colId]
     );
   };
 
@@ -186,6 +172,11 @@ export default function BlogManagementPage() {
     setMessage("Delete Blog Successful!", "error");
     fetchBlogs();
   };
+
+  const handleDeleteModalBlog = (blog: Blog) => {
+    setEditingBlog(blog);
+    setIsModalDelete(true);
+  };
   const handleUploadImage = (blog: Blog) => {
     setUploadingBlog(blog);
     setBlogId(blog._id || "");
@@ -248,12 +239,23 @@ export default function BlogManagementPage() {
       });
       setMessage("Edit Blog Successful!", "success");
     } else {
-      await fetch("/api/blog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      setMessage("Add Blog Successful!", "success");
+      try {
+        const res = await fetch("/api/blog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          setMessage("Add Blog Successful!", "success");
+        } else {
+          // setIsError(true);
+          const data = await res.json();
+          setMessage(data.error || "Unknown error", "error");
+          return;
+        }
+      } catch (error) {
+        setMessage("Add Blog Failed!", "error");
+      }
     }
     setIsModalOpen(false);
     fetchBlogs();
@@ -365,6 +367,26 @@ export default function BlogManagementPage() {
             Search
           </button>
         </form>
+
+        {/* {isError && (
+          <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded shadow-lg flex items-center gap-2 animate-fade-in z-[1000] min-w-[320px] max-w-[90vw]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
+              />
+            </svg>
+            <span className="font-semibold">{error}</span>
+          </div>
+        )} */}
         <div className="btn-add flex gap-x-4">
           <button
             onClick={handleAddClick}
@@ -464,7 +486,7 @@ export default function BlogManagementPage() {
           image_url: typeof blog.image_url === "string" ? blog.image_url : "",
         }))}
         onEdit={handleEditBlog}
-        onDelete={handleDeleteBlog}
+        onDelete={handleDeleteModalBlog}
         onViewDetail={handleViewDetail}
 
         // onUpload={handleUploadImage}
@@ -480,6 +502,7 @@ export default function BlogManagementPage() {
           // setCurrentPage(1);
         }}
       />
+
       <AdminModal
         open={isModalOpen}
         title={editingBlog ? "Edit Blog" : "Add Blog"}
@@ -904,6 +927,23 @@ export default function BlogManagementPage() {
           />
         )}
       </AdminModal>
+
+      {isModalDelete && (
+        <AdminModal
+          open={isModalDelete}
+          title="Delete Blog"
+          onClose={() => setIsModalDelete(false)}
+          onConfirm={() => {
+            handleDeleteBlog(editingBlog!);
+            setIsModalDelete(false);
+          }}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          isDelete={true}
+        >
+          <h2>Are you sure you want to delete this Blog?</h2>
+        </AdminModal>
+      )}
     </div>
   );
 }

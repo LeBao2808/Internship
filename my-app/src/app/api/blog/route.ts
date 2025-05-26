@@ -3,10 +3,12 @@ import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
 import slugify from "slugify";
 import { z } from 'zod';
+import { Content } from "next/font/google";
 
 const BlogSchema = z.object({
-  // title: z.string().trim().max(200).regex(/^[\p{L}0-9\s]+$/u, 'Name must not contain special characters').optional()
-  // .optional(),
+  title: z.string().trim().min(20)
+  .optional(),
+  content: z.string().trim().min(200)
 });
 
 export async function GET(req: NextRequest) {
@@ -63,7 +65,7 @@ const parsed = BlogSchema.safeParse(body);
 
 if (!parsed.success) {
   return NextResponse.json(
-    { error: parsed.error.format() },
+    { error: "Title or content not entered or too short." },
     { status: 400 }
   );
 }

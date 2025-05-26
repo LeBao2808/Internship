@@ -24,6 +24,8 @@ export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isModalDelete, setIsModalDelete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -109,6 +111,11 @@ export default function UserManagementPage() {
     fetchUsers();
   };
 
+  const handleDeleteModalUser = (user: User) => {
+    setEditingUser(user);
+    setIsModalDelete(true);
+  };
+
   const handleFormChange = (e: React.ChangeEvent<any>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -129,13 +136,24 @@ export default function UserManagementPage() {
       });
       setMessage("Edit User Successful!", "success");
     } else {
-      await fetch("/api/user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      setMessage("Add User Successful!", "success");
+      try {
+        const res = await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          setError(data.error || "Unknown error");
+          return;
+        } else {
+          setMessage("Add User Successful!", "success");
+        }
+      } catch (error) {
+        console.error("Error adding user:", error);
+      }
     }
+
     setIsModalOpen(false);
     fetchUsers();
   };
@@ -274,8 +292,10 @@ export default function UserManagementPage() {
               : user.role || "",
         }))}
         onEdit={handleEditUser}
-        onDelete={handleDeleteUser}
+        onDelete={handleDeleteModalUser}
       />
+
+      {error && <div className="text-red-500 mb-2">{error}</div>}
       <Pagination
         currentPage={currentPage}
         totalPages={Math.ceil(total / pageSize) || 1}
@@ -416,6 +436,23 @@ export default function UserManagementPage() {
           </div>
         </AdminForm>
       </AdminModal>
+
+      {isModalDelete && (
+        <AdminModal
+          open={isModalDelete}
+          title="Delete User"
+          onClose={() => setIsModalDelete(false)}
+          onConfirm={() => {
+            handleDeleteUser(editingUser!);
+            setIsModalDelete(false);
+          }}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          isDelete={true}
+        >
+          <h2>Are you sure you want to delete this User?</h2>
+        </AdminModal>
+      )}
     </div>
   );
 }

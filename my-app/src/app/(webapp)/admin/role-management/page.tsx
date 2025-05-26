@@ -16,6 +16,7 @@ interface Role {
 export default function RoleManagementPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalDelete, setIsModalDelete] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
@@ -58,6 +59,11 @@ export default function RoleManagementPage() {
     });
     setMessage("Delete role Successful!", "error");
     fetchRoles();
+  };
+
+  const handleDeleteModalRole = (role: Role) => {
+    setEditingRole(role);
+    setIsModalDelete(true);
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +202,7 @@ export default function RoleManagementPage() {
         ]}
         rows={Array.isArray(roles) ? roles : []} // Dùng roles trực tiếp, không dùng sortedRoles
         onEdit={handleEditRole}
-        onDelete={handleDeleteRole}
+        onDelete={handleDeleteModalRole}
       />
       <AdminModal
         open={isModalOpen}
@@ -227,6 +233,23 @@ export default function RoleManagementPage() {
           submitLabel={editingRole ? "Update" : "Create"}
         />
       </AdminModal>
+
+      {isModalDelete && (
+        <AdminModal
+          open={isModalDelete}
+          title="Delete Role"
+          onClose={() => setIsModalDelete(false)}
+          onConfirm={() => {
+            handleDeleteRole(editingRole!);
+            setIsModalDelete(false);
+          }}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          isDelete={true}
+        >
+          <h2>Are you sure you want to delete this role?</h2>
+        </AdminModal>
+      )}
     </div>
   );
 }
