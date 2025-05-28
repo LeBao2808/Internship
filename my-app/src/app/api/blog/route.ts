@@ -6,9 +6,8 @@ import { z } from 'zod';
 import { Content } from "next/font/google";
 
 const BlogSchema = z.object({
-  title: z.string().trim().min(20)
+  title: z.string().trim().min(5)
   .optional(),
-  content: z.string().trim().min(200)
 });
 
 export async function GET(req: NextRequest) {
@@ -70,7 +69,12 @@ if (!parsed.success) {
   );
 }
   try {
-    const newBlog = await Blog.create({...body,slug:slugify(body.title).toLowerCase(), createdAt: new Date(), updatedAt: new Date() });
+    const newBlog = await Blog.create({...body,slug:slugify(body.title)  .normalize("NFD")                  // tách dấu tiếng Việt
+      .replace(/[\u0300-\u036f]/g, "")   // xoá dấu
+      .replace(/[^a-z0-9\s-]/g, "")      // xoá ký tự đặc biệt
+      .replace(/\s+/g, "-")              // thay space bằng -
+      .replace(/-+/g, "-")               // gộp nhiều dấu - liên tiếp
+      .replace(/^-+|-+$/g, ""), createdAt: new Date(), updatedAt: new Date() });
     return NextResponse.json(newBlog, { status: 201 }); 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

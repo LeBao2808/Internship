@@ -22,10 +22,10 @@ export default function LoginPage() {
         router.push("/admin");
       } else {
         const data = await res.json();
-        setError(data.error || "Đăng nhập thất bại");
+        setError(data.error || "Login failed");
       }
     } catch (err) {
-      setError("Lỗi kết nối máy chủ");
+      setError("internal server error");
     }
   };
 

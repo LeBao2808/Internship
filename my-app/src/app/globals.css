@@ -26,6 +26,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   background: linear-gradient(120deg, #f0f4ff 0%, #e6ecfa 100%);
+  
 }
 
 .MuiDialog-paper  {

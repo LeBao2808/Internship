@@ -6,13 +6,16 @@ import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
-
+import { z } from "zod";
 interface Role {
   _id?: string;
   name: string;
   description: string;
 }
-
+const RoleSchema = z.object({
+  description: z.string().min(1, "Description is required"),
+  name: z.string().min(1, "Name is required"),
+});
 export default function RoleManagementPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +26,7 @@ export default function RoleManagementPage() {
   const [sortBy, setSortBy] = useState<keyof Role>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
-
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   useEffect(() => {
     fetchRoles();
   }, [sortBy, sortOrder]); // Thêm sortBy, sortOrder vào dependency
@@ -67,11 +70,65 @@ export default function RoleManagementPage() {
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "name") {
+      const result = RoleSchema.shape.name.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          title: result.error.errors[0]?.message || "Invalid title",
+        }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.name;
+          return newErrors;
+        });
+      }
+    }
+
+    if (name === "description") {
+      const result = RoleSchema.shape.description.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          description: result.error.errors[0]?.message || "Invalid description",
+        }));
+      }
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.description;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsModalDelete(false);
+    setErrors({});
+    setForm({
+      description: "",
+      name: "",
+    });
   };
 
   const handleSaveRole = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = RoleSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        name: fieldErrors.name?.[0] || "",
+        description: fieldErrors.description?.[0] || "",
+      });
+      return;
+    }
+    setErrors({});
     if (editingRole) {
       // Update
       await fetch("/api/role", {
@@ -207,7 +264,7 @@ export default function RoleManagementPage() {
       <AdminModal
         open={isModalOpen}
         title={editingRole ? "Edit Role" : "Add Role"}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => handleCloseModal()}
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
@@ -219,14 +276,16 @@ export default function RoleManagementPage() {
               label: "Role Name",
               value: form.name,
               onChange: handleFormChange,
-              required: true,
+              error: !!errors.name,
+              helperText: errors.name,
             },
             {
               name: "description",
               label: "Description",
               value: form.description,
               onChange: handleFormChange,
-              required: true,
+              error: !!errors.description,
+              helperText: errors.description,
             },
           ]}
           onSubmit={handleSaveRole}

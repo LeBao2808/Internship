@@ -6,12 +6,17 @@ import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
-
+import { z } from "zod";
 interface Category {
   _id?: string;
   name: string;
   description: string;
 }
+
+const CategogySchema = z.object({
+  description: z.string().min(1, "Description is required"),
+  name: z.string().min(1, "Name is required"),
+});
 
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -23,6 +28,7 @@ export default function CategoryManagementPage() {
   const [sortBy, setSortBy] = useState<keyof Category>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   useEffect(() => {
     fetchCategories();
   }, [sortBy, sortOrder]);
@@ -67,11 +73,66 @@ export default function CategoryManagementPage() {
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "name") {
+      const result = CategogySchema.shape.name.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          title: result.error.errors[0]?.message || "Invalid title",
+        }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.name;
+          return newErrors;
+        });
+      }
+    }
+
+    if (name === "description") {
+      const result = CategogySchema.shape.description.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          description: result.error.errors[0]?.message || "Invalid description",
+        }));
+      }
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.description;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsModalDelete(false);
+    setErrors({});
+    setForm({
+      description: "",
+      name: "",
+    });
   };
 
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = CategogySchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        name: fieldErrors.name?.[0] || "",
+        description: fieldErrors.description?.[0] || "",
+      });
+      return;
+    }
+    setErrors({});
+
     if (editingCategory) {
       // Update
       await fetch("/api/category", {
@@ -206,7 +267,7 @@ export default function CategoryManagementPage() {
       <AdminModal
         open={isModalOpen}
         title={editingCategory ? "Edit Category" : "Add Category"}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => handleCloseModal()}
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
@@ -218,14 +279,18 @@ export default function CategoryManagementPage() {
               label: "Category Name",
               value: form.name,
               onChange: handleFormChange,
-              required: true,
+              error: !!errors.name,
+              helperText: errors.name,
+              // required: true,
             },
             {
               name: "description",
               label: "Description",
               value: form.description,
               onChange: handleFormChange,
-              required: true,
+              error: !!errors.description,
+              helperText: errors.description,
+              // required: true,
             },
           ]}
           onSubmit={handleSaveCategory}

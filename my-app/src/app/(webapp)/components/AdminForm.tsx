@@ -10,6 +10,8 @@ interface AdminFormProps {
     value?: string | number;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
+    error?: boolean;
+    helperText?: string;
   }>;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   submitLabel?: string;
@@ -55,6 +57,8 @@ const AdminForm: React.FC<AdminFormProps> = ({
             required={field.required}
             fullWidth
             margin="normal"
+            error={field.error}
+            helperText={field.helperText}
           />
         ))}
         {children}

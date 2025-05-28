@@ -8,6 +8,7 @@ import Pagination from "../../components/Pagination";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
+import { z } from "zod";
 interface User {
   id?: number;
   name: string;
@@ -20,6 +21,13 @@ interface Role {
   _id?: number;
   name: string;
 }
+
+const UserSchema = z.object({
+  email: z.string().email("Invalid email format").optional(),
+  name: z.string().min(1, "Name is required"),
+  role: z.string().min(1, "Role is required"),
+});
+
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,6 +49,7 @@ export default function UserManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [user, setUserEdit] = useState<User | null>(null); // Add this line
   const { setMessage } = useMessageStore();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   useEffect(() => {
     fetchRoles();
   }, []);
@@ -93,10 +102,10 @@ export default function UserManagementPage() {
     console.log(user.role);
     setUserEdit(user);
     setForm({
-      name: user.name,
-      email: user.email,
-      image: user.image || "",
-      role: user?.nameRole || "",
+      name: "",
+      email: "",
+      role: "",
+      image: "",
     });
     setIsModalOpen(true);
   };
@@ -117,12 +126,67 @@ export default function UserManagementPage() {
   };
 
   const handleFormChange = (e: React.ChangeEvent<any>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "name") {
+      const result = UserSchema.shape.name.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          name: result.error.errors[0]?.message || "Invalid title",
+        }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.name;
+          return newErrors;
+        });
+      }
+    }
+    if (name === "email") {
+      const result = UserSchema.shape.email.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          email: result.error.errors[0]?.message || "Invalid email",
+        }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.email;
+          return newErrors;
+        });
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setErrors({});
+    setForm({
+      name: "",
+      email: "",
+      role: "",
+      image: "",
+    });
+    setEditingUser(null);
+    setIsModalOpen(false);
   };
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    const result = UserSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        name: fieldErrors.name?.[0] || "",
+        email: fieldErrors.email?.[0] || "",
+        role: fieldErrors.role?.[0] || "",
+      });
+      return;
+    }
 
+    setErrors({});
     const payload = {
       ...form,
       image: typeof form.image === "string" ? form.image : "",
@@ -309,7 +373,7 @@ export default function UserManagementPage() {
       <AdminModal
         open={isModalOpen}
         title={editingUser ? "Edit User" : "Add User"}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => handleCloseModal()}
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
@@ -321,14 +385,18 @@ export default function UserManagementPage() {
               label: "User Name",
               value: form.name,
               onChange: handleFormChange,
-              required: true,
+              // required: true,
+              error: !!errors.name,
+              helperText: errors.name,
             },
             {
               name: "email",
               label: "Email",
               value: form.email,
               onChange: handleFormChange,
-              required: true,
+              // required: true,
+              error: !!errors.email,
+              helperText: errors.email,
             },
           ]}
           onSubmit={handleSaveUser}
@@ -424,12 +492,21 @@ export default function UserManagementPage() {
                 <AdminSelect
                   label="Role"
                   name="role"
+                  error={!!errors.role}
                   value={user?.role._id || form.role || ""}
                   options={roles}
-                  onChange={(e: any) =>
-                    setForm({ ...form, role: e.target.value })
-                  }
-                  required={true}
+                  onChange={(e: any) => {
+                    setForm({ ...form, role: e.target.value });
+                    if (e.target.value) {
+                      setErrors((prev) => {
+                        const newErrors = { ...prev };
+                        delete newErrors.user;
+                        return newErrors;
+                      });
+                    }
+                  }}
+
+                  // required={true}
                 />
               </React.Suspense>
             )}

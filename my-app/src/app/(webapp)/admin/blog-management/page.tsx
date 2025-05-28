@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
+import { z } from "zod";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 interface Blog {
@@ -26,7 +27,13 @@ interface Blog {
   nameuser?: string;
   updatedAt?: string;
 }
-
+const BlogSchema = z.object({
+  title: z.string().trim().min(5, "Title must be at least 5 characters"),
+  content: z.string().min(1, "Content is required"),
+  user: z.string().min(1, "User is required"),
+  category: z.string().min(1, "Category is required"),
+  image_url: z.string().optional(),
+});
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +74,7 @@ export default function BlogManagementPage() {
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { setMessage } = useMessageStore();
-
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -214,14 +221,44 @@ export default function BlogManagementPage() {
   //     setResult("Lỗi kết nối server");
   //   }
   // };
+
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "title") {
+      const result = BlogSchema.shape.title.safeParse(value);
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          title: result.error.errors[0]?.message || "Invalid title",
+        }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.title;
+          return newErrors;
+        });
+      }
+    }
   };
   console.log(form);
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
+    const result = BlogSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        title: fieldErrors.title?.[0] || "",
+        content: fieldErrors.content?.[0] || "",
+        user: fieldErrors.user?.[0] || "",
+        category: fieldErrors.category?.[0] || "",
+      });
+      return;
+    }
+    setErrors({});
     // Đảm bảo image_url là string
     const payload = {
       ...form,
@@ -231,6 +268,7 @@ export default function BlogManagementPage() {
           ? (form.category as { _id: string })._id
           : form.category,
     };
+
     if (editingBlog) {
       await fetch("/api/blog", {
         method: "PUT",
@@ -250,7 +288,7 @@ export default function BlogManagementPage() {
         } else {
           // setIsError(true);
           const data = await res.json();
-          setMessage(data.error || "Unknown error", "error");
+
           return;
         }
       } catch (error) {
@@ -259,6 +297,19 @@ export default function BlogManagementPage() {
     }
     setIsModalOpen(false);
     fetchBlogs();
+  };
+
+  const handleCloseModal = () => {
+    setErrors({});
+    setForm({
+      title: "",
+      content: "",
+      user: "",
+      image_url: "",
+      category: "",
+    });
+    setEditingBlog(null);
+    setIsModalOpen(false);
   };
 
   // Hàm xử lý khi bấm nút xem chi tiết
@@ -293,21 +344,42 @@ export default function BlogManagementPage() {
   const EditorFormat = useMemo(
     () => (
       <Editor
+        error={errors.content}
+        helperText={errors.content}
         value={editingBlog ? editingBlog.content : form.content}
         onChange={(data: any) => {
           // console.log("Editor is ready to use!", data);
           // console.log("editingBlog", editingBlog);
           // console.log("form", form);
+          console.log("data", data);
+          console.log("editingBlog", editingBlog);
           if (editingBlog) {
+            console.log("data", data);
             setEditingBlog({
               ...editingBlog,
               content: data,
             });
+            console.log("editingBlog", editingBlog);
           } else {
             console.log("form", form);
             setForm({ ...form, content: data });
           }
+          // console.log("data", data);
+          console.log("editingBlog", data.length);
+          if (data && data.length === 0) {
+            setErrors((prev) => ({
+              ...prev,
+              content: "Content is required",
+            }));
+          } else {
+            setErrors((prev) => {
+              const newErrors = { ...prev };
+              delete newErrors.content;
+              return newErrors;
+            });
+          }
         }}
+        setErrors={setErrors}
       />
     ),
     [editingBlog, form]
@@ -506,7 +578,7 @@ export default function BlogManagementPage() {
       <AdminModal
         open={isModalOpen}
         title={editingBlog ? "Edit Blog" : "Add Blog"}
-        onClose={hanleClose}
+        onClose={handleCloseModal}
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
@@ -519,7 +591,8 @@ export default function BlogManagementPage() {
               label: "Title",
               value: form.title,
               onChange: handleFormChange,
-              required: true,
+              error: !!errors.title,
+              helperText: errors.title,
             },
             // {
             //   name: "image_url",
@@ -553,14 +626,23 @@ export default function BlogManagementPage() {
               <AdminSelect
                 label="User"
                 name="user"
+                error={!!errors.user}
                 value={form.user}
+                helperText={errors.user}
                 options={users.map((user: any) => ({
                   value: user.id,
                   label: user.name || user.email,
                 }))}
-                onChange={(e: any) =>
-                  setForm({ ...form, user: e.target.value })
-                }
+                onChange={(e: any) => {
+                  setForm({ ...form, user: e.target.value });
+                  if (e.target.value) {
+                    setErrors((prev) => {
+                      const newErrors = { ...prev };
+                      delete newErrors.user;
+                      return newErrors;
+                    });
+                  }
+                }}
               />
             </React.Suspense>
           </div>
@@ -568,26 +650,23 @@ export default function BlogManagementPage() {
           <div>
             {categories.length > 0 && (
               <React.Suspense fallback={null}>
-                {/* {React.createElement(
-                  require("../../components/AdminSelect").default,
-                  {
-                    label: "Category",
-                    name: "category",
-                    value: form.category,
-                    options: categories,
-                    onChange: (e: any) =>
-                      setForm({ ...form, category: e.target.value }),
-                    required: true,
-                  }
-                )} */}
                 <AdminSelect
                   label="Category"
                   name="category"
+                  error={!!errors.category}
+                  helperText={errors.category}
                   value={form.category}
                   options={categories}
-                  onChange={(e: any) =>
-                    setForm({ ...form, category: e.target.value })
-                  }
+                  onChange={(e: any) => {
+                    setForm({ ...form, category: e.target.value });
+                    if (e.target.value) {
+                      setErrors((prev) => {
+                        const newErrors = { ...prev };
+                        delete newErrors.category;
+                        return newErrors;
+                      });
+                    }
+                  }}
                 />
               </React.Suspense>
             )}
@@ -699,6 +778,9 @@ export default function BlogManagementPage() {
               }}
             /> */}
             {EditorFormat}
+            {/* {errors &&
+              (console.log("errors.content", errors.content),
+              (<p className="text-red-500 mt-2">sssss</p>))} */}
           </div>
         </AdminForm>
       </AdminModal>

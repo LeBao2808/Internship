@@ -4,17 +4,25 @@ import React from "react";
 
 const Editor = ({
   onChange,
-  value
+  value,
+  setErrors, // Add this prop
+  error,
+  helperText
 }) => {
   return (
-    <CKEditor
-      data = {value}
-      editor={ClassicEditor}
-      onBlur={(_event, editor) => {
-        const data = editor.getData();
-        onChange(data);
-      }}
-    />
+    <div>
+      <CKEditor
+        data={value}
+        error={error}
+        helperText= {helperText}
+        editor={ClassicEditor}
+        onBlur={(_event, editor) => {
+          const data = editor.getData();
+          onChange(data);
+        }}
+      />
+     
+    </div>
   );
 };
 
