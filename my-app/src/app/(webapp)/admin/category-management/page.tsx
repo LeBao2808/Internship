@@ -7,6 +7,7 @@ import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
+import InputSearch from "../../components/InputSearch";
 interface Category {
   _id?: string;
   name: string;
@@ -36,9 +37,8 @@ export default function CategoryManagementPage() {
   const fetchCategories = async (query = "") => {
     let url = "/api/category";
     const params = [];
-    if (query) url += `?search=${encodeURIComponent(query)}`;
+    if (query) params.push(`search=${encodeURIComponent(query)}`);
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
-    ``;
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
@@ -192,6 +192,7 @@ export default function CategoryManagementPage() {
     >
       {/* <h1>Category Management</h1> */}
       <div
+        className="container-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -199,7 +200,7 @@ export default function CategoryManagementPage() {
           marginBottom: 16,
         }}
       >
-        <form
+        {/* <form
           onSubmit={(e) => {
             e.preventDefault();
             fetchCategories(search);
@@ -231,8 +232,18 @@ export default function CategoryManagementPage() {
           >
             Search
           </button>
-        </form>
+        </form> */}
+
+        <InputSearch
+          onInput={(e) => {
+            setSearch(e.target.value);
+            e.preventDefault();
+            fetchCategories(e.target.value);
+          }}
+        />
+
         <button
+          className="btn-add"
           onClick={handleAddClick}
           style={{
             padding: "8px 16px",

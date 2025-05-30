@@ -9,6 +9,8 @@ import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
+import "./user-management.css";
+import InputSearch from "../../components/InputSearch";
 interface User {
   id?: number;
   name: string;
@@ -61,7 +63,7 @@ export default function UserManagementPage() {
   const fetchUsers = async (query = "") => {
     let url = `/api/user`;
     const params = [];
-    if (query) url += `&search=${encodeURIComponent(query)}`;
+    if (query) params.push(`search=${encodeURIComponent(query)}`);
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
@@ -265,6 +267,7 @@ export default function UserManagementPage() {
     >
       {/* <h1>User Management</h1> */}
       <div
+        className="container-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -272,7 +275,7 @@ export default function UserManagementPage() {
           marginBottom: 16,
         }}
       >
-        <form
+        {/* <form
           onSubmit={(e) => {
             e.preventDefault();
             setCurrentPage(1);
@@ -289,7 +292,7 @@ export default function UserManagementPage() {
               padding: 8,
               borderRadius: 4,
               border: "1px solid #ccc",
-              minWidth: 220,
+              maxWidth: 160,
             }}
           />
           <button
@@ -303,10 +306,31 @@ export default function UserManagementPage() {
               cursor: "pointer",
             }}
           >
-            Search
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+              />
+            </svg>
           </button>
-        </form>
+        </form> */}
+
+        <InputSearch
+          onInput={(e) => {
+            setSearch(e.target.value);
+            fetchUsers(e.target.value);
+          }}
+        />
         <button
+          className="btn-add"
           onClick={handleAddClick}
           style={{
             padding: "8px 16px",

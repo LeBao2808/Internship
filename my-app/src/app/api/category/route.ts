@@ -1,4 +1,4 @@
-import {  NextResponse } from "next/server";
+import {  NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Category from "../models/Category";
 import { z } from 'zod';
@@ -9,7 +9,7 @@ const CategorySchema = z.object({
   description: z.string().max(200).optional(),
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     await dbConnect();
     try {
       const { searchParams } = new URL(request.url);
@@ -18,15 +18,12 @@ export async function GET(request: Request) {
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
       const skip = (page - 1) * limit;
-  
-      const query = search
-        ? {
-            $or: [
-              { name: { $regex: search, $options: "i" } },
-              // { description: { $regex: search, $options: "i" } }
-            ],
-          }
-        : {};
+      let query: any = {};
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+        ];
+      }
   
 
         let sort: any = {};

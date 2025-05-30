@@ -2,6 +2,7 @@
 import React from "react";
 import NavigationClient from "./NavigationClient";
 import { SessionProvider } from "next-auth/react";
+import MobileSlideUp from "./MobileSlideUp";
 import MessageToast from "../components/MessageToast";
 
 export default function AdminLayout({
@@ -25,6 +26,7 @@ export default function AdminLayout({
             <MessageToast />
           </div>
         </main>
+        <MobileSlideUp />
       </div>
     </SessionProvider>
   );

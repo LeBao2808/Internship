@@ -29,7 +29,7 @@ export default function MessageToast() {
   return (
     <>
       <div
-        className={`fixed bottom-30 right-5 z-50 w-72 rounded shadow ${bgColor} text-white`}
+        className={`fixed bottom-5 right-5 z-50 w-72 rounded shadow ${bgColor} text-white`}
       >
         <div className="flex justify-between items-center">
           <div className="px-4 py-2">{message}</div>

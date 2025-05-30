@@ -7,6 +7,7 @@ import AdminForm from "../../components/AdminForm";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
+import InputSearch from "../../components/InputSearch";
 interface Role {
   _id?: string;
   name: string;
@@ -189,6 +190,7 @@ export default function RoleManagementPage() {
     >
       {/* <h1>Role Management</h1> */}
       <div
+        className="container-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -196,7 +198,7 @@ export default function RoleManagementPage() {
           marginBottom: 16,
         }}
       >
-        <form
+        {/* <form
           onSubmit={(e) => {
             e.preventDefault();
             fetchRoles(search);
@@ -228,8 +230,16 @@ export default function RoleManagementPage() {
           >
             Search
           </button>
-        </form>
+        </form> */}
+        <InputSearch
+          onInput={(e) => {
+            setSearch(e.target.value);
+            e.preventDefault();
+            fetchRoles(e.target.value);
+          }}
+        />
         <button
+          className="btn-add"
           onClick={handleAddClick}
           style={{
             padding: "8px 16px",

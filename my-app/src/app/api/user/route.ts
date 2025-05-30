@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../api/models/User";
 import Role from "../../api/models/Role";
@@ -19,7 +19,7 @@ const UserSchema = z.object({
 });
 require('../../api/models/Role');
  
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);

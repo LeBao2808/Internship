@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
+import InputSearch from "../../components/InputSearch";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 interface Blog {
@@ -399,6 +400,7 @@ export default function BlogManagementPage() {
     >
       {/* <h1>Blog Management</h1> */}
       <div
+        className="container-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -406,14 +408,7 @@ export default function BlogManagementPage() {
           marginBottom: 16,
         }}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchBlogs(search, currentPage, pageSize);
-          }}
-          style={{ display: "flex", gap: 8 }}
-        >
-          <input
+        {/* <input
             type="text"
             placeholder="Search blog..."
             value={search}
@@ -437,8 +432,13 @@ export default function BlogManagementPage() {
             }}
           >
             Search
-          </button>
-        </form>
+          </button> */}
+        <InputSearch
+          onInput={(e) => {
+            setSearch(e.target.value);
+            fetchBlogs(e.target.value, currentPage, pageSize);
+          }}
+        />
 
         {/* {isError && (
           <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded shadow-lg flex items-center gap-2 animate-fade-in z-[1000] min-w-[320px] max-w-[90vw]">
