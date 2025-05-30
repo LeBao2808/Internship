@@ -81,10 +81,10 @@ export default function BlogManagementPage() {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    fetchBlogs();
-    // Thêm dòng này để lấy danh sách category
-  }, [sortBy, sortOrder]);
+  // useEffect(() => {
+  //   fetchBlogs();
+  //   // Thêm dòng này để lấy danh sách category
+  // }, [sortBy, sortOrder]);
 
   useEffect(() => {
     fetchBlogs(search, currentPage, pageSize);
@@ -558,7 +558,7 @@ export default function BlogManagementPage() {
           image_url: typeof blog.image_url === "string" ? blog.image_url : "",
         }))}
         onEdit={handleEditBlog}
-        onDelete={handleDeleteModalBlog}
+        onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
 
         // onUpload={handleUploadImage}
@@ -582,7 +582,6 @@ export default function BlogManagementPage() {
         onConfirm={undefined}
         confirmLabel={undefined}
         cancelLabel={undefined}
-        width={{ width: 1000 }}
       >
         <AdminForm
           fields={[
@@ -1010,7 +1009,7 @@ export default function BlogManagementPage() {
         )}
       </AdminModal>
 
-      {isModalDelete && (
+      {/* {isModalDelete && (
         <AdminModal
           open={isModalDelete}
           title="Delete Blog"
@@ -1025,7 +1024,7 @@ export default function BlogManagementPage() {
         >
           <h2>Are you sure you want to delete this Blog?</h2>
         </AdminModal>
-      )}
+      )} */}
     </div>
   );
 }

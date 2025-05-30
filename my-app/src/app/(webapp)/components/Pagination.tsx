@@ -17,7 +17,7 @@ const Pagination: React.FC<PaginationProps> = ({
   pageSizeOptions = [10, 20, 50],
   onPageSizeChange,
 }) => {
-  if (totalPages <= 1) return null;
+  // if (totalPages <= 1) return null;
 
   const getPages = () => {
     const pages = [];
@@ -45,7 +45,7 @@ const Pagination: React.FC<PaginationProps> = ({
         margin: "16px 0",
       }}
     >
-      <button
+      {/* <button
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
         style={{
@@ -57,7 +57,7 @@ const Pagination: React.FC<PaginationProps> = ({
         }}
       >
         First page
-      </button>
+      </button> */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -102,7 +102,7 @@ const Pagination: React.FC<PaginationProps> = ({
       >
         After
       </button>
-      <button
+      {/* <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
         style={{
@@ -114,7 +114,7 @@ const Pagination: React.FC<PaginationProps> = ({
         }}
       >
         Last page
-      </button>
+      </button> */}
       {/* {onPageSizeChange && (
         <select
           value={pageSize}

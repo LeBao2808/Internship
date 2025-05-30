@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useLanguage } from "../LanguageContext";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
+import { Popover, Button, Typography } from "@mui/material";
 
 interface Column {
   id: string;
@@ -40,6 +41,8 @@ const AdminTable: React.FC<AdminTableProps> = ({
 }) => {
   const { t } = useLanguage();
   const [previewImage, setPreviewImage] = useState<string | null>(null); // Thêm state này
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [rowToDelete, setRowToDelete] = useState<any>(null);
 
   // Hàm cắt ngắn chuỗi
   const truncate = (str: string, max: number) => {
@@ -131,9 +134,56 @@ const AdminTable: React.FC<AdminTableProps> = ({
                       </IconButton>
                     )}
                     {onDelete && (
-                      <IconButton color="error" onClick={() => onDelete(row)}>
-                        <DeleteIcon />
-                      </IconButton>
+                      <>
+                        <IconButton
+                          color="error"
+                          onClick={(e) => {
+                            setAnchorEl(e.currentTarget);
+                            setRowToDelete(row);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <Popover
+                          open={Boolean(anchorEl) && rowToDelete === row}
+                          anchorEl={anchorEl}
+                          onClose={() => {
+                            setAnchorEl(null);
+                            setRowToDelete(null);
+                          }}
+                          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                        >
+                          <div style={{ padding: 16, maxWidth: 220 }}>
+                            <Typography variant="body1" gutterBottom>
+                              Are you sure you want to delete?
+                            </Typography>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                              <Button
+                                onClick={() => {
+                                  setAnchorEl(null);
+                                  setRowToDelete(null);
+                                }}
+                                size="small"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                color="error"
+                                variant="contained"
+                                onClick={() => {
+                                  if (onDelete) onDelete(row);
+                                  setAnchorEl(null);
+                                  setRowToDelete(null);
+                                }}
+                                size="small"
+                              >
+                                Confirm
+                              </Button>
+                            </div>
+                          </div>
+                        </Popover>
+                      </>
                     )}
                     {onUpload && (
                       <IconButton

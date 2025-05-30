@@ -8,6 +8,7 @@ import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
+import Pagination from "../../components/Pagination";
 interface Role {
   _id?: string;
   name: string;
@@ -20,6 +21,9 @@ const RoleSchema = z.object({
 export default function RoleManagementPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [isModalDelete, setIsModalDelete] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
@@ -28,15 +32,20 @@ export default function RoleManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  useEffect(() => {
-    fetchRoles();
-  }, [sortBy, sortOrder]); // Thêm sortBy, sortOrder vào dependency
+  // useEffect(() => {
+  //   fetchRoles();
+  // }, [sortBy, sortOrder]); // Thêm sortBy, sortOrder vào dependency
 
-  const fetchRoles = async (query = "") => {
+  useEffect(() => {
+    fetchRoles(search, currentPage, pageSize);
+  }, [search, currentPage, pageSize, sortBy, sortOrder]);
+  const fetchRoles = async (query = "", page = currentPage, size = 10) => {
     let url = "/api/role";
     const params = [];
     if (query) params.push(`search=${encodeURIComponent(query)}`);
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (page) params.push(`page=${page}`);
+    if (size) params.push(`pageSize=${size}`);
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
@@ -97,13 +106,13 @@ export default function RoleManagementPage() {
           ...prev,
           description: result.error.errors[0]?.message || "Invalid description",
         }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.description;
+          return newErrors;
+        });
       }
-    } else {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.description;
-        return newErrors;
-      });
     }
   };
 
@@ -119,7 +128,6 @@ export default function RoleManagementPage() {
 
   const handleSaveRole = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const result = RoleSchema.safeParse(form);
     if (!result.success) {
       const fieldErrors = result.error.flatten().fieldErrors;
@@ -269,7 +277,18 @@ export default function RoleManagementPage() {
         ]}
         rows={Array.isArray(roles) ? roles : []} // Dùng roles trực tiếp, không dùng sortedRoles
         onEdit={handleEditRole}
-        onDelete={handleDeleteModalRole}
+        onDelete={handleDeleteRole}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(total / pageSize) || 1}
+        onPageChange={(page) => setCurrentPage(page)}
+        pageSize={pageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          // setCurrentPage(1);
+        }}
       />
       <AdminModal
         open={isModalOpen}
@@ -303,7 +322,7 @@ export default function RoleManagementPage() {
         />
       </AdminModal>
 
-      {isModalDelete && (
+      {/* {isModalDelete && (
         <AdminModal
           open={isModalDelete}
           title="Delete Role"
@@ -318,7 +337,7 @@ export default function RoleManagementPage() {
         >
           <h2>Are you sure you want to delete this role?</h2>
         </AdminModal>
-      )}
+      )} */}
     </div>
   );
 }

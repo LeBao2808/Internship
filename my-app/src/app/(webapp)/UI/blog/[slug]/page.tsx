@@ -85,14 +85,14 @@ export default function BlogDetailPage({
 
   return (
     <BlogLayout>
-      <div className="max-w-6xl mx-auto flex flex-col gap-8 mt-12 mb-12">
+      <div className="max-w-6xl mx-auto flex flex-col gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
         {/* Nội dung blog */}
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-lg p-6 md:p-12">
-            <h1 className="text-4xl font-extrabold mb-4 text-gray-900 leading-tight">
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-gray-900 leading-tight">
               {blog.title}
             </h1>
-            <div className="flex items-center mb-6 text-gray-500 text-sm gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 text-gray-500 text-xs sm:text-sm gap-2 sm:gap-4">
               {blog.user && (
                 <span className="flex items-center gap-1">
                   <svg
@@ -124,7 +124,7 @@ export default function BlogDetailPage({
             </div>
 
             {blog.image_url ? (
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <img
                   src={blog.image_url}
                   alt={blog.title}
@@ -134,30 +134,30 @@ export default function BlogDetailPage({
             ) : null}
 
             <div
-              className="prose prose-lg max-w-none mt-8 text-gray-800 leading-relaxed"
+              className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
           </div>
         </div>
       </div>
       {/* Thanh trượt bài viết cùng category */}
-      <div className="max-w-6xl mx-auto mt-8">
-        <h2 className="text-xl font-bold mb-4 text-blue-700">
-          Related articles{" "}
+      <div className="max-w-6xl mx-auto mt-6 sm:mt-8 px-2 sm:px-4 md:px-8">
+        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-blue-700">
+          Related articles
         </h2>
-        <div className="flex overflow-x-auto gap-4 pb-2 ">
+        <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-2">
           {latestBlogs.length > 0 ? (
             latestBlogs.map((item) => (
               <a
                 key={item.slug}
                 href={`/UI/blog/${item.slug}`}
-                className="min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-40"
+                className="min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-3 sm:p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-36 sm:w-40"
               >
                 {item.image_url ? (
                   <img
                     src={item.image_url}
                     alt={item.title}
-                    className="w-full h-32 object-cover rounded mb-2"
+                    className="w-full h-24 sm:h-32 object-cover rounded mb-2"
                   />
                 ) : (
                   <svg

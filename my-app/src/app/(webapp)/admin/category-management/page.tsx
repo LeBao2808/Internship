@@ -8,6 +8,7 @@ import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
+import Pagination from "../../components/Pagination";
 interface Category {
   _id?: string;
   name: string;
@@ -23,6 +24,9 @@ export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalDelete, setIsModalDelete] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
@@ -30,15 +34,21 @@ export default function CategoryManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  useEffect(() => {
-    fetchCategories();
-  }, [sortBy, sortOrder]);
+  // useEffect(() => {
+  //   fetchCategories();
+  // }, [sortBy, sortOrder]);
 
-  const fetchCategories = async (query = "") => {
+  useEffect(() => {
+    fetchCategories(search, currentPage, pageSize);
+  }, [search, currentPage, pageSize, sortBy, sortOrder]);
+
+  const fetchCategories = async (query = "", page = currentPage, size = 10) => {
     let url = "/api/category";
     const params = [];
     if (query) params.push(`search=${encodeURIComponent(query)}`);
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (page) params.push(`page=${page}`);
+    if (size) params.push(`pageSize=${size}`);
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
@@ -99,13 +109,13 @@ export default function CategoryManagementPage() {
           ...prev,
           description: result.error.errors[0]?.message || "Invalid description",
         }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.description;
+          return newErrors;
+        });
       }
-    } else {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.description;
-        return newErrors;
-      });
     }
   };
 
@@ -273,7 +283,18 @@ export default function CategoryManagementPage() {
         ]}
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}
-        onDelete={handleDeleteModalCategory}
+        onDelete={handleDeleteCategory}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(total / pageSize) || 1}
+        onPageChange={(page) => setCurrentPage(page)}
+        pageSize={pageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          // setCurrentPage(1);
+        }}
       />
       <AdminModal
         open={isModalOpen}
@@ -309,7 +330,7 @@ export default function CategoryManagementPage() {
         />
       </AdminModal>
 
-      {isModalDelete && (
+      {/* {isModalDelete && (
         <AdminModal
           open={isModalDelete}
           title="Delete Category"
@@ -324,7 +345,7 @@ export default function CategoryManagementPage() {
         >
           <h2>Are you sure you want to delete this Category?</h2>
         </AdminModal>
-      )}
+      )} */}
     </div>
   );
 }

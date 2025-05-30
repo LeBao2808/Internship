@@ -45,6 +45,7 @@ export default function UserManagementPage() {
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState<keyof User>("name");
@@ -56,15 +57,21 @@ export default function UserManagementPage() {
     fetchRoles();
   }, []);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [sortBy, sortOrder]);
+  // useEffect(() => {
+  //   fetchUsers();
+  // }, [sortBy, sortOrder]);
 
-  const fetchUsers = async (query = "") => {
+  useEffect(() => {
+    fetchUsers(search, currentPage, pageSize);
+    // fetchRoles();
+  }, [currentPage, pageSize, search, sortBy, sortOrder]);
+  const fetchUsers = async (query = "", page = currentPage, size = 10) => {
     let url = `/api/user`;
     const params = [];
     if (query) params.push(`search=${encodeURIComponent(query)}`);
     if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+    if (page) params.push(`page=${page}`);
+    if (size) params.push(`pageSize=${size}`);
     if (params.length > 0) url += "?" + params.join("&");
     const res = await fetch(url);
     const data = await res.json();
@@ -224,11 +231,6 @@ export default function UserManagementPage() {
     fetchUsers();
   };
 
-  useEffect(() => {
-    fetchUsers(search);
-    fetchRoles();
-  }, [currentPage, pageSize]);
-
   const renderColumnHeader = (col: { id: keyof User; label: string }) => (
     <span
       className="flex items-center gap-1 cursor-pointer select-none"
@@ -380,7 +382,7 @@ export default function UserManagementPage() {
               : user.role || "",
         }))}
         onEdit={handleEditUser}
-        onDelete={handleDeleteModalUser}
+        onDelete={handleDeleteUser}
       />
 
       {error && <div className="text-red-500 mb-2">{error}</div>}
@@ -391,7 +393,7 @@ export default function UserManagementPage() {
         pageSize={pageSize}
         onPageSizeChange={(size) => {
           setPageSize(size);
-          setCurrentPage(1);
+          // setCurrentPage(1);
         }}
       />
       <AdminModal
@@ -524,7 +526,7 @@ export default function UserManagementPage() {
                     if (e.target.value) {
                       setErrors((prev) => {
                         const newErrors = { ...prev };
-                        delete newErrors.user;
+                        delete newErrors.role;
                         return newErrors;
                       });
                     }
@@ -538,7 +540,7 @@ export default function UserManagementPage() {
         </AdminForm>
       </AdminModal>
 
-      {isModalDelete && (
+      {/* {isModalDelete && (
         <AdminModal
           open={isModalDelete}
           title="Delete User"
@@ -553,7 +555,7 @@ export default function UserManagementPage() {
         >
           <h2>Are you sure you want to delete this User?</h2>
         </AdminModal>
-      )}
+      )} */}
     </div>
   );
 }
