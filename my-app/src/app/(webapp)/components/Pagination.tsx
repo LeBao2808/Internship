@@ -13,11 +13,11 @@ const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  pageSize,
-  pageSizeOptions = [10, 20, 50],
-  onPageSizeChange,
+  // pageSize,
+  // pageSizeOptions = [10, 20, 50],
+  // onPageSizeChange,
 }) => {
-  if (totalPages <= 1) return null;
+  // if (totalPages <= 1) return null;
 
   const getPages = () => {
     const pages = [];
@@ -36,18 +36,38 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", margin: "16px 0" }}>
-      <button
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        justifyContent: "center",
+        margin: "16px 0",
+      }}
+    >
+      {/* <button
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
-        style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === 1 ? "#eee" : "#fff", cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
+        style={{
+          padding: "6px 12px",
+          borderRadius: 4,
+          border: "1px solid #ccc",
+          background: currentPage === 1 ? "#eee" : "#fff",
+          cursor: currentPage === 1 ? "not-allowed" : "pointer",
+        }}
       >
-       First page
-      </button>
+        First page
+      </button> */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === 1 ? "#eee" : "#fff", cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
+        style={{
+          padding: "6px 12px",
+          borderRadius: 4,
+          border: "1px solid #ccc",
+          background: currentPage === 1 ? "#eee" : "#fff",
+          cursor: currentPage === 1 ? "not-allowed" : "pointer",
+        }}
       >
         Before
       </button>
@@ -72,18 +92,30 @@ const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === totalPages ? "#eee" : "#fff", cursor: currentPage === totalPages ? "not-allowed" : "pointer" }}
+        style={{
+          padding: "6px 12px",
+          borderRadius: 4,
+          border: "1px solid #ccc",
+          background: currentPage === totalPages ? "#eee" : "#fff",
+          cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+        }}
       >
-       After 
+        After
       </button>
-      <button
+      {/* <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
-        style={{ padding: "6px 12px", borderRadius: 4, border: "1px solid #ccc", background: currentPage === totalPages ? "#eee" : "#fff", cursor: currentPage === totalPages ? "not-allowed" : "pointer" }}
+        style={{
+          padding: "6px 12px",
+          borderRadius: 4,
+          border: "1px solid #ccc",
+          background: currentPage === totalPages ? "#eee" : "#fff",
+          cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+        }}
       >
         Last page
-      </button>
-      {onPageSizeChange && (
+      </button> */}
+      {/* {onPageSizeChange && (
         <select
           value={pageSize}
           onChange={e => onPageSizeChange(Number(e.target.value))}
@@ -95,7 +127,7 @@ const Pagination: React.FC<PaginationProps> = ({
             </option>
           ))}
         </select>
-      )}
+      )} */}
     </div>
   );
 };

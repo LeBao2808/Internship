@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import Blog from "../../models/Blog";
+import User from "../../models/User";
 import dbConnect from "@/resources/lib/mongodb";
+
 
 const uploadDir = path.join(process.cwd(), "public", "uploads");
 
@@ -14,14 +15,14 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const file = formData.get("image") as File;
-  const blogId = formData.get("id") as string;
-console.log(blogId);
+  const userId = formData.get("id") as string;
+console.log(userId);
 console.log(file);
   if (!file) {
     return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
   }
-  if (!blogId) {
-    return NextResponse.json({ error: "No blog id provided" }, { status: 400 });
+  if (!userId) {
+    return NextResponse.json({ error: "No user id provided" }, { status: 400 });
   }
 
   const arrayBuffer = await file.arrayBuffer();
@@ -33,26 +34,10 @@ console.log(file);
   const imageUrl = "/uploads/" + fileName;
 
   try {
-    await Blog.findByIdAndUpdate(blogId, { image_url: imageUrl });
+    await User.findByIdAndUpdate(userId, { image: imageUrl });
   } catch (e) {
-    return NextResponse.json({ error: "Update blog failed" }, { status: 500 });
+    return NextResponse.json({ error: "Update user failed" }, { status: 500 });
   }
 
-  return NextResponse.json({ image_url: imageUrl }, { status: 200 });
-}
-
-
-
-
-export async function GET() {
-  const dir = path.join(process.cwd(), "public", "uploads");
-  let files: string[] = [];
-  try {
-    files = fs.readdirSync(dir);
-  } catch (e) {
-    return NextResponse.json({ images: [] });
-  }
-  // Returns the public link for each image
-  const images = files.map(file => "/uploads/" + file);
-  return NextResponse.json({ images });
+  return NextResponse.json({ image: imageUrl }, { status: 200 });
 }

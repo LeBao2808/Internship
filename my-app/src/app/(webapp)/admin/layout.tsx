@@ -1,8 +1,9 @@
-"use client"
+"use client";
 import React from "react";
 import NavigationClient from "./NavigationClient";
-import SessionProviderClient from "./SessionProviderClient";
 import { SessionProvider } from "next-auth/react";
+import MobileSlideUp from "./MobileSlideUp";
+import MessageToast from "../components/MessageToast";
 
 export default function AdminLayout({
   children,
@@ -11,14 +12,22 @@ export default function AdminLayout({
 }) {
   return (
     <SessionProvider>
-      <SessionProviderClient>
-      <div style={{ fontFamily: "sans-serif", minHeight: "100vh", background: "#f9f9f9" }}>
+      <div
+        style={{
+          fontFamily: "sans-serif",
+          minHeight: "100vh",
+          background: "#f9f9f9",
+        }}
+      >
         <NavigationClient />
         <main style={{ padding: 32 }}>
+          <div className="w-full items-center justify-center">
             {children}
+            <MessageToast />
+          </div>
         </main>
+        <MobileSlideUp />
       </div>
-      </SessionProviderClient>
     </SessionProvider>
   );
 }

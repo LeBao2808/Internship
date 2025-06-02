@@ -14,10 +14,10 @@ export async function GET(
   try {
     const blog = await Blog.findById(id);
     if (!blog) {
-      return NextResponse.json({ error: 'Không tìm thấy blog' }, { status: 404 });
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
     return NextResponse.json(blog);
   } catch (error) {
-    return NextResponse.json({ error: 'Lỗi server' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

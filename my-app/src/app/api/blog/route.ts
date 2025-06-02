@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
 import slugify from "slugify";
+import { z } from 'zod';
+import { Content } from "next/font/google";
+
+const BlogSchema = z.object({
+  title: z.string().trim().min(5)
+  .optional(),
+});
 
 export async function GET(req: NextRequest) {
   await dbConnect();
@@ -12,9 +19,9 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const skip = (page - 1) * limit;
   const category = searchParams.get("category");
-  const sortParam = searchParams.get("sort") || ""; // Thêm dòng này
+  const sortParam = searchParams.get("sort") || ""; 
 
-  let query: any = {};
+  const query: any = {};
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: "i" } },
@@ -25,13 +32,13 @@ export async function GET(req: NextRequest) {
     query.category = category;
   }
 
-  // Xử lý sort
+  // Handle sort
   let sort: any = {};
   if (sortParam) {
     const [field, direction] = sortParam.split(":");
     sort[field] = direction === "desc" ? -1 : 1;
   } else {
-    sort = { createdAt: -1 }; // Mặc định sort theo createdAt mới nhất
+    sort = { createdAt: -1 }; // Default sort by latest createdAt
   }
 
   try {
@@ -39,8 +46,9 @@ export async function GET(req: NextRequest) {
       Blog.find(query)
         .skip(skip)
         .limit(limit)
-        .sort(sort) // Thêm sort vào đây
-        .populate("category", "name"),
+        .sort(sort) 
+        .populate("category", "name")
+        .populate("user", "name"),
       Blog.countDocuments(query)
     ]);
     return NextResponse.json({ blogs, total, page, limit });
@@ -48,27 +56,50 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-// Thêm mới blog
+
 export async function POST(req: NextRequest) {
   await dbConnect();
 const body = await req.json();
+const parsed = BlogSchema.safeParse(body);
+
+if (!parsed.success) {
+  return NextResponse.json(
+    { error: "Title or content not entered or too short." },
+    { status: 400 }
+  );
+}
   try {
-    const newBlog = await Blog.create({...body,slug:slugify(body.title), createdAt: new Date(), updatedAt: new Date() });
-    return NextResponse.json(newBlog, { status: 201 }); // Trả về một phản hồi thành công với status 201 và dữ liệu của blog mới
+    const newBlog = await Blog.create({...body,slug:slugify(body.title)  .normalize("NFD")                  // tách dấu tiếng Việt
+      .replace(/[\u0300-\u036f]/g, "")   // xoá dấu
+      .replace(/[^a-z0-9\s-]/g, "")      // xoá ký tự đặc biệt
+      .replace(/\s+/g, "-")              // thay space bằng -
+      .replace(/-+/g, "-")               // gộp nhiều dấu - liên tiếp
+      .replace(/^-+|-+$/g, ""), createdAt: new Date(), updatedAt: new Date() });
+    return NextResponse.json(newBlog, { status: 201 }); 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
 
-// Sửa blog (cần truyền id trên query, ví dụ: /api/blog?id=xxx)
+
 export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
   console.log(body);
+  const parsed = BlogSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.format() },
+      { status: 400 }
+    );
+  }
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(
       body.id,
-      { ...body, updatedAt: new Date() },
+      { ...body,
+         updatedAt: new Date() 
+        },
       { new: true }
     );
     if (!updatedBlog) {
@@ -81,13 +112,14 @@ export async function PUT(request: Request) {
 }
 
 
-// Xóa blog (cần truyền id trên query, ví dụ: /api/blog?id=xxx)
+
 export async function DELETE(req: NextRequest) {
   await dbConnect();
   const body = await req.json();
   try {
+    // await Blog.findByIdAndUpdate(body.id,{...body ,deletedAt: new Date(), isDeleted:true});
     await Blog.findByIdAndDelete(body.id);
-    return NextResponse.json({ message: "Blog deleted" }, { status: 200 }); // Trả về một phản hồi thành công với status 200 và thông điệp thành công
+    return NextResponse.json({ message: "Blog deleted" }, { status: 200 }); 
   }catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }

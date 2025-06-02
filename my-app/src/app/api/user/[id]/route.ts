@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
-import User from "../../../api/models/User";// Đảm bảo đường dẫn đúng
+import User from "../../../api/models/User";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest,    params :  {
+  params:Promise<{
+    id:string
+  }>
+}) {
+  const id = (await params.params).id;
   await dbConnect();
-  const { id } = params;
+  
   try {
     const user = await User.findById(id).select("name email");
     if (!user) {

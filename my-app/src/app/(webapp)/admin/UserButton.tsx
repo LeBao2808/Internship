@@ -2,16 +2,22 @@
 import { useSession } from "next-auth/react";
 import React, { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function UserButton() {
   const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputerscience.com%2Fxlasu%2Ffaculties%2Ffaculty.php%3Fid%3D16&psig=AOvVaw1AGntHOW-1HuJFhS_rzTdX&ust=1747793387203000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDgk_L7sI0DFQAAAAAdAAAAABAE';
+  const imageUrl = "/uploads/BlueHead.png";
+  const router = useRouter();
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShow(false);
       }
     }
@@ -25,23 +31,39 @@ const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputer
     };
   }, [show]);
 
-  if (status === "loading") return null;
-  if (!session) return null;
+  // if (status === "loading") return null;
+  // if (!session) return null;
+  // hoặc refreshToken; // hoặc refreshToken
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }} ref={dropdownRef} >
+    <div
+      style={{ position: "relative", display: "inline-block" }}
+      ref={dropdownRef}
+    >
       <button
-        style={{ width: "100%", borderRadius: 4, cursor: "pointer" }}
+        style={{
+          width: "100%",
+          borderRadius: 4,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: 12,
+          border: "none",
+          background: "none",
+          color: "#333",
+          transition: "background 0.3s ease-in-out",
+        }}
         onClick={() => setShow((prev) => !prev)}
       >
-        {/* {session.user?.name || session.user?.email} */}
-        <img
-  src={session?.user?.image || imageUrl }
-  alt={session?.user?.name || 'User'}
-  width={40}
-  height={40}
-  className="rounded-full"
-/>
+        <Image
+          src={session?.user?.image || imageUrl}
+          alt={session?.user?.name || "User"}
+          width={40}
+          height={40}
+          className="rounded-full mr-4"
+        />
+        <p className="text-white">{session?.user?.name}</p>
       </button>
       {show && (
         <div
@@ -59,11 +81,21 @@ const imageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Flasucomputer
           }}
         >
           {/* <strong>Tên user:</strong> {session.user?.name || session.user?.email} */}
-          <button 
-              style={{ marginTop: 12, width: "100%" }} className="nav-view-btn"
-          >View Detail</button>
           <button
+            style={{ marginTop: 12, width: "100%" }}
+            className="nav-view-btn"
             onClick={() => {
+              // Giả sử bạn có userId trong session.user.userId
+              if (session?.user) {
+                router.push(`/admin/viewdetail-user`);
+              }
+            }}
+          >
+            View Detail
+          </button>
+          <button
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
               signOut({ callbackUrl: "/authen/login", redirect: true });
             }}
             className="nav-logout-btn"

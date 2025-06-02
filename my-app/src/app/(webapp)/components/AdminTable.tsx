@@ -1,14 +1,22 @@
-
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, IconButton } from "@mui/material";
+import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  IconButton,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useLanguage } from "../LanguageContext";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
+import { Popover, Button, Typography } from "@mui/material";
 
 interface Column {
   id: string;
-  label: React.ReactNode; 
+  label: React.ReactNode;
 }
 
 interface AdminTableProps {
@@ -18,11 +26,21 @@ interface AdminTableProps {
   onDelete?: (row: any) => void;
   onViewDetail?: (row: any) => void; // Thêm props mới
   onUpload?: (row: any) => void; // Thêm props mới
+  onVisible?: (row: any) => void; // Thêm props mới
 }
 
-const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete, onViewDetail, onUpload }) => {
-  const { t } = useLanguage();
+const AdminTable: React.FC<AdminTableProps> = ({
+  columns,
+  rows,
+  onEdit,
+  onDelete,
+  onViewDetail,
+  onUpload,
+  onVisible,
+}) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null); // Thêm state này
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [rowToDelete, setRowToDelete] = useState<any>(null);
 
   // Hàm cắt ngắn chuỗi
   const truncate = (str: string, max: number) => {
@@ -39,7 +57,9 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
               {columns.map((col) => (
                 <TableCell key={col.id}>{col.label}</TableCell>
               ))}
-              {(onEdit || onDelete || onViewDetail || onUpload) && <TableCell>{t("action")}</TableCell>}
+              {(onEdit || onDelete || onViewDetail || onUpload) && (
+                <TableCell>action</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -53,30 +73,56 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
-                      cursor: typeof row[col.id] === "string" && row[col.id].length > 30 ? "pointer" : "default"
+                      cursor:
+                        typeof row[col.id] === "string" &&
+                        row[col.id].length > 30
+                          ? "pointer"
+                          : "default",
                     }}
                   >
-                    {col.id === "image_url" && typeof row[col.id] === "string" && row[col.id] ? (
+                    {(col.id === "image_url" || col.id === "image") &&
+                    typeof row[col.id] === "string" &&
+                    row[col.id] ? (
                       <img
                         src={row[col.id]}
                         alt="blog"
-                        style={{width: 60, height: 40, objectFit: "cover", cursor: "pointer", border: "1px solid #eee", background: "#f5f5f5"}}
+                        style={{
+                          width: 60,
+                          height: 40,
+                          objectFit: "cover",
+                          cursor: "pointer",
+                          border: "1px solid #eee",
+                          background: "#f5f5f5",
+                        }}
                         onClick={() => setPreviewImage(row[col.id])}
                       />
-                    ) : col.id === "content" && typeof row[col.id] === "string" ? (
+                    ) : col.id === "content" &&
+                      typeof row[col.id] === "string" ? (
                       <div
-                        style={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-                        dangerouslySetInnerHTML={{ __html: truncate(row[col.id],30) }}
+                        style={{
+                          maxWidth: 200,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: truncate(row[col.id], 30),
+                        }}
                       />
-                    ) : typeof row[col.id] === "string"
-                      ? truncate(row[col.id], 30)
-                      : row[col.id]}
+                    ) : typeof row[col.id] === "string" ? (
+                      truncate(row[col.id], 30)
+                    ) : (
+                      row[col.id]
+                    )}
                   </TableCell>
                 ))}
                 {(onEdit || onDelete || onViewDetail) && (
                   <TableCell sx={{ width: 240 }}>
                     {onViewDetail && (
-                      <IconButton color="info" onClick={() => onViewDetail(row)}>
+                      <IconButton
+                        color="info"
+                        onClick={() => onViewDetail(row)}
+                      >
                         <EyeIcon style={{ width: 24, height: 24 }} />
                       </IconButton>
                     )}
@@ -86,13 +132,77 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
                       </IconButton>
                     )}
                     {onDelete && (
-                      <IconButton color="error" onClick={() => onDelete(row)}>
-                        <DeleteIcon />
-                      </IconButton>
+                      <>
+                        <IconButton
+                          color="error"
+                          onClick={(e) => {
+                            setAnchorEl(e.currentTarget);
+                            setRowToDelete(row);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <Popover
+                          open={Boolean(anchorEl) && rowToDelete === row}
+                          anchorEl={anchorEl}
+                          onClose={() => {
+                            setAnchorEl(null);
+                            setRowToDelete(null);
+                          }}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "center",
+                          }}
+                          transformOrigin={{
+                            vertical: "bottom",
+                            horizontal: "center",
+                          }}
+                        >
+                          <div style={{ padding: 16, maxWidth: 220 }}>
+                            <Typography variant="body1" gutterBottom>
+                              Are you sure you want to delete?
+                            </Typography>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                gap: 8,
+                              }}
+                            >
+                              <Button
+                                onClick={() => {
+                                  setAnchorEl(null);
+                                  setRowToDelete(null);
+                                }}
+                                size="small"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                color="error"
+                                variant="contained"
+                                onClick={() => {
+                                  if (onDelete) onDelete(row);
+                                  setAnchorEl(null);
+                                  setRowToDelete(null);
+                                }}
+                                size="small"
+                              >
+                                Confirm
+                              </Button>
+                            </div>
+                          </div>
+                        </Popover>
+                      </>
                     )}
                     {onUpload && (
-                      <IconButton color="secondary" onClick={() => onUpload(row)}>
-                        <span role="img" aria-label="upload">⬆️</span>
+                      <IconButton
+                        color="secondary"
+                        onClick={() => onUpload(row)}
+                      >
+                        <span role="img" aria-label="upload">
+                          ⬆️
+                        </span>
                       </IconButton>
                     )}
                   </TableCell>
@@ -107,12 +217,15 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
         <div
           style={{
             position: "fixed",
-            top: 0, left: 0, right: 0, bottom: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             background: "rgba(0,0,0,0.6)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 9999
+            zIndex: 9999,
           }}
           onClick={() => setPreviewImage(null)}
         >
@@ -124,9 +237,9 @@ const AdminTable: React.FC<AdminTableProps> = ({ columns, rows, onEdit, onDelete
               maxHeight: "90vh",
               borderRadius: 8,
               background: "#fff",
-              boxShadow: "0 4px 32px rgba(0,0,0,0.2)"
+              boxShadow: "0 4px 32px rgba(0,0,0,0.2)",
             }}
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}

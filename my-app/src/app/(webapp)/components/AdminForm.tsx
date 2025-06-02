@@ -10,6 +10,8 @@ interface AdminFormProps {
     value?: string | number;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
+    error?: boolean;
+    helperText?: string;
   }>;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   submitLabel?: string;
@@ -23,13 +25,28 @@ const AdminForm: React.FC<AdminFormProps> = ({
   onSubmit,
   submitLabel = "Lưu",
   children,
-  onBack
+  onBack,
 }) => {
   return (
     <>
-      <Box component="form" onSubmit={onSubmit} sx={{ p: 3, border: "1px solid #eee", width: "100%", borderRadius: 2, maxWidth: 1000, mx: "auto" }}>
-        {title && <Typography variant="h6" mb={2}>{title}</Typography>}
-        {fields.map((field, idx) => (
+      <Box
+        component="form"
+        onSubmit={onSubmit}
+        sx={{
+          p: 3,
+          border: "1px solid #eee",
+          width: "100%",
+          borderRadius: 2,
+          maxWidth: 1000,
+          mx: "auto",
+        }}
+      >
+        {title && (
+          <Typography variant="h6" mb={2}>
+            {title}
+          </Typography>
+        )}
+        {fields.map((field) => (
           <TextField
             key={field.name}
             label={field.label}
@@ -40,15 +57,33 @@ const AdminForm: React.FC<AdminFormProps> = ({
             required={field.required}
             fullWidth
             margin="normal"
+            error={field.error}
+            helperText={field.helperText}
           />
         ))}
         {children}
-        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>{submitLabel}</Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          {submitLabel}
+        </Button>
       </Box>
       {onBack && (
-        <Box sx={{ maxWidth: 500, mx: "auto", mt: 2, display: "flex", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            maxWidth: 500,
+            mx: "auto",
+            mt: 2,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
           <Button onClick={onBack} variant="outlined" color="secondary">
-            Quay lại
+            Back
           </Button>
         </Box>
       )}

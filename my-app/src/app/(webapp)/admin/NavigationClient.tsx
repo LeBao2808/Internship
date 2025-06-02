@@ -2,38 +2,51 @@
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { useLanguage } from "../LanguageContext";
+// import { signOut } from "next-auth/react";
+// import { useLanguage } from "../LanguageContext";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { CiLogin } from "react-icons/ci";
+// import { CiLogin } from "react-icons/ci";
 import UserButton from "./UserButton";
+import { useEffect, useState } from "react";
 
 export default function NavigationClient() {
   const pathname = usePathname();
-  const { lang, setLang } = useLanguage ? useLanguage() : { lang: "vi", setLang: () => {} };
-  const { t, i18n } = useTranslation ? useTranslation() : { t: (s:string)=>s, i18n: { language: "vi", changeLanguage: ()=>{} } };
+
+  // const { lang, setLang } = useLanguage
+  //   ? useLanguage()
+  //   : { lang: "vi", setLang: () => {} };
+
   const router = useRouter();
   const navItems = [
-    { label: t("User"), href: "/admin/user-management" },
-    { label: t("Role"), href: "/admin/role-management" },
-    { label: t("Blog"), href: "/admin/blog-management" },
-    { label: t("Category"), href: "/admin/category-management" },
+    { label: "User", href: "/admin/user-management" },
+    { label: "Role", href: "/admin/role-management" },
+    { label: "Blog", href: "/admin/blog-management" },
+    { label: "Category", href: "/admin/category-management" },
     // { label: t("Home"), href: "/UI/blog" },
   ];
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  if (isMobile) return null;
   return (
-    
     <nav
       style={{
-        position:"relative",
+        position: "relative",
         height: 64,
         display: "flex",
         gap: 16,
         padding: "16px 32px",
         background: "#1976d2",
         color: "#fff",
-        alignItems: "center"
+        alignItems: "center",
       }}
     >
       <style>{`
@@ -104,23 +117,24 @@ export default function NavigationClient() {
           box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
           }
       `}</style>
-         
- 
-      <img src="/logo.png" alt="Logo" style={{ width: "auto", height: "100px" }} />
+
+      <img
+        src="/logo.png"
+        alt="Logo"
+        style={{ width: "auto", height: "100px", cursor: "pointer" }}
+        onClick={() => router.push("/admin")}
+      />
       {navItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
-          className={
-            "nav-link" + (pathname === item.href ? " active" : "")
-          }
+          className={"nav-link" + (pathname === item.href ? " active" : "")}
         >
           {item.label}
         </Link>
       ))}
       <div style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
-
-      {/* <button
+        {/* <button
           onClick={() => {
             router.push("/UI/blog");
           }}
@@ -128,7 +142,7 @@ export default function NavigationClient() {
         >
           Visit your blog
         </button> */}
-        <UserButton  />
+        <UserButton />
 
         {/* <button
           onClick={() => {

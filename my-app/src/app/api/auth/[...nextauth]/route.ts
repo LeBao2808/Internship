@@ -3,14 +3,14 @@ import GoogleProvider from "next-auth/providers/google";
 import type { NextAuthOptions } from "next-auth";
 
 // Define authentication options
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "select_account", // luôn chọn tài khoản
+          prompt: "select_account", // select_account is the default behavior
         },
       },
     }),
@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
      // Allows callback URLs on the same origin
      else if (new URL(url).origin === baseUrl) return url
     //  return baseUrl
-    return "/admin/user-management";
+    return "/admin";
     //Youcan add and modify it your usecase here
    }
  },

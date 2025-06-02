@@ -1,0 +1,23 @@
+@media (max-width: 768px) {
+  .admin-table {
+    font-size: 14px;
+    overflow-x: auto;
+  }
+  .admin-modal {
+    width: 95vw;
+    padding: 8px;
+  }
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-add{
+  margin-top: 10px;
+  }
+  .container-header{
+    display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  /* flex-direction: row-reverse; */
+  }
+}

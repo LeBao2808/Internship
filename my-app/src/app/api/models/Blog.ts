@@ -6,7 +6,7 @@ import slugify from "slugify";
 export interface IBlog extends Document, IBaseTimestamps {
   title: string;
   content: string;
-  image_url: string; // Thêm dòng này
+  image_url: string; 
   user: mongoose.Schema.Types.ObjectId;
   category: mongoose.Schema.Types.ObjectId;
   slug: string;
@@ -15,7 +15,7 @@ export interface IBlog extends Document, IBaseTimestamps {
 const BlogSchema: Schema<IBlog> = new Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
-  image_url: { type: String }, // Thêm dòng này
+  image_url: { type: String }, 
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   slug: {
