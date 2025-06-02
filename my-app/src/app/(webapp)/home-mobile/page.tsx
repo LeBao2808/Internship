@@ -17,11 +17,11 @@ export default function HomeMobile({ onSelect }: { onSelect?: () => void }) {
   ];
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <Head>
         <title>{t("Home")}</title>
       </Head>
-      <main className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+      <main className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 ">
         <div className="flex flex-col items-center mb-8">
           <div
             className="bg-white shadow-lg rounded-full p-2 mb-3 hover:shadow-xl transition-shadow duration-200 cursor-pointer glow-animate"
@@ -30,7 +30,7 @@ export default function HomeMobile({ onSelect }: { onSelect?: () => void }) {
             <img
               src="/logo.png"
               alt="Logo"
-              className="w-24 h-24 object-contain bg-cyan-700 rounded-full"
+              className="w-24 h-24 object-contain bg-cyan-700 rounded-full "
             />
           </div>
           {/* <h1 className="text-4xl font-extrabold text-blue-700 drop-shadow-lg text-center tracking-tight">
@@ -53,6 +53,21 @@ export default function HomeMobile({ onSelect }: { onSelect?: () => void }) {
           ))}
         </div>
       </main>
+      <style jsx global>{`
+        .blog-home-bg {
+          background: linear-gradient(
+            to right,
+            rgb(255, 228, 230),
+            rgb(204, 251, 241)
+          );
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </div>
   );
 }

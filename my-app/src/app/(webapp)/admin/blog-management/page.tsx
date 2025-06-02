@@ -313,7 +313,7 @@ export default function BlogManagementPage() {
     setIsModalOpen(false);
   };
 
-  // Hàm xử lý khi bấm nút xem chi tiết
+ 
   const handleViewDetail = (blog: Blog) => {
     setDetailBlog(blog);
     setDetailModalOpen(true);

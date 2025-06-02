@@ -7,6 +7,8 @@ import HomeMobile from "../home-mobile/page";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { FaUser, FaUserShield, FaBlog, FaList } from "react-icons/fa";
+import { signOut } from "next-auth/react";
+import { TbLogout } from "react-icons/tb";
 export default function MobileSlideUp() {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -144,7 +146,7 @@ export default function MobileSlideUp() {
                 <a
                   className={`nav-link-mobile ${
                     pathname === item.href ? "active" : null
-                  } `}
+                  }`}
                   key={index}
                   href={item.href}
                 >
@@ -152,6 +154,16 @@ export default function MobileSlideUp() {
                   {item.label}
                 </a>
               ))}
+              <button
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  signOut({ callbackUrl: "/authen/login", redirect: true });
+                }}
+                className="nav-logout-btn width-96  flex  bg-red-500 w-full justify-center text-white p-[5px] font-semibold mt-[3px] cursor-pointer rounded-sm "
+              >
+                <TbLogout className="text-xl mr-2" />
+                <span>Logout</span>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>

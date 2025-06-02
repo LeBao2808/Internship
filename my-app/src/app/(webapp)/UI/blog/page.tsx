@@ -32,7 +32,19 @@ export default function BlogPage({ blog }: { blog: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
+  const [isMobile, setIsMobile] = useState(false);
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   // const savedSearch = localStorage.getItem("blog_search") || "";
   useEffect(() => {
     const fetchUserNames = async () => {
@@ -135,26 +147,36 @@ export default function BlogPage({ blog }: { blog: any }) {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="blog-home-bg min-h-screen py-10 px-2 md:px-0">
+    <div className={`blog-home-bg min-h-screen px-5 sm:px-2 py-10 md:px-0`}>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
-            Learn to Code,
-            <br />
-            One Day at a Time
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            A blog for beginners and aspiring developers to grow their coding
-            skills.
-          </p>
-          {/* <div className="flex justify-center gap-4 mb-2 flex-wrap">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow" onClick={()=>setCategory(null)}>
-              Explore the Blog
-            </button>
-            <button className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition shadow" onClick={()=>router.push('/UI/blog')}>Get Started</button>
-          </div> */}
-        </div>
+
+        {isMobile ? (
+          <div className="text-center mb-12">
+            <h3 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900 drop-shadow-lg leading-tight">
+              Learn to Code
+              <br />
+              One Day at a Time
+            </h3>
+
+            <p className="text-sm md:text-base text-gray-600 mb-2">
+              A blog for beginners and aspiring developers to grow their coding
+              skills.
+            </p>
+          </div>
+        ) : (
+          <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
+              Learn to Code
+              <br />
+              One Day at a Time
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              A blog for beginners and aspiring developers to grow their coding
+              skills.
+            </p>
+          </div>
+        )}
 
         {/* Featured Posts */}
         <div className="mb-12">
@@ -399,7 +421,7 @@ export default function BlogPage({ blog }: { blog: any }) {
             disabled={page === 1}
             className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition"
           >
-            Previous page
+            Previous
           </button>
           <span className="text-gray-700 font-semibold">
             Page {page} / {totalPages}
@@ -409,17 +431,13 @@ export default function BlogPage({ blog }: { blog: any }) {
             disabled={page === totalPages || totalPages === 0}
             className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition"
           >
-            Next page
+            Next
           </button>
         </div>
       </div>
       <style jsx global>{`
         .blog-home-bg {
-          background: linear-gradient(
-            to right,
-            rgb(255, 228, 230),
-            rgb(204, 251, 241)
-          );
+          background: bg-gradient-to-r from-cyan-200 to-cyan-400;
         }
         .line-clamp-3 {
           display: -webkit-box;
