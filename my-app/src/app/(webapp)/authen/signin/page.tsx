@@ -14,6 +14,7 @@ export default function SignIn() {
 
   useEffect(() => {
     if (session) {
+      //ssss
       router.push("/");
     } else {
       getProviders().then((prov) => setProviders(prov));
