@@ -74,10 +74,10 @@ export default function RoleManagementPage() {
     fetchRoles();
   };
 
-  const handleDeleteModalRole = (role: Role) => {
-    setEditingRole(role);
-    setIsModalDelete(true);
-  };
+  // const handleDeleteModalRole = (role: Role) => {
+  //   setEditingRole(role);
+  //   setIsModalDelete(true);
+  // };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

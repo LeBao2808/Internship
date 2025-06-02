@@ -46,7 +46,7 @@ const AdminForm: React.FC<AdminFormProps> = ({
             {title}
           </Typography>
         )}
-        {fields.map((field, idx) => (
+        {fields.map((field) => (
           <TextField
             key={field.name}
             label={field.label}

@@ -2,32 +2,27 @@
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { useLanguage } from "../LanguageContext";
+// import { signOut } from "next-auth/react";
+// import { useLanguage } from "../LanguageContext";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { CiLogin } from "react-icons/ci";
+// import { CiLogin } from "react-icons/ci";
 import UserButton from "./UserButton";
 import { useEffect, useState } from "react";
 
 export default function NavigationClient() {
   const pathname = usePathname();
 
-  const { lang, setLang } = useLanguage
-    ? useLanguage()
-    : { lang: "vi", setLang: () => {} };
-  const { t, i18n } = useTranslation
-    ? useTranslation()
-    : {
-        t: (s: string) => s,
-        i18n: { language: "vi", changeLanguage: () => {} },
-      };
+  // const { lang, setLang } = useLanguage
+  //   ? useLanguage()
+  //   : { lang: "vi", setLang: () => {} };
+
   const router = useRouter();
   const navItems = [
-    { label: t("User"), href: "/admin/user-management" },
-    { label: t("Role"), href: "/admin/role-management" },
-    { label: t("Blog"), href: "/admin/blog-management" },
-    { label: t("Category"), href: "/admin/category-management" },
+    { label: "User", href: "/admin/user-management" },
+    { label: "Role", href: "/admin/role-management" },
+    { label: "Blog", href: "/admin/blog-management" },
+    { label: "Category", href: "/admin/category-management" },
     // { label: t("Home"), href: "/UI/blog" },
   ];
   const [isMobile, setIsMobile] = useState(false);

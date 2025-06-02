@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category");
   const sortParam = searchParams.get("sort") || ""; 
 
-  let query: any = {};
+  const query: any = {};
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: "i" } },

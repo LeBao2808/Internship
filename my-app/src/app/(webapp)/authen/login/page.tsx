@@ -78,7 +78,7 @@ export default function LoginPage() {
           Sign in Google
         </button>
         <div className="mt-6 text-blue-900">
-          Don't have an account?{" "}
+          Dont have an account?{" "}
           <a
             href="/authen/register"
             className="text-blue-700 underline hover:text-blue-900"

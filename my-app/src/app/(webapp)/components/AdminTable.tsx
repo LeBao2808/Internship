@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useLanguage } from "../LanguageContext";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import { Popover, Button, Typography } from "@mui/material";
@@ -39,7 +38,6 @@ const AdminTable: React.FC<AdminTableProps> = ({
   onUpload,
   onVisible,
 }) => {
-  const { t } = useLanguage();
   const [previewImage, setPreviewImage] = useState<string | null>(null); // Thêm state này
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [rowToDelete, setRowToDelete] = useState<any>(null);
@@ -60,7 +58,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
                 <TableCell key={col.id}>{col.label}</TableCell>
               ))}
               {(onEdit || onDelete || onViewDetail || onUpload) && (
-                <TableCell>{t("action")}</TableCell>
+                <TableCell>action</TableCell>
               )}
             </TableRow>
           </TableHead>
@@ -151,14 +149,26 @@ const AdminTable: React.FC<AdminTableProps> = ({
                             setAnchorEl(null);
                             setRowToDelete(null);
                           }}
-                          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "center",
+                          }}
+                          transformOrigin={{
+                            vertical: "bottom",
+                            horizontal: "center",
+                          }}
                         >
                           <div style={{ padding: 16, maxWidth: 220 }}>
                             <Typography variant="body1" gutterBottom>
                               Are you sure you want to delete?
                             </Typography>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                gap: 8,
+                              }}
+                            >
                               <Button
                                 onClick={() => {
                                   setAnchorEl(null);

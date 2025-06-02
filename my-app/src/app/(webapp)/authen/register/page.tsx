@@ -27,7 +27,7 @@ export default function RegisterPage() {
         const data = await res.json();
         setError(data.error || "Đăng ký thất bại");
       }
-    } catch (err) {
+    } catch (_) {
       setError("Lỗi kết nối máy chủ");
     }
   };

@@ -2,8 +2,8 @@
 
 import React from "react";
 import { useEffect, useState, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import HomeMobile from "../home-mobile/page";
+import { usePathname } from "next/navigation";
+// import HomeMobile from "../home-mobile/page";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { FaUser, FaUserShield, FaBlog, FaList } from "react-icons/fa";
@@ -12,8 +12,8 @@ import { TbLogout } from "react-icons/tb";
 export default function MobileSlideUp() {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-  const [shouldRender, setShouldRender] = useState(false);
+  // const router = useRouter();
+  // const [shouldRender, setShouldRender] = useState(false);
 
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -26,12 +26,9 @@ export default function MobileSlideUp() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const { t, i18n } = useTranslation
-    ? useTranslation()
-    : {
-        t: (s: string) => s,
-        i18n: { language: "vi", changeLanguage: () => {} },
-      };
+  const { t } = {
+    t: (s: string) => s,
+  };
 
   const navItems = [
     {

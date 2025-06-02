@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "10", 10);      
   const skip = (page - 1) * limit;
-  let query: any = {};
+  const query: any = {};
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: "i" } },

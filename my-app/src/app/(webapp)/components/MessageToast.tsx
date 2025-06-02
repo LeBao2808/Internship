@@ -7,7 +7,7 @@ import { useMessageStore } from "../components/messageStore";
 export default function MessageToast() {
   const { message, type, show, clearMessage } = useMessageStore();
   const duration = 3000;
-  const [visible, setVisible] = useState(true);
+
   useEffect(() => {
     if (show) {
       const timer = setTimeout(() => {
@@ -19,7 +19,6 @@ export default function MessageToast() {
 
   if (!show) return null;
 
-  if (!visible) return null;
   const bgColor = {
     success: "bg-green-500",
     error: "bg-red-500",

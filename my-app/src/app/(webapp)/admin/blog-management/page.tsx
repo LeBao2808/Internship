@@ -1,13 +1,12 @@
 "use client";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
-import { Category } from "@mui/icons-material";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import AdminSelect from "../../components/AdminSelect";
@@ -15,6 +14,19 @@ import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
+
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+}
+
+interface User {
+  _id?: string;
+  id?: string;
+  name: string;
+  email: string;
+}
 
 interface Blog {
   _id?: string;
@@ -38,7 +50,7 @@ const BlogSchema = z.object({
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUpload, setIsUpload] = useState(false);
+  // const [isUpload, setIsUpload] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const [form, setForm] = useState({
     title: "",
@@ -53,13 +65,7 @@ export default function BlogManagementPage() {
   const [search, setSearch] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [detailBlog, setDetailBlog] = useState<Blog | null>(null);
-  const [image, setImage] = useState<File | null>(null);
-  const [blogId, setBlogId] = useState("");
-  const [result, setResult] = useState<string | null>(null);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [uploadingBlog, setUploadingBlog] = useState<Blog | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [previewUpload, setPreviewUpload] = useState<string | null>(null);
   const [categories, setCategories] = useState<
     { value: string; label: string }[]
   >([]);
@@ -67,13 +73,8 @@ export default function BlogManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const textareaRef = useRef(null);
-  const [isModalDelete, setIsModalDelete] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const router = useRouter();
-  const [page, setPage] = useState(1);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   useEffect(() => {
@@ -95,7 +96,7 @@ export default function BlogManagementPage() {
     const data = await res.json();
     const arr = Array.isArray(data.categories) ? data.categories : [];
     setCategories(
-      arr.map((cat: any) => ({
+      arr.map((cat: Category) => ({
         value: cat._id || cat.id,
         label: cat.name,
       }))
@@ -121,7 +122,7 @@ export default function BlogManagementPage() {
     const data = await res.json();
     const arr = Array.isArray(data.users) ? data.users : [];
     setUsers(
-      arr.map((user: any) => ({
+      arr.map((user: User) => ({
         id: user._id || user.id,
         name: user.name || user.email,
         email: user.email,
@@ -129,25 +130,25 @@ export default function BlogManagementPage() {
     );
   };
 
-  const hanleClose = () => {
-    setIsModalOpen(false);
-    setEditingBlog(null);
-    setForm({
-      title: "",
-      content: "",
-      user: "",
-      image_url: "",
-      category: "",
-    });
-  };
+  // const hanleClose = () => {
+  //   setIsModalOpen(false);
+  //   setEditingBlog(null);
+  //   setForm({
+  //     title: "",
+  //     content: "",
+  //     user: "",
+  //     image_url: "",
+  //     category: "",
+  //   });
+  // };
 
   const handleAddClick = () => {
-    setIsUpload(false);
+    // setIsUpload(false);
 
     setIsModalOpen(true);
   };
   const handleEditBlog = (blog: Blog) => {
-    setIsUpload(true);
+    // setIsUpload(true);
     setEditingBlog(blog);
     console.log("blog", blog);
 
@@ -181,17 +182,10 @@ export default function BlogManagementPage() {
     fetchBlogs();
   };
 
-  const handleDeleteModalBlog = (blog: Blog) => {
-    setEditingBlog(blog);
-    setIsModalDelete(true);
-  };
-  const handleUploadImage = (blog: Blog) => {
-    setUploadingBlog(blog);
-    setBlogId(blog._id || "");
-    setImage(null);
-    setResult(null);
-    setIsUploadModalOpen(true);
-  };
+  // const handleDeleteModalBlog = (blog: Blog) => {
+  //   setEditingBlog(blog);
+  //   // setIsModalDelete(true);
+  // };
 
   // const handleUploadImageSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -288,11 +282,10 @@ export default function BlogManagementPage() {
           setMessage("Add Blog Successful!", "success");
         } else {
           // setIsError(true);
-          const data = await res.json();
-
+          // const data = await res.json();
           return;
         }
-      } catch (error) {
+      } catch {
         setMessage("Add Blog Failed!", "error");
       }
     }
@@ -313,7 +306,6 @@ export default function BlogManagementPage() {
     setIsModalOpen(false);
   };
 
- 
   const handleViewDetail = (blog: Blog) => {
     setDetailBlog(blog);
     setDetailModalOpen(true);

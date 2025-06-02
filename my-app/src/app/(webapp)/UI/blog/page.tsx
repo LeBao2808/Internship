@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 
 interface Blog {
   _id: string;
@@ -20,7 +19,7 @@ interface Category {
   name: string;
 }
 
-export default function BlogPage({ blog }: { blog: any }) {
+export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -30,8 +29,7 @@ export default function BlogPage({ blog }: { blog: any }) {
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("search") || "";
+
   const [isMobile, setIsMobile] = useState(false);
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
 
@@ -70,7 +68,6 @@ export default function BlogPage({ blog }: { blog: any }) {
       setUserNames(newUserNames);
     };
     if (blogs.length > 0) fetchUserNames();
-    // eslint-disable-next-line
   }, [blogs]);
 
   // Lấy featured posts (giả lập: 3 bài đầu tiên)
@@ -119,10 +116,6 @@ export default function BlogPage({ blog }: { blog: any }) {
     setLoading(false);
   };
 
-  const handleViewDetail = () => {
-    router.push(`/blog/${blog.slug}`);
-  };
-
   useEffect(() => {
     // This code only runs on the client
     // const savedSearch = typeof window !== "undefined" ? localStorage.getItem("blog_search") || "" : "";
@@ -135,8 +128,6 @@ export default function BlogPage({ blog }: { blog: any }) {
 
   useEffect(() => {
     fetchBlogs();
-
-    // eslint-disable-next-line
   }, [search, page, category, router]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

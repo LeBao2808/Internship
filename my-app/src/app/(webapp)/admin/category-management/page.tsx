@@ -23,9 +23,9 @@ const CategogySchema = z.object({
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalDelete, setIsModalDelete] = useState(false);
+  // const [isModalDelete, setIsModalDelete] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  // const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
@@ -67,10 +67,10 @@ export default function CategoryManagementPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteModalCategory = (category: Category) => {
-    setEditingCategory(category);
-    setIsModalDelete(true);
-  };
+  // const handleDeleteModalCategory = (category: Category) => {
+  //   setEditingCategory(category);
+  //   // setIsModalDelete(true);
+  // };
 
   const handleDeleteCategory = async (category: Category) => {
     await fetch("/api/category", {
@@ -121,7 +121,7 @@ export default function CategoryManagementPage() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIsModalDelete(false);
+    // setIsModalDelete(false);
     setErrors({});
     setForm({
       description: "",
@@ -288,7 +288,7 @@ export default function CategoryManagementPage() {
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(total / pageSize) || 1}
+        totalPages={Math.ceil(0 / pageSize) || 1}
         onPageChange={(page) => setCurrentPage(page)}
         pageSize={pageSize}
         onPageSizeChange={(size) => {

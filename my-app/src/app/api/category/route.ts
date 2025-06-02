@@ -11,14 +11,14 @@ const CategorySchema = z.object({
 
 export async function GET(request: NextRequest) {
     await dbConnect();
+    const { searchParams } = new URL(request.url);
     try {
-      const { searchParams } = new URL(request.url);
       const search = searchParams.get("search") || "";
       const sortParam = searchParams.get("sort") || ""; 
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
       const skip = (page - 1) * limit;
-      let query: any = {};
+      const query: any = {};
       if (search) {
         query.$or = [
           { name: { $regex: search, $options: "i" } },
