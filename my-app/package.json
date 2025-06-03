@@ -33,6 +33,7 @@
     "react-icons": "^5.5.0",
     "slugify": "^1.6.6",
     "uuid": "^11.1.0",
+    "zod": "^3.25.49",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
