@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Footer from "../../components/Footer";
 
 interface Blog {
   _id: string;
@@ -138,7 +139,7 @@ export default function BlogPage() {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className={`blog-home-bg min-h-screen px-5 sm:px-2 py-10 md:px-0`}>
+    <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
 
@@ -426,9 +427,10 @@ export default function BlogPage() {
           </button>
         </div>
       </div>
+
       <style jsx global>{`
         .blog-home-bg {
-          background: bg-gradient-to-r from-cyan-200 to-cyan-400;
+          padding-top: 40px;
         }
         .line-clamp-3 {
           display: -webkit-box;
@@ -437,6 +439,7 @@ export default function BlogPage() {
           overflow: hidden;
         }
       `}</style>
+      <Footer />
     </div>
   );
 }

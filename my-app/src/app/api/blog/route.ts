@@ -3,7 +3,6 @@ import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
 import slugify from "slugify";
 import { z } from 'zod';
-import { Content } from "next/font/google";
 
 const BlogSchema = z.object({
   title: z.string().trim().min(5)
