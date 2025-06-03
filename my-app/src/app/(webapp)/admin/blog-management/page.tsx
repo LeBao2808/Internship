@@ -15,12 +15,6 @@ import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
-interface Category {
-  _id?: string;
-  id?: string;
-  name: string;
-}
-
 interface User {
   _id?: string;
   id?: string;
@@ -96,7 +90,7 @@ export default function BlogManagementPage() {
     const data = await res.json();
     const arr = Array.isArray(data.categories) ? data.categories : [];
     setCategories(
-      arr.map((cat: Category) => ({
+      arr.map((cat: any) => ({
         value: cat._id || cat.id,
         label: cat.name,
       }))
