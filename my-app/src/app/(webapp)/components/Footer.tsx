@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function Footer() {
   return (
-    <footer className="bg-blue-700 text-white py-6 mt-10">
+    <footer className="bg-blue-700 text-white py-6 mt-10 ">
       <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex flex-col items-center md:items-start">
           <img

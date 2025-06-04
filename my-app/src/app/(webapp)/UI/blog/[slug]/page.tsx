@@ -1,7 +1,6 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Footer from "../../../components/Footer";
 
 import BlogLayout from "../BlogLayout";
 interface Blog {
