@@ -8,7 +8,8 @@ const BlogSchema = z.object({
   title: z.string().trim().min(5)
   .optional(),
 });
-
+require('../../api/models/Category');
+require('../../api/models/User');
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
