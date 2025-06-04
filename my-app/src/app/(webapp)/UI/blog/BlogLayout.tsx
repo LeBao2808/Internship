@@ -66,7 +66,6 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
       </div>
       {/* Nội dung trang */}
       <div>{children}</div>
-      <Footer />
     </div>
   );
 };

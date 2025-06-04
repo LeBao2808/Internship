@@ -15,13 +15,6 @@ import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
-interface User {
-  _id?: string;
-  id?: string;
-  name: string;
-  email: string;
-}
-
 interface Blog {
   _id?: string;
   title: string;
@@ -116,7 +109,7 @@ export default function BlogManagementPage() {
     const data = await res.json();
     const arr = Array.isArray(data.users) ? data.users : [];
     setUsers(
-      arr.map((user: User) => ({
+      arr.map((user: any) => ({
         id: user._id || user.id,
         name: user.name || user.email,
         email: user.email,

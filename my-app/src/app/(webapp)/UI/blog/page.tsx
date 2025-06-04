@@ -439,7 +439,7 @@ export default function BlogPage() {
           overflow: hidden;
         }
       `}</style>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

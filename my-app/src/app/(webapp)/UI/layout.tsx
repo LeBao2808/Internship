@@ -1,5 +1,5 @@
-"use client";
 import React from "react";
+import Footer from "../components/Footer";
 
 export default function AdminLayout({
   children,
@@ -15,6 +15,7 @@ export default function AdminLayout({
     >
       <main style={{}}>
         <div className="w-full items-center justify-center">{children}</div>
+        <Footer />
       </main>
     </div>
   );
