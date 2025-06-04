@@ -105,7 +105,7 @@ export default function BlogManagementPage() {
   };
 
   const fetchUsers = async () => {
-    const res = await fetch("/api/user?sort=name:asc");
+    const res = await fetch("/api/user");
     const data = await res.json();
     const arr = Array.isArray(data.users) ? data.users : [];
     setUsers(
