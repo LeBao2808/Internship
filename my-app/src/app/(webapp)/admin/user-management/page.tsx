@@ -15,7 +15,8 @@ interface User {
   id?: number;
   name: string;
   email: string;
-  role: Role; // Allow role to be string or object
+  // role: Role; // Allow role to be string or object
+  role: string | { _id: string; name: string };
   image: string;
   nameRole: string;
 }
@@ -53,6 +54,7 @@ export default function UserManagementPage() {
   const [user, setUserEdit] = useState<User | null>(null); // Add this line
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     fetchRoles();
   }, []);
@@ -66,19 +68,24 @@ export default function UserManagementPage() {
     // fetchRoles();
   }, [currentPage, pageSize, search, sortBy, sortOrder]);
   const fetchUsers = async (query = "", page = currentPage, size = 10) => {
-    let url = `/api/user`;
-    const params = [];
-    if (query) params.push(`search=${encodeURIComponent(query)}`);
-    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
-    if (page) params.push(`page=${page}`);
-    if (size) params.push(`pageSize=${size}`);
-    if (params.length > 0) url += "?" + params.join("&");
-    const res = await fetch(url);
-    const data = await res.json();
-    setUsers(
-      data.users.map((user: any) => ({ ...user, id: user.id || user._id }))
-    );
-    setTotal(data.total);
+    try {
+      setLoading(true);
+      let url = `/api/user`;
+      const params = [];
+      if (query) params.push(`search=${encodeURIComponent(query)}`);
+      if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+      if (page) params.push(`page=${page}`);
+      if (size) params.push(`pageSize=${size}`);
+      if (params.length > 0) url += "?" + params.join("&");
+      const res = await fetch(url);
+      const data = await res.json();
+      setUsers(
+        data.users.map((user: any) => ({ ...user, id: user.id || user._id }))
+      );
+      setTotal(data.total);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchRoles = async () => {
@@ -110,22 +117,29 @@ export default function UserManagementPage() {
     console.log(user);
     console.log(user.role);
     setUserEdit(user);
+    console.log(editingUser);
     setForm({
-      name: "",
-      email: "",
-      role: "",
-      image: "",
+      name: user.name,
+      email: user.email,
+      role:
+        typeof user.role === "object" && user.role !== null
+          ? user.role._id
+          : typeof user.role === "object" && user.role !== null
+          ? user.role || user.role
+          : user.role || "",
+
+      image: user.image || "",
     });
     setIsModalOpen(true);
   };
-
+  console.log("editingUser", editingUser);
   const handleDeleteUser = async (user: User) => {
     await fetch("/api/user", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: user.id }),
     });
-    setMessage("Delete User Successful!", "error");
+    // setMessage("Delete User Successful!", "error");
     fetchUsers();
   };
 
@@ -357,7 +371,7 @@ export default function UserManagementPage() {
             label: renderColumnHeader({ id: "email", label: "Email" }),
           },
           {
-            id: "role",
+            id: "nameRole",
             label: renderColumnHeader({ id: "role", label: "Role" }),
           },
           {
@@ -372,17 +386,22 @@ export default function UserManagementPage() {
         rows={users.map((user) => ({
           ...user,
           role:
-            typeof user.role === "object" && user.role !== null
-              ? user.role.name || user.role._id || ""
-              : user.role || "",
+            typeof user.role === "object" &&
+            user.role !== null &&
+            "name" in user.role
+              ? user.role._id
+              : user.role,
           image: typeof user.image === "string" ? user.image : "",
           nameRole:
-            typeof user.role === "object" && user.role !== null
-              ? user.role._id || user.role._id || ""
-              : user.role || "",
+            typeof user.role === "object" &&
+            user.role !== null &&
+            "name" in user.role
+              ? user.role.name
+              : user.role,
         }))}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
+        loading={loading}
       />
 
       {error && <div className="text-red-500 mb-2">{error}</div>}
@@ -519,7 +538,8 @@ export default function UserManagementPage() {
                   label="Role"
                   name="role"
                   error={!!errors.role}
-                  value={user?.role._id || form.role || ""}
+                  value={form.role}
+                  helperText={errors.role}
                   options={roles}
                   onChange={(e: any) => {
                     setForm({ ...form, role: e.target.value });
@@ -531,7 +551,6 @@ export default function UserManagementPage() {
                       });
                     }
                   }}
-
                   // required={true}
                 />
               </React.Suspense>

@@ -64,6 +64,8 @@ export default function BlogManagementPage() {
   const router = useRouter();
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -91,17 +93,22 @@ export default function BlogManagementPage() {
   };
 
   const fetchBlogs = async (query = "", page = currentPage, size = 10) => {
-    let url = "/api/blog";
-    const params = [];
-    if (query) params.push(`search=${encodeURIComponent(query)}`);
-    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
-    if (page) params.push(`page=${page}`);
-    if (size) params.push(`pageSize=${size}`);
-    if (params.length > 0) url += "?" + params.join("&");
-    const res = await fetch(url);
-    const data = await res.json();
-    setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
-    setTotal(data.total);
+    try {
+      setLoading(true);
+      let url = "/api/blog";
+      const params = [];
+      if (query) params.push(`search=${encodeURIComponent(query)}`);
+      if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+      if (page) params.push(`page=${page}`);
+      if (size) params.push(`pageSize=${size}`);
+      if (params.length > 0) url += "?" + params.join("&");
+      const res = await fetch(url);
+      const data = await res.json();
+      setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
+      setTotal(data.total);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchUsers = async () => {
@@ -131,7 +138,14 @@ export default function BlogManagementPage() {
 
   const handleAddClick = () => {
     // setIsUpload(false);
-
+    setEditingBlog(null);
+    setForm({
+      title: "",
+      content: "",
+      user: "",
+      image_url: "",
+      category: "",
+    });
     setIsModalOpen(true);
   };
   const handleEditBlog = (blog: Blog) => {
@@ -160,13 +174,17 @@ export default function BlogManagementPage() {
   };
 
   const handleDeleteBlog = async (blog: Blog) => {
-    await fetch("/api/blog", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: blog._id }),
-    });
-    setMessage("Delete Blog Successful!", "error");
-    fetchBlogs();
+    try {
+      await fetch("/api/blog", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: blog._id }),
+      });
+      setMessage("Delete Blog Successful!", "error");
+      fetchBlogs();
+    } catch (err) {
+      setMessage("Delete Blog Failed!", "error");
+    }
   };
 
   // const handleDeleteModalBlog = (blog: Blog) => {
@@ -250,14 +268,15 @@ export default function BlogManagementPage() {
           ? (form.category as { _id: string })._id
           : form.category,
     };
-
     if (editingBlog) {
-      await fetch("/api/blog", {
+      const res = await fetch("/api/blog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingBlog._id, ...payload }),
+        body: JSON.stringify({ id: editingBlog._id, ...editingBlog }),
       });
-      setMessage("Edit Blog Successful!", "success");
+      if (res.ok) {
+        setMessage("Edit Blog Successful!", "success");
+      }
     } else {
       try {
         const res = await fetch("/api/blog", {
@@ -282,6 +301,7 @@ export default function BlogManagementPage() {
 
   const handleCloseModal = () => {
     setErrors({});
+    setEditingBlog(null);
     setForm({
       title: "",
       content: "",
@@ -289,7 +309,7 @@ export default function BlogManagementPage() {
       image_url: "",
       category: "",
     });
-    setEditingBlog(null);
+
     setIsModalOpen(false);
   };
 
@@ -327,10 +347,7 @@ export default function BlogManagementPage() {
         error={errors.content}
         helperText={errors.content}
         value={editingBlog ? editingBlog.content : form.content}
-        onChange={(data: any) => {
-          // console.log("Editor is ready to use!", data);
-          // console.log("editingBlog", editingBlog);
-          // console.log("form", form);
+        onChange={(data: string) => {
           console.log("data", data);
           console.log("editingBlog", editingBlog);
           if (editingBlog) {
@@ -339,7 +356,6 @@ export default function BlogManagementPage() {
               ...editingBlog,
               content: data,
             });
-            console.log("editingBlog", editingBlog);
           } else {
             console.log("form", form);
             setForm({ ...form, content: data });
@@ -364,7 +380,45 @@ export default function BlogManagementPage() {
     ),
     [editingBlog, form]
   );
-  // console.log(editingBlog);
+
+  const ImgUpload = useMemo(() => {
+    if (editingBlog) {
+      return (
+        editingBlog.image_url && (
+          <img
+            src={editingBlog.image_url}
+            alt="Preview"
+            style={{
+              maxWidth: 120,
+              maxHeight: 80,
+              borderRadius: 8,
+              border: "1px solid #eee",
+              boxShadow: "0 2px 8px #e3e3e3",
+              background: "#fafbfc",
+              objectFit: "cover",
+            }}
+          />
+        )
+      );
+    }
+    return (
+      form.image_url && (
+        <img
+          src={form.image_url}
+          alt="Preview"
+          style={{
+            maxWidth: 120,
+            maxHeight: 80,
+            borderRadius: 8,
+            border: "1px solid #eee",
+            boxShadow: "0 2px 8px #e3e3e3",
+            background: "#fafbfc",
+            objectFit: "cover",
+          }}
+        />
+      )
+    );
+  }, [form, editingBlog]);
 
   return (
     <div
@@ -539,7 +593,7 @@ export default function BlogManagementPage() {
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
-
+        loading={loading}
         // onUpload={handleUploadImage}
       />
 
@@ -697,7 +751,14 @@ export default function BlogManagementPage() {
                         });
                         const data = await res.json();
                         if (res.ok && data.image_url) {
-                          setForm({ ...form, image_url: data.image_url });
+                          if (editingBlog) {
+                            setEditingBlog({
+                              ...editingBlog,
+                              image_url: data.image_url,
+                            });
+                          } else {
+                            setForm({ ...form, image_url: data.image_url });
+                          }
                         } else {
                           alert(
                             "Upload thất bại: " +
@@ -708,7 +769,7 @@ export default function BlogManagementPage() {
                     }}
                   />
                 </label>
-                {form.image_url && (
+                {/* {form.image_url && (
                   <img
                     src={form.image_url}
                     alt="Preview"
@@ -722,7 +783,8 @@ export default function BlogManagementPage() {
                       objectFit: "cover",
                     }}
                   />
-                )}
+                )} */}
+                {ImgUpload}
               </div>
             </div>
           )}

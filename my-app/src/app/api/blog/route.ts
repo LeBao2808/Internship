@@ -13,7 +13,6 @@ require('../../api/models/User');
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
-
   const search = searchParams.get("search") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "10", 10);
@@ -60,8 +59,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   await dbConnect();
 const body = await req.json();
+// console.log(body);
 const parsed = BlogSchema.safeParse(body);
-
+console.log(parsed);
 if (!parsed.success) {
   return NextResponse.json(
     { error: "Title or content not entered or too short." },
@@ -116,6 +116,7 @@ export async function PUT(request: Request) {
 export async function DELETE(req: NextRequest) {
   await dbConnect();
   const body = await req.json();
+  console.log(body);
   try {
     // await Blog.findByIdAndUpdate(body.id,{...body ,deletedAt: new Date(), isDeleted:true});
     await Blog.findByIdAndDelete(body.id);

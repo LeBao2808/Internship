@@ -32,6 +32,7 @@ export default function RoleManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
   // useEffect(() => {
   //   fetchRoles();
   // }, [sortBy, sortOrder]); // Thêm sortBy, sortOrder vào dependency
@@ -40,16 +41,22 @@ export default function RoleManagementPage() {
     fetchRoles(search, currentPage, pageSize);
   }, [search, currentPage, pageSize, sortBy, sortOrder]);
   const fetchRoles = async (query = "", page = currentPage, size = 10) => {
-    let url = "/api/role";
-    const params = [];
-    if (query) params.push(`search=${encodeURIComponent(query)}`);
-    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
-    if (page) params.push(`page=${page}`);
-    if (size) params.push(`pageSize=${size}`);
-    if (params.length > 0) url += "?" + params.join("&");
-    const res = await fetch(url);
-    const data = await res.json();
-    setRoles(Array.isArray(data.roles) ? data.roles : []);
+    try {
+      setLoading(true);
+      let url = "/api/role";
+      const params = [];
+      if (query) params.push(`search=${encodeURIComponent(query)}`);
+      if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+      if (page) params.push(`page=${page}`);
+      if (size) params.push(`pageSize=${size}`);
+      if (params.length > 0) url += "?" + params.join("&");
+      const res = await fetch(url);
+      const data = await res.json();
+      setRoles(Array.isArray(data.roles) ? data.roles : []);
+    } finally {
+      setLoading(false);
+    }
+    // setLoading(true);
   };
 
   const handleAddClick = () => {
@@ -278,6 +285,7 @@ export default function RoleManagementPage() {
         rows={Array.isArray(roles) ? roles : []} // Dùng roles trực tiếp, không dùng sortedRoles
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
+        loading={loading}
       />
 
       <Pagination

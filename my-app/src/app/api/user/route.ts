@@ -82,6 +82,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
+  console.log(body);
   const parsed = UserSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

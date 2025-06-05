@@ -25,7 +25,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
       <div className="max-w-7xl mx-auto flex items-center gap-4 mt-8 mb-6 px-4 ">
         <button
           onClick={() => router.push("/UI/blog")}
-          className="p-2 rounded-full hover:bg-blue-100 transition bg-white"
+          className="p-2 rounded-full hover:bg-blue-100 transition bg-white cursor-pointer "
           title="Về trang chủ blog"
         >
           <svg
@@ -66,6 +66,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
       </div>
       {/* Nội dung trang */}
       <div>{children}</div>
+      <Footer />
     </div>
   );
 };

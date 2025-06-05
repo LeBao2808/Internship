@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
-
 interface Blog {
   _id: string;
   title: string;
@@ -175,42 +174,52 @@ export default function BlogPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Featured Posts
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredPosts.map((blog, idx) => (
-              <div
-                key={blog._id}
-                className="bg-white rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
-                onClick={() => router.push(`/UI/blog/${blog.slug}`)}
-              >
-                <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">
-                  {blog.title}
-                </h3>
+          {loading ? (
+            <div className="flex justify-center items-center h-40">
+              <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></span>
+            </div>
+          ) : blogs.length === 0 ? (
+            <div className="text-center text-gray-500 py-12 text-lg">
+              No blog found.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredPosts.map((blog, idx) => (
                 <div
-                  className="text-gray-600 mb-3 line-clamp-3"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      blog.content && blog.content.length > 90
-                        ? blog.content.slice(0, 90) + "..."
-                        : blog.content || "",
-                  }}
-                />
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {blog.category && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-                      {blog.category.name}
-                    </span>
-                  )}
-                </div>
-                <button
+                  key={blog._id}
+                  className="bg-white rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
                   onClick={() => router.push(`/UI/blog/${blog.slug}`)}
-                  // onClick={handleViewDetail}
-                  className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
                 >
-                  Read More
-                </button>
-              </div>
-            ))}
-          </div>
+                  <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">
+                    {blog.title}
+                  </h3>
+                  <div
+                    className="text-gray-600 mb-3 line-clamp-3"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        blog.content && blog.content.length > 90
+                          ? blog.content.slice(0, 90) + "..."
+                          : blog.content || "",
+                    }}
+                  />
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {blog.category && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                        {blog.category.name}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                    // onClick={handleViewDetail}
+                    className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
+                  >
+                    Read More
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Browse by Category */}
@@ -313,7 +322,7 @@ export default function BlogPage() {
 
           <div className="flex px-6 py-3 rounded-md border-2 border-blue-500 overflow-hidden bg-white ">
             <input
-              type="email"
+              // type="email"
               placeholder="Search Something..."
               onChange={handleSearchChange}
               className="w-full outline-none bg-transparent text-gray-600 text-sm"
@@ -439,7 +448,7 @@ export default function BlogPage() {
           overflow: hidden;
         }
       `}</style>
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }

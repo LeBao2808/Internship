@@ -1,5 +1,4 @@
 import React from "react";
-import Footer from "../components/Footer";
 
 export default function AdminLayout({
   children,
@@ -13,10 +12,7 @@ export default function AdminLayout({
         minHeight: "100vh",
       }}
     >
-      <main style={{}}>
-        <div className="w-full items-center justify-center">{children}</div>
-        <Footer />
-      </main>
+      <main style={{}}>{children}</main>
     </div>
   );
 }

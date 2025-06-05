@@ -34,6 +34,7 @@ export default function CategoryManagementPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
   // useEffect(() => {
   //   fetchCategories();
   // }, [sortBy, sortOrder]);
@@ -43,16 +44,21 @@ export default function CategoryManagementPage() {
   }, [search, currentPage, pageSize, sortBy, sortOrder]);
 
   const fetchCategories = async (query = "", page = currentPage, size = 10) => {
-    let url = "/api/category";
-    const params = [];
-    if (query) params.push(`search=${encodeURIComponent(query)}`);
-    if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
-    if (page) params.push(`page=${page}`);
-    if (size) params.push(`pageSize=${size}`);
-    if (params.length > 0) url += "?" + params.join("&");
-    const res = await fetch(url);
-    const data = await res.json();
-    setCategories(Array.isArray(data.categories) ? data.categories : []);
+    try {
+      setLoading(true);
+      let url = "/api/category";
+      const params = [];
+      if (query) params.push(`search=${encodeURIComponent(query)}`);
+      if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
+      if (page) params.push(`page=${page}`);
+      if (size) params.push(`pageSize=${size}`);
+      if (params.length > 0) url += "?" + params.join("&");
+      const res = await fetch(url);
+      const data = await res.json();
+      setCategories(Array.isArray(data.categories) ? data.categories : []);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddClick = () => {
@@ -284,6 +290,7 @@ export default function CategoryManagementPage() {
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}
         onDelete={handleDeleteCategory}
+        loading={loading}
       />
 
       <Pagination
