@@ -269,6 +269,9 @@ export default function BlogManagementPage() {
           : form.category,
     };
     if (editingBlog) {
+      editingBlog.title = form.title;
+      editingBlog.user = form.user;
+      editingBlog.category = form.category;
       const res = await fetch("/api/blog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -341,6 +344,7 @@ export default function BlogManagementPage() {
       )}
     </span>
   );
+  console.log("blogs", editingBlog);
   const EditorFormat = useMemo(
     () => (
       <Editor
