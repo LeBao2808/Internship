@@ -30,8 +30,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 w-full">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 w-full px-3">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center ">
         <h2 className="text-2xl font-bold text-blue-900 mb-6">Sign In</h2>
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <div>
