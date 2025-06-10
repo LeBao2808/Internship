@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import type { NextAuthOptions } from "next-auth";
-
+const ADMIN_EMAIL = "ble07983@gmail.com";
 // Define authentication options
 const authOptions: NextAuthOptions = {
   providers: [
@@ -24,7 +24,6 @@ const authOptions: NextAuthOptions = {
      else if (new URL(url).origin === baseUrl) return url
     //  return baseUrl
     return "/admin";
-    //Youcan add and modify it your usecase here
    }
  },
 

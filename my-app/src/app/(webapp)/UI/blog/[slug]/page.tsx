@@ -2,6 +2,7 @@
 import { use, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import BlogLayout from "../BlogLayout";
+import CommentSection from "../../../components/CommentSection";
 interface Blog {
   _id: string;
   title: string;
@@ -136,58 +137,62 @@ export default function BlogDetailPage({
               className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
+            <hr className="text-gray-100 mt-10" />
+            <div className="max-w-6xl mx-auto mt-6 sm:mt-8 px-2 sm:px-0 md:px-2">
+              <h2 className="text-xl sm:text-xl font-semibold mb-3 sm:mb-4  ">
+                Related articles
+              </h2>
+              <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-2">
+                {latestBlogs.length > 0 ? (
+                  latestBlogs.map((item) => (
+                    <a
+                      key={item.slug}
+                      href={`/UI/blog/${item.slug}`}
+                      className="min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-3 sm:p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-36 sm:w-40"
+                    >
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-24 sm:h-32 object-cover rounded mb-2"
+                        />
+                      ) : (
+                        <svg
+                          className="h-auto aspect-[8/5] w-full text-blue-400 opacity-40"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 6v6l4 2"
+                          />
+                        </svg>
+                      )}
+                      <div className="font-semibold text-gray-900 line-clamp-2">
+                        {item.title}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString()
+                          : ""}
+                      </div>
+                    </a>
+                  ))
+                ) : (
+                  <div className="text-gray-400 text-sm">
+                    Không có bài viết nào.
+                  </div>
+                )}
+              </div>
+            </div>
+            <CommentSection slug={slug} />
           </div>
         </div>
       </div>
       {/* Thanh trượt bài viết cùng category */}
-      <div className="max-w-6xl mx-auto mt-6 sm:mt-8 px-2 sm:px-4 md:px-8">
-        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-blue-700">
-          Related articles
-        </h2>
-        <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-2">
-          {latestBlogs.length > 0 ? (
-            latestBlogs.map((item) => (
-              <a
-                key={item.slug}
-                href={`/UI/blog/${item.slug}`}
-                className="min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-3 sm:p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-36 sm:w-40"
-              >
-                {item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-24 sm:h-32 object-cover rounded mb-2"
-                  />
-                ) : (
-                  <svg
-                    className="h-auto aspect-[8/5] w-full text-blue-400 opacity-40"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6v6l4 2"
-                    />
-                  </svg>
-                )}
-                <div className="font-semibold text-gray-900 line-clamp-2">
-                  {item.title}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString()
-                    : ""}
-                </div>
-              </a>
-            ))
-          ) : (
-            <div className="text-gray-400 text-sm">Không có bài viết nào.</div>
-          )}
-        </div>
-      </div>
     </BlogLayout>
   );
 }

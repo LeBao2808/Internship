@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
         Category.find(query).skip(skip).limit(limit).sort(sort),
         Category.countDocuments(query),
       ]);
+      console.log(categories);
   
       return NextResponse.json({ categories, total, page, limit });
     } catch (error: any) {
@@ -48,6 +49,7 @@ export async function GET(request: NextRequest) {
   export async function POST(request: Request) {
     await dbConnect();
     const body = await request.json();
+    console.log(body);
     const parsed = CategorySchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -66,6 +68,7 @@ export async function GET(request: NextRequest) {
   export async function PUT(request: Request) {
     await dbConnect();
     const body = await request.json();
+    console.log(body);
     const parsed = CategorySchema.safeParse(body);
 
     if (!parsed.success) {
@@ -86,6 +89,7 @@ export async function GET(request: NextRequest) {
   export async function DELETE(request: Request) {
     await dbConnect();
     const body = await request.json();
+    console.log(body);
     try {
       Category.findByIdAndUpdate(body.id,{...body, deletedAt: new Date(), deleted: true});
       await Category.findByIdAndDelete(body.id);

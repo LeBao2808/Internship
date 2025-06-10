@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
+
 interface Blog {
   _id: string;
   title: string;
@@ -141,7 +142,14 @@ export default function BlogPage() {
     <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
-
+        <div className="flex w-full justify-end">
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition w-[200px] cursor-pointer border-10 border-blue-600 hover:border-blue-700 "
+            onClick={() => router.push("/authen/login")}
+          >
+            Login
+          </button>
+        </div>
         {isMobile ? (
           <div className="text-center mb-12">
             <h3 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900 drop-shadow-lg leading-tight">
@@ -439,7 +447,7 @@ export default function BlogPage() {
 
       <style jsx global>{`
         .blog-home-bg {
-          padding-top: 40px;
+          padding-top: 20px;
         }
         .line-clamp-3 {
           display: -webkit-box;

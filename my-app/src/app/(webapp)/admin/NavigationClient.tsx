@@ -23,6 +23,7 @@ export default function NavigationClient() {
     { label: "Role", href: "/admin/role-management" },
     { label: "Blog", href: "/admin/blog-management" },
     { label: "Category", href: "/admin/category-management" },
+    { label: "Comment", href: "/admin/comment-management" },
     // { label: t("Home"), href: "/UI/blog" },
   ];
   const [isMobile, setIsMobile] = useState(false);

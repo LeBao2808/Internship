@@ -73,11 +73,6 @@ export default function CategoryManagementPage() {
     setIsModalOpen(true);
   };
 
-  // const handleDeleteModalCategory = (category: Category) => {
-  //   setEditingCategory(category);
-  //   // setIsModalDelete(true);
-  // };
-
   const handleDeleteCategory = async (category: Category) => {
     await fetch("/api/category", {
       method: "DELETE",
@@ -216,40 +211,6 @@ export default function CategoryManagementPage() {
           marginBottom: 16,
         }}
       >
-        {/* <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchCategories(search);
-          }}
-          style={{ display: "flex", gap: 8 }}
-        >
-          <input
-            type="text"
-            placeholder="Search category..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: 8,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              minWidth: 220,
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "8px 16px",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-          >
-            Search
-          </button>
-        </form> */}
-
         <InputSearch
           onInput={(e) => {
             setSearch(e.target.value);
@@ -336,23 +297,6 @@ export default function CategoryManagementPage() {
           submitLabel={editingCategory ? "Update" : "Create"}
         />
       </AdminModal>
-
-      {/* {isModalDelete && (
-        <AdminModal
-          open={isModalDelete}
-          title="Delete Category"
-          onClose={() => setIsModalDelete(false)}
-          onConfirm={() => {
-            handleDeleteCategory(editingCategory!);
-            setIsModalDelete(false);
-          }}
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          isDelete={true}
-        >
-          <h2>Are you sure you want to delete this Category?</h2>
-        </AdminModal>
-      )} */}
     </div>
   );
 }

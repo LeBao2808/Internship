@@ -2,12 +2,15 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 import { IBaseTimestamps } from "./BaseTimestamps";
 import { baseTimestamps } from "./BaseTimestamps";
 
+interface IRole extends Document {
+  name: string;
+}
 export interface IUser extends Document, IBaseTimestamps {
   name: string;
   email: string;
   password?: string;
   image: string;
-  role: mongoose.Schema.Types.ObjectId;
+  role: mongoose.Schema.Types.ObjectId | IRole ;
 }
 
 const UserSchema: Schema<IUser> = new Schema({

@@ -18,10 +18,18 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
+      const data = await res.json();
+
       if (res.ok) {
-        router.push("/admin");
+        console.log(data.user?.role);
+        const role = data?.user?.role;
+        if (role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/UI/blog");
+        }
       } else {
-        const data = await res.json();
         setError(data.error || "Login failed");
       }
     } catch (err) {

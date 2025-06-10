@@ -13,13 +13,21 @@ export default function SignIn() {
   const [providers, setProviders] = useState<any>(null);
 
   useEffect(() => {
-    if (session) {
-      //ssss
-      router.push("/");
-    } else {
-      getProviders().then((prov) => setProviders(prov));
+    // if (session) {
+    //   //ssss
+    //   router.push("/");
+    // } else {
+    //   getProviders().then((prov) => setProviders(prov));
+    // }
+
+    if (session?.user?.email) {
+      if (session.user.email === "ble07983@gmail.com") {
+        router.push("/admin");
+      } else {
+        router.push("/ui/blog");
+      }
     }
-  }, [session]);
+  }, [session, router]);
 
   if (!providers) {
     return <div>Loading...</div>;

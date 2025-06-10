@@ -98,7 +98,10 @@ export async function PUT(request: Request) {
     const updatedBlog = await Blog.findByIdAndUpdate(
       body.id,
       { ...body,
-         updatedAt: new Date() 
+         updatedAt: new Date() ,
+         slug:slugify(body.title) .normalize("NFD")                  // tách dấu tiếng Việt
+         .replace(/[\u0300-\u036f]/g, "")   // xoá dấu
+         .replace(/[^a-z0-9\s-]/g, "")      // xoá ký tự đặc biệt
         },
       { new: true }
     );

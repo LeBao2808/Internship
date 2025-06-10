@@ -9,7 +9,7 @@ export default function UserButton() {
   const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const imageUrl = "/uploads/BlueHead.png";
+  const imageUrl = "/BlueHead.png";
   const router = useRouter();
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {

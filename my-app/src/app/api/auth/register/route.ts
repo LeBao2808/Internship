@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../models/User";
 import bcrypt from "bcryptjs";
+import Role from "../../models/Role";
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -13,7 +14,13 @@ export async function POST(request: Request) {
   if (existing) {
     return NextResponse.json({ error: "Email already exists" }, { status: 400 });
   }
+
+  const defaultRole = await Role.findOne({ name: "user" }); // Tìm role "user"
+
+if (!defaultRole) {
+  throw new Error("Default role 'user' not found in Role collection");
+}
   const hashed = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, password: hashed });
+  const user = await User.create({ name, email, password: hashed,  role: defaultRole._id,  });
   return NextResponse.json({ userId: user._id, name: user.name, email: user.email });
 }

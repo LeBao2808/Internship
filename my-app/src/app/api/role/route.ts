@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
     Role.find(query).skip(skip).limit(limit).sort(sort),
     Role.countDocuments(query),
   ]);
+  console.log(roles);
 
   return NextResponse.json({roles, total, page, limit });
   } catch (error: any) {
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
 export async function POST(request: Request) {
   await dbConnect();
   const body = await request.json();
-
+  console.log(body);
   const parsed = RoleSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   await dbConnect();
   const body = await request.json();
+  console.log(body);
   const parsed = RoleSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -95,6 +97,7 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   await dbConnect();
   const body = await request.json();
+  console.log(body);
   try {
     // await Role.findByIdAndUpdate(body.id, {...body,createdDelete: new Date(), isDelete: new Date() }, { new: true });
     await Role.findByIdAndDelete(body.id);
