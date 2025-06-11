@@ -61,7 +61,8 @@ export default function UserButton() {
           alt={session?.user?.name || "User"}
           width={40}
           height={40}
-          className="rounded-full mr-4"
+          style={{ width: 40, height: 40 }}
+          className="rounded-full mr-4 w-[40px] h-[40px] object-cover"
         />
         <p className="text-white">{session?.user?.name}</p>
       </button>

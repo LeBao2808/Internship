@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "start-server": "node ./src/server.js",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
@@ -29,7 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.513.0",
     "mongoose": "^8.14.1",
-     "next": "15.3.3",
+    "next": "15.3.3",
     "next-auth": "^4.24.11",
     "next-i18next": "^15.4.2",
     "react": "^18.3.1",
@@ -57,6 +57,7 @@
     "eslint-config-next": "15.3.1",
     "postcss": "^8.5.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

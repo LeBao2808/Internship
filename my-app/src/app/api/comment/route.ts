@@ -3,7 +3,12 @@ import dbConnect from "@/resources/lib/mongodb";
 import Comment from "@/app/api/models/Comment";
 import User from "@/app/api/models/User"; // nếu cần `populate`
 import { z } from "zod";
+import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../api/auth/[...nextauth]/route";
+
 require('../../api/models/User');
+
 require('../../api/models/Blog');
 // Define Comment validation schema
 const CommentSchema = z.object({
@@ -12,6 +17,7 @@ const CommentSchema = z.object({
 });
 
 import Blog from "@/app/api/models/Blog";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export async function GET(request: NextRequest) {
   await dbConnect();
@@ -67,23 +73,56 @@ export async function GET(request: NextRequest) {
 }
 
 
-export async function POST(request: Request) {
-  await dbConnect();
-  const body = await request.json();
-  const parsed = CommentSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.format() },
-      { status: 400 }
-    );
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    const newComment = await Comment.create(body);
-    return NextResponse.json(newComment, { status: 201 });
+    await dbConnect();
+
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.id) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
+    }
+
+    const { content, slug } = await request.json();
+
+    if (!content || !slug) {
+      return new Response(JSON.stringify({ error: "Thiếu dữ liệu" }), {
+        status: 400,
+      });
+    }
+
+    const decodedSlug = decodeURIComponent(slug);
+    const blog = await Blog.findOne({ slug: decodedSlug });
+
+    if (!blog) {
+      return new Response(
+        JSON.stringify({ error: "Không tìm thấy bài viết" }),
+        {
+          status: 404,
+        }
+      );
+    }
+
+    const newComment = await Comment.create({
+      content,
+      user: session.user.id,
+      blog: blog._id,
+    });
+
+
+
+    return new Response(
+      JSON.stringify({ success: true, comment: newComment }),
+      { status: 200 }
+    );
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error("❌ Lỗi tạo bình luận:", error);
+    return new Response(
+      JSON.stringify({ error: "Lỗi máy chủ nội bộ" }),
+      { status: 500 }
+    );
   }
 }
 

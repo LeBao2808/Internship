@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
+import UserButton from "../../admin/UserButton";
 
 interface Blog {
   _id: string;
@@ -143,12 +144,13 @@ export default function BlogPage() {
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="flex w-full justify-end">
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition w-[200px] cursor-pointer border-10 border-blue-600 hover:border-blue-700 "
+          {/* <button
+            className=" py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition w-[200px] cursor-pointer border-10 border-blue-600 hover:border-blue-700 "
             onClick={() => router.push("/authen/login")}
           >
             Login
-          </button>
+          </button> */}
+          <UserButton />
         </div>
         {isMobile ? (
           <div className="text-center mb-12">

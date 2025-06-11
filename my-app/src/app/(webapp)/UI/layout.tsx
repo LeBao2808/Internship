@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Providers } from "./providers";
 export default function AdminLayout({
   children,
 }: {
@@ -12,7 +12,9 @@ export default function AdminLayout({
         minHeight: "100vh",
       }}
     >
-      <main style={{}}>{children}</main>
+      <main style={{}}>
+        <Providers>{children}</Providers>
+      </main>
     </div>
   );
 }

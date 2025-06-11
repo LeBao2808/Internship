@@ -12,28 +12,26 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
 
-      const data = await res.json();
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
 
-      if (res.ok) {
-        console.log(data.user?.role);
-        const role = data?.user?.role;
-        if (role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/UI/blog");
-        }
+    if (result?.ok) {
+      // Lấy lại session để redirect theo role
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+      const role = session?.user?.role;
+
+      if (role === "admin") {
+        router.push("/admin");
       } else {
-        setError(data.error || "Login failed");
+        router.push("/UI/blog");
       }
-    } catch (err) {
-      setError("internal server error");
+    } else {
+      setError("Invalid email or password");
     }
   };
 
