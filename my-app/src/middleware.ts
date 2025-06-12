@@ -15,19 +15,19 @@ export async function middleware(req: NextRequest) {
     const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
   
-    // Nếu là trang login và người dùng đã có token → redirect về /
+ 
     if (isLoginPage && token) {
       return NextResponse.redirect(new URL("/", req.url));
     }
   
-    // Kiểm tra nếu là route /admin
+
     if (isAdminRoute) {
-      // Nếu chưa đăng nhập → redirect về login
+  
       if (!token) {
         return NextResponse.redirect(new URL("/authen/login", req.url));
       }
   
-      // Nếu đã đăng nhập nhưng role không phải admin → redirect về /
+
       if (token.role !== "admin") {
         return NextResponse.redirect(new URL("/UI/blog", req.url));
       }
