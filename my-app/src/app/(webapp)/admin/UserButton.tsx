@@ -5,7 +5,7 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-export default function UserButton() {
+export default function UserButton({ isAdmin }: { isAdmin: boolean }) {
   const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

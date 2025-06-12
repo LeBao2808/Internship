@@ -61,11 +61,14 @@ export async function GET(request: NextRequest) {
         .skip(skip)
         .limit(limit)
         .sort(sort)
-        .populate("user", "name email")
+        .populate("user", "name email image")
         .populate("blog", "title"),
       Comment.countDocuments(query),
     ]);
-
+console.log(comments);
+    // const comments = await Comment.find(query)
+    //   .skip(skip)
+    //   .limit(limit)
     return NextResponse.json({ comments, total, page, limit });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -80,47 +83,42 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user || !session.user.id) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { content, slug } = await request.json();
 
     if (!content || !slug) {
-      return new Response(JSON.stringify({ error: "Thiếu dữ liệu" }), {
-        status: 400,
-      });
+      return NextResponse.json({ error: "Missing required data" }, { status: 400 });
     }
 
     const decodedSlug = decodeURIComponent(slug);
     const blog = await Blog.findOne({ slug: decodedSlug });
 
     if (!blog) {
-      return new Response(
-        JSON.stringify({ error: "Không tìm thấy bài viết" }),
-        {
-          status: 404,
-        }
-      );
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+    }
+
+    const userInDB = await User.findOne({ email: session.user.email, name: session.user.name });
+
+    if (!userInDB) {
+      return NextResponse.json({ error: "User not found in database" }, { status: 404 });
     }
 
     const newComment = await Comment.create({
       content,
-      user: session.user.id,
+      user: userInDB.id,
       blog: blog._id,
     });
 
-
-
-    return new Response(
-      JSON.stringify({ success: true, comment: newComment }),
+    return NextResponse.json(
+      { success: true, comment: newComment },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("❌ Lỗi tạo bình luận:", error);
-    return new Response(
-      JSON.stringify({ error: "Lỗi máy chủ nội bộ" }),
+    console.error("❌ Error creating comment:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

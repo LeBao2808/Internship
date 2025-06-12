@@ -65,6 +65,8 @@ export default function CommentSection({ slug }: CommentSectionProps) {
     }
   };
 
+  console.log("comments", comments);
+
   // Gửi bình luận lên server qua API
   const handleSubmit = async () => {
     setComment("");
@@ -149,7 +151,7 @@ export default function CommentSection({ slug }: CommentSectionProps) {
       {/* Danh sách bình luận */}
       <div className="space-y-4 max-h-64 overflow-y-auto pr-2">
         {loading ? (
-          <p>Đang tải bình luận...</p>
+          <p>Loading Comment...</p>
         ) : comments.length === 0 ? (
           <p className="text-gray-500 italic">Chưa có bình luận nào.</p>
         ) : (

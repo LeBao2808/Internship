@@ -12,7 +12,7 @@ const REFRESH_TOKEN_EXPIRES_IN = "7d";
 
 export async function POST(request: Request) {
   await dbConnect();
-  const ADMIN_EMAIL = "ble7983@gmail.com";
+  const ADMIN_EMAIL = "admin123@gmail.com";
   const adminUser = await User.findOne({ email: ADMIN_EMAIL });
   console.log(adminUser);
 if (!adminUser) {

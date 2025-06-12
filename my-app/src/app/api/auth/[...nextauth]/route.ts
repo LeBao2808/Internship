@@ -56,7 +56,52 @@ export const authOptions: NextAuthOptions = {
         },
       }),
     ],
+
+  
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const { email, name, image } = user;
+
+        if (!email) return false;
+
+        try {
+          const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/check-email`, {
+            method: "POST",
+            body: JSON.stringify({ email }),
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await res.json();
+
+          if (!data.exists && name) {
+            const registerRes = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/register`, {
+              method: "POST",
+              body: JSON.stringify({
+                name,
+                email,
+                password: null, 
+                image,
+              }),
+              headers: { "Content-Type": "application/json" },
+            });
+
+            if (!registerRes.ok) {
+              console.error("Register failed");
+              return false;
+            }
+          }
+
+          return true; // Cho phép đăng nhập
+        } catch (error) {
+          console.error("Error during Google sign-in:", error);
+          return false;
+        }
+      }
+
+      return true; // Cho phép các provider khác
+    },
+
 
     async jwt({ token, user }) {
       if (user) {

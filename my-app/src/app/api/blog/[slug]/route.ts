@@ -14,7 +14,7 @@ export async function GET(
   const slug = (await params.params).slug;
   await dbConnect();
   const blog = await Blog.findOne({ slug });
-
+console.log(blog)
   if (!blog) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
