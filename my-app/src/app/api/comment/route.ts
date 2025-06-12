@@ -5,7 +5,7 @@ import User from "@/app/api/models/User"; // nếu cần `populate`
 import { z } from "zod";
 import { getToken } from "next-auth/jwt";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
+
 
 require('../../api/models/User');
 
@@ -18,6 +18,7 @@ const CommentSchema = z.object({
 
 import Blog from "@/app/api/models/Blog";
 import { NextApiRequest, NextApiResponse } from "next";
+import { authOptions } from "@/resources/lib/auth.config";
 
 export async function GET(request: NextRequest) {
   await dbConnect();

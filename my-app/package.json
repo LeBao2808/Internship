@@ -6,7 +6,7 @@
     "dev": "next dev",
     "start-server": "node ./src/server.js",
     "build": "next build",
-    "start": "node dist/server.js"
+    "start": "next start"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
