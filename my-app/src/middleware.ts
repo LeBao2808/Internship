@@ -9,8 +9,18 @@ export async function middleware(req: NextRequest) {
     // if (!hasSessionToken) {
     //   return NextResponse.redirect(new URL('/authen/login', req.url))
     // }
+    console.log("req" ,req)
     const secret = process.env.NEXTAUTH_SECRET;
-    const token = await getToken({ req, secret });
+    // const token = await getToken({ req, secret });
+    // const token = req.cookies.get('next-auth.session-token')?.value || ""
+    const token = await getToken({
+                req: req,
+                secret: process.env.NEXTAUTH_SECRET,
+                cookieName:
+                    process.env.NODE_ENV === 'production'
+                        ? '__Secure-next-auth.session-token'
+                        : 'next-auth.session-token',
+            });
     console.log("URL:", req.nextUrl.pathname);
   console.log("Cookies:", req.cookies.getAll());
   console.log("Token:", token);
@@ -26,7 +36,7 @@ export async function middleware(req: NextRequest) {
     if (isAdminRoute) {
   
       if (!token) {
-        return NextResponse.redirect(new URL("/UI/blog", req.url));
+        return NextResponse.redirect(new URL("/authen/login", req.url));
       }
        console.log("token", token )
 
