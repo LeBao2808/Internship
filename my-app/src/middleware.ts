@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
     if (isAdminRoute) {
   
       if (!token) {
-        return NextResponse.redirect(new URL("/authen/login", req.url));
+        return NextResponse.redirect(new URL("/UI/blog", req.url));
       }
        console.log("token", token )
 

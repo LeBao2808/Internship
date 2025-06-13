@@ -74,7 +74,7 @@ export default function LoginPage() {
         </form>
         <button
           onClick={() =>
-            signIn("google", { callbackUrl: "/admin/user-management" })
+            signIn("google", { callbackUrl: "/UI/blog" })
           }
           className="w-full py-2 mt-4 bg-white border border-blue-700 text-blue-900 rounded-lg font-semibold flex items-center justify-center gap-2 shadow hover:bg-blue-50 transition"
         >
