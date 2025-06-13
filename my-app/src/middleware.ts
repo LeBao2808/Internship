@@ -9,10 +9,11 @@ export async function middleware(req: NextRequest) {
     // if (!hasSessionToken) {
     //   return NextResponse.redirect(new URL('/authen/login', req.url))
     // }
-    // const secret = process.env.NEXTAUTH_SECRET;
-     const secret = "123@abc";
+    const secret = process.env.NEXTAUTH_SECRET;
     const token = await getToken({ req, secret });
-  
+    console.log("URL:", req.nextUrl.pathname);
+  console.log("Cookies:", req.cookies.getAll());
+  console.log("Token:", token);
     const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
   
@@ -32,7 +33,7 @@ export async function middleware(req: NextRequest) {
       if (token.role !== "admin") {
         return NextResponse.redirect(new URL("/UI/blog", req.url));
       }
-    }
+    } 
   
 
     return NextResponse.next()

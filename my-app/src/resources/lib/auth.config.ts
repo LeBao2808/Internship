@@ -134,16 +134,16 @@ export const authOptions: NextAuthOptions = {
    }
  },
 
- cookies: {
+cookies: {
   sessionToken: {
-    name: `next-auth.session-token`, 
+    name: 'next-auth.session-token',
     options: {
       httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'lax',
+      path: '/',
+      secure: process.env.NODE_ENV === 'production', // chỉ HTTPS
       domain: process.env.NODE_ENV === 'production'
-        ? undefined 
+        ? undefined // Không cần domain khi dùng vercel.app
         : undefined,
     },
   },
