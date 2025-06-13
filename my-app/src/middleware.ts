@@ -9,7 +9,8 @@ export async function middleware(req: NextRequest) {
     // if (!hasSessionToken) {
     //   return NextResponse.redirect(new URL('/authen/login', req.url))
     // }
-    const secret = process.env.NEXTAUTH_SECRET;
+    // const secret = process.env.NEXTAUTH_SECRET;
+     const secret = "123@abc";
     const token = await getToken({ req, secret });
   
     const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
