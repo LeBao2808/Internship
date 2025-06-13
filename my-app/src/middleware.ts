@@ -10,7 +10,11 @@ export async function middleware(req: NextRequest) {
     //   return NextResponse.redirect(new URL('/authen/login', req.url))
     // }
     // const token = await getToken({ req, secret });
+    console.log("req", req);
+    
     const tokenRq = req.cookies.get('next-auth.session-token')?.value || ""
+    console.log("tokenRq",tokenRq);
+    
     const reqProduction:any = req.cookies.set("__Secure-next-auth.session-token", tokenRq)
     const objRq = {
                 req: process.env.NODE_ENV === "production" ? reqProduction : req,
@@ -18,10 +22,9 @@ export async function middleware(req: NextRequest) {
                 cookieName:
                     process.env.NODE_ENV === 'production'
                         ? '__Secure-next-auth.session-token'
-
                         : 'next-auth.session-token',
             }
-    console.log("req",reqProduction);
+    console.log("reqProduction",reqProduction);
     console.log("objRq", objRq);
     const token = await getToken(objRq);
     const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
