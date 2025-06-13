@@ -12,6 +12,7 @@ export async function middleware(req: NextRequest) {
 
     console.log("req" ,req)
     const secret = process.env.NEXTAUTH_SECRET;
+    console.log("secret", secret );
     console.log(process.env.NODE_ENV);
     // const token = await getToken({ req, secret });
     // const token = req.cookies.get('next-auth.session-token')?.value || ""
