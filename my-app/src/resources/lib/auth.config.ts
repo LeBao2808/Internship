@@ -136,12 +136,15 @@ export const authOptions: NextAuthOptions = {
 
  cookies: {
   sessionToken: {
-    name: `next-auth.session-token`, // không có __Secure-
+    name: `next-auth.session-token`, 
     options: {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
-      secure: false, // ⚠️ rất quan trọng khi dev local
+      secure: process.env.NODE_ENV === 'production', 
+      domain: process.env.NODE_ENV === 'production'
+        ? undefined 
+        : undefined,
     },
   },
 },
