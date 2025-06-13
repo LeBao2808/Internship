@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
             const userId = user.userId;
         
             if (!userId) {
-              console.error("❌ User không có userId", user);
+              console.error("❌ User dont have userId", user);
               return null;
             }
         
