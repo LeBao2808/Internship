@@ -9,25 +9,19 @@ export async function middleware(req: NextRequest) {
     // if (!hasSessionToken) {
     //   return NextResponse.redirect(new URL('/authen/login', req.url))
     // }
-
-    console.log("req" ,req)
-    const secret = process.env.NEXTAUTH_SECRET;
-    console.log("secret", secret );
-    console.log(process.env.NODE_ENV);
     // const token = await getToken({ req, secret });
-    // const token = req.cookies.get('next-auth.session-token')?.value || ""
+    const tokenRq = req.cookies.get('next-auth.session-token')?.value || ""
+    const reqProduction:any = req.cookies.set("__Secure-next-auth.session-token", tokenRq)
+    console.log(reqProduction);
+    
     const token = await getToken({
-                req: req,
+                req: process.env.NODE_ENV === "production" ? reqProduction : req,
                 secret: process.env.NEXTAUTH_SECRET,
-                cookieName:
-                    process.env.NODE_ENV === 'production'
-                        ? '__Secure-next-auth.session-token'
-                        : 'next-auth.session-token',
+                // cookieName:
+                //     process.env.NODE_ENV === 'production'
+                //         ? '__Secure-next-auth.session-token'
+                //         : 'next-auth.session-token',
             });
-
-    console.log("URL:", req.nextUrl.pathname);
-  console.log("Cookies:", req.cookies.getAll());
-  console.log("Token:", token);
     const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
   
@@ -36,13 +30,13 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/", req.url));
     }
   
-       console.log("token", token );
+      //  console.log("token", token );
     if (isAdminRoute) {
   
       if (!token) {
         return NextResponse.redirect(new URL("/authen/login", req.url));
       }
-       console.log("token", token )
+      //  console.log("token", token )
 
       if (token.role !== "admin") {
         return NextResponse.redirect(new URL("/UI/blog", req.url));
