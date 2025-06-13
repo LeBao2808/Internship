@@ -9,8 +9,10 @@ export async function middleware(req: NextRequest) {
     // if (!hasSessionToken) {
     //   return NextResponse.redirect(new URL('/authen/login', req.url))
     // }
+
     console.log("req" ,req)
     const secret = process.env.NEXTAUTH_SECRET;
+    console.log(process.env.NODE_ENV);
     // const token = await getToken({ req, secret });
     // const token = req.cookies.get('next-auth.session-token')?.value || ""
     const token = await getToken({
@@ -21,6 +23,7 @@ export async function middleware(req: NextRequest) {
                         ? '__Secure-next-auth.session-token'
                         : 'next-auth.session-token',
             });
+
     console.log("URL:", req.nextUrl.pathname);
   console.log("Cookies:", req.cookies.getAll());
   console.log("Token:", token);
