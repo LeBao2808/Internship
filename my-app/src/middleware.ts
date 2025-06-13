@@ -20,6 +20,7 @@ export async function middleware(req: NextRequest) {
                 // cookieName:
                 //     process.env.NODE_ENV === 'production'
                 //         ? '__Secure-next-auth.session-token'
+                
                 //         : 'next-auth.session-token',
             });
     const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
