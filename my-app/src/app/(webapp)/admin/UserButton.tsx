@@ -64,23 +64,18 @@ export default function UserButton() {
           style={{ width: 40, height: 40 }}
           className="rounded-full mr-4 w-[40px] h-[40px] object-cover"
         />
-        <p className="text-white">{session?.user?.name}</p>
+        <p className="text-white text-nav-btn-user">{session?.user?.name}</p>
       </button>
-      {show && (
-        <div
-          style={{
-            position: "absolute",
-            top: "110%",
-            right: 0,
-            minWidth: 200,
-            background: "#fff",
-            border: "1px solid #ddd",
-            borderRadius: 4,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
-            zIndex: 100,
-            padding: 12,
-          }}
-        >
+{show && (
+  <div
+    className="
+      absolute top-[90%] right-0 min-w-[200px] bg-white border border-gray-200 rounded-md 
+      shadow-xl z-50 py-2 px-2 
+      opacity-0 translate-y-4 scale-95 
+      animate-dropdown-enter
+      pointer-events-none
+    "
+  >
           {/* <strong>Tên user:</strong> {session.user?.name || session.user?.email} */}
           <button
             style={{ marginTop: 12, width: "100%" }}

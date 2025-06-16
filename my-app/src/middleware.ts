@@ -3,12 +3,6 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
-  // const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
-  // const hasSessionToken = req.cookies.has('next-auth.session-token') || req.cookies.has('accessToken') || req.cookies.has('refreshToken')
-  // if (!hasSessionToken) {
-  //   return NextResponse.redirect(new URL('/authen/login', req.url))
-  // }
-  // const token = await getToken({ req, secret });
   const objRq = {
     req: req,
     secret: process.env.NEXTAUTH_SECRET,
@@ -20,23 +14,18 @@ export async function middleware(req: NextRequest) {
   console.log(isLoginPage, token, process.env.NEXTAUTH_SECRET);
 
   if (isLoginPage && token) {
-    console.log("Vô");
 
     return NextResponse.redirect(new URL("/", req.url));
   }
   if (isAdminRoute) {
     if (!token) {
-      console.log("out 1");
-
       return NextResponse.redirect(new URL("/authen/login", req.url));
     }
     if (token.role !== "admin") {
-      console.log("out 2");
       return NextResponse.redirect(new URL("/UI/blog", req.url));
     }
   }
 
-  console.log("callback");
 
   return NextResponse.next();
 }

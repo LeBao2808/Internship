@@ -224,7 +224,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
           </TableBody>
         </Table>
       </TableContainer>
-      {/* Modal hiển thị ảnh lớn */}
+     
       {previewImage && (
         <div
           style={{

@@ -141,6 +141,78 @@ export default function BlogPage() {
 
   return (
     <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
+      <div className="flex w-full justify-end">
+        <UserButton  />
+      </div>
+          
+      <style>{`
+      .nav-logout-btn {
+          margin-left: auto;
+          background: #d32f2f;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.25s, box-shadow 0.25s;
+        }
+        .nav-logout-btn:hover {
+          background: #b71c1c;
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+        }
+           .nav-logout-btn {
+          margin-left: auto;
+          background: #d32f2f;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.25s, box-shadow 0.25s;
+        }
+        .nav-logout-btn:hover {
+          background: #b71c1c;
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+        }
+
+
+       .nav-home-btn {
+          margin-left: auto;
+          background:#fff;
+          color: #1976d2;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+       }
+          .nav-home-btn:hover {
+          background:rgb(214, 214, 214);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+          }
+
+               .nav-view-btn {
+          margin-left: auto;
+          background:#rgb(168, 155, 137);
+          color: #1976d2;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+       }
+          .nav-view-btn:hover {
+          background:rgb(230, 231, 220);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+          }
+
+          .text-nav-btn-user{
+          display:none; 
+          }
+
+     `}</style>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="flex w-full justify-end">
@@ -150,7 +222,7 @@ export default function BlogPage() {
           >
             Login
           </button> */}
-          <UserButton />
+
         </div>
         {isMobile ? (
           <div className="text-center mb-12">

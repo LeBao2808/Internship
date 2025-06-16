@@ -140,3 +140,19 @@ body {
   color: #1d1c19;
   box-shadow: 0 2px 12px 0 rgba(25,118,210,0.12);
 }
+
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+}
+
+.animate-dropdown-enter {
+  animation: dropdown-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
