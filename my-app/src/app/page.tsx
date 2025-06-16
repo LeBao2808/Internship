@@ -1,7 +1,7 @@
 // import Image from "next/image";
 import { redirect } from "next/navigation";
 export default function Home() {
-  redirect("/authen/login");
+  redirect("/UI/blog");
   return null;
 }
 

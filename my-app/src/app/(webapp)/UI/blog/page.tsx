@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
 import UserButton from "../../admin/UserButton";
-
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 interface Blog {
   _id: string;
   title: string;
@@ -34,6 +35,7 @@ export default function BlogPage() {
 
   const [isMobile, setIsMobile] = useState(false);
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const handleResize = () => {
@@ -141,9 +143,42 @@ export default function BlogPage() {
 
   return (
     <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
-      <div className="flex w-full justify-end">
-        <UserButton  />
-      </div>
+   <div className="flex justify-end ">
+ {session ? (
+        <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
+          <UserButton />
+          <span className="mx-2 text-gray-400">|</span>
+          <button
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
+              signOut({ callbackUrl: "/authen/login", redirect: true });
+            }}
+            className="text-gray-600 hover:text-red-500 hover:bg-gray-100 rounded-full transition cursor-pointer p-2"
+            aria-label="Logout"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25v-4.25m-6-7l-3 3m0 0l3 3m-3-3h12"
+              />
+            </svg>
+          </button>
+        </div>
+      ) : (
+          <div className="flex items-cente rounded-lg  mr-2 mt-2 p-1">
+                   <UserButton />
+             </div>
+
+      )}
+</div>
           
       <style>{`
       .nav-logout-btn {
@@ -209,7 +244,11 @@ export default function BlogPage() {
           }
 
           .text-nav-btn-user{
-          display:none; 
+            color: black; 
+          }
+
+          .user-btn{
+          display: none ; 
           }
 
      `}</style>
@@ -520,9 +559,9 @@ export default function BlogPage() {
       </div>
 
       <style jsx global>{`
-        .blog-home-bg {
-          padding-top: 20px;
-        }
+        // .blog-home-bg {
+        //   padding-top: 20px;
+        // }
         .line-clamp-3 {
           display: -webkit-box;
           -webkit-line-clamp: 3;

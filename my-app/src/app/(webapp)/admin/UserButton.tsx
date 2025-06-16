@@ -35,6 +35,15 @@ export default function UserButton() {
   // if (!session) return null;
   // hoặc refreshToken; // hoặc refreshToken
 
+  if(!session){
+    return <a
+  href="/authen/login"
+  className="px-5 py-2 text-blue-600 font-medium border border-blue-600 rounded-full hover:bg-blue-50 transition-all bg-white"
+>
+  Log in
+</a>
+  }
+  
   return (
     <div
       style={{ position: "relative", display: "inline-block" }}
@@ -56,6 +65,12 @@ export default function UserButton() {
         }}
         onClick={() => setShow((prev) => !prev)}
       >
+        <p 
+        style={{
+          fontFamily: "cursive"
+        }}
+        className="text-white text-nav-btn-user mr-5 "  
+        >{session?.user?.name}</p>
         <Image
           src={session?.user?.image || imageUrl}
           alt={session?.user?.name || "User"}
@@ -64,20 +79,27 @@ export default function UserButton() {
           style={{ width: 40, height: 40 }}
           className="rounded-full mr-4 w-[40px] h-[40px] object-cover"
         />
-        <p className="text-white text-nav-btn-user">{session?.user?.name}</p>
+    
       </button>
 {show && (
   <div
     className="
-      absolute top-[90%] right-0 min-w-[200px] bg-white border border-gray-200 rounded-md 
+      absolute top-[70%] right-0 min-w-[200px] bg-white border border-gray-200 rounded-md 
       shadow-xl z-50 py-2 px-2 
       opacity-0 translate-y-4 scale-95 
       animate-dropdown-enter
       pointer-events-none
+      user-btn
     "
   >
-          {/* <strong>Tên user:</strong> {session.user?.name || session.user?.email} */}
-          <button
+         <p 
+        style={{
+          fontFamily: "cursive"
+        }}
+        className="text-white text-nav-btn-user mr-5 text-center"  
+        >{session.user?.email ||  session?.user?.name}</p>
+
+          {/* <button
             style={{ marginTop: 12, width: "100%" }}
             className="nav-view-btn"
             onClick={() => {
@@ -88,7 +110,8 @@ export default function UserButton() {
             }}
           >
             View Detail
-          </button>
+          </button> */}
+
           <button
             onClick={async () => {
               await fetch("/api/auth/logout", { method: "POST" });
