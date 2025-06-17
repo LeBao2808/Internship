@@ -2,15 +2,19 @@
 import { useSession } from "next-auth/react";
 import React, { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from 'next/navigation';
 import Image from "next/image";
+// import "../../(webapp)/components/userButton.css"
 
 export default function UserButton() {
   const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const imageUrl = "/BlueHead.png";
+
   const router = useRouter();
+const pathname = usePathname(); 
+const isOnAdminPage = pathname.startsWith('/admin');
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -99,18 +103,19 @@ export default function UserButton() {
         className="text-black text-nav-btn-user mr-5 text-center"  
         >{session.user?.email ||  session?.user?.name}</p>
 
-          <button
-            style={{ marginTop: 12, width: "100%" }}
-            className="nav-view-btn"
-            onClick={() => {
-              // Giả sử bạn có userId trong session.user.userId
-              if (session?.user) {
-                router.push(`/admin/blog-management`);
-              }
-            }}
-          >
-           Post Blog
-          </button>
+  <button
+  style={{ marginTop: 12, width: "100%" }}
+  className="nav-view-btn"
+  onClick={() => {
+    if (isOnAdminPage) {
+      router.push("/UI/blog");
+    } else {
+      session?.user && router.push("/admin/blog-management");
+    }
+  }}
+>
+  {isOnAdminPage ? "Go to Blog" : "Blog Management"}
+</button>
 
           <button
             onClick={async () => {

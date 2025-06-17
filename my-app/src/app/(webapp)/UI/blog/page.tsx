@@ -246,8 +246,7 @@ export default function BlogPage() {
           .text-nav-btn-user{
             color: black; 
           }
-
-        
+ 
 
      `}</style>
       <div className="max-w-7xl mx-auto">

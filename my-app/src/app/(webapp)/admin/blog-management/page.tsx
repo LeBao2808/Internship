@@ -433,7 +433,7 @@ export default function BlogManagementPage() {
             Add Blog
           </button>
 
-          <button
+          {/* <button
             onClick={() => {
               router.push("/UI/blog");
             }}
@@ -447,7 +447,7 @@ export default function BlogManagementPage() {
             }}
           >
             Visit your blog
-          </button>
+          </button> */}
         </div>
       </div>
       <AdminTable

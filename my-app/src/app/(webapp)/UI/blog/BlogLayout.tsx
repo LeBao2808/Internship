@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
+import UserButton from "../../admin/UserButton";
 
 interface BlogLayoutProps {
   children: React.ReactNode;
@@ -20,9 +21,88 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
   };
 
   return (
+
+    
     <div>
+           <style>{`
+      .nav-logout-btn {
+          margin-left: auto;
+          background: #d32f2f;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.25s, box-shadow 0.25s;
+        }
+        .nav-logout-btn:hover {
+          background: #b71c1c;
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+        }
+           .nav-logout-btn {
+          margin-left: auto;
+          background: #d32f2f;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.25s, box-shadow 0.25s;
+        }
+        .nav-logout-btn:hover {
+          background: #b71c1c;
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+        }
+
+
+       .nav-home-btn {
+          margin-left: auto;
+          background:#fff;
+          color: #1976d2;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+       }
+          .nav-home-btn:hover {
+          background:rgb(214, 214, 214);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+          }
+
+               .nav-view-btn {
+          margin-left: auto;
+          background:#rgb(168, 155, 137);
+          color: #1976d2;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+       }
+          .nav-view-btn:hover {
+          background:rgb(230, 231, 220);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+          }
+
+          .text-nav-btn-user{
+            color: black; 
+          }
+ 
+
+     `}</style>
+         <div className="flex justify-end ">
+                  <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
+                <UserButton />
+              
+              </div>
+              </div>
+    
       {/* Thanh điều hướng */}
-      <div className="max-w-7xl mx-auto flex items-center gap-4 mt-8 mb-6 px-4 ">
+      <div className="max-w-7xl mx-auto flex items-center gap-4 mb-6 px-4 ">
+     
         <button
           onClick={() => router.push("/UI/blog")}
           className="p-2 rounded-full hover:bg-blue-100 transition bg-white cursor-pointer "
@@ -43,6 +123,8 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
             />
           </svg>
         </button>
+
+           
         {/* <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
           <input
             type="text"
