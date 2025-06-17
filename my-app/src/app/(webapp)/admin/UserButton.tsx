@@ -103,14 +103,16 @@ const isOnAdminPage = pathname.startsWith('/admin');
         className="text-black text-nav-btn-user mr-5 text-center"  
         >{session.user?.email ||  session?.user?.name}</p>
 
-  <button
+<button
   style={{ marginTop: 12, width: "100%" }}
   className="nav-view-btn"
   onClick={() => {
     if (isOnAdminPage) {
       router.push("/UI/blog");
     } else {
-      session?.user && router.push("/admin/blog-management");
+      if (session?.user) {
+        router.push("/admin/blog-management");
+      }
     }
   }}
 >
