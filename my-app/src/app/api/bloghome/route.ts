@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
-import User from "../models/User";
 import { z } from 'zod';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
@@ -33,10 +32,6 @@ export async function GET(req: NextRequest) {
       { content: { $regex: search, $options: "i" } }
     ];
   }
-     const dbUser = await User.findOne({ email: session?.user?.email  }).exec();
-    if (dbUser &&  session?.user?.role != "admin" ) {
-      query.user = dbUser.id;
-    }
   if (category) {
     query.category = category;
   }
@@ -68,38 +63,19 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   await dbConnect();
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const body = await req.json();
-  const parsed = BlogSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Title or content not entered or too short." },
-      { status: 400 }
-    );
-  }
-
+const body = await req.json();
+// console.log(body);
+const parsed = BlogSchema.safeParse(body);
+console.log(parsed);
+if (!parsed.success) {
+  return NextResponse.json(
+    { error: "Title or content not entered or too short." },
+    { status: 400 }
+  );
+}
   try {
-    const dbUser = await User.findOne({ email: session.user.email }).exec();
-
-    if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const slug = generateSlug(body.title)
-    const newBlog = await Blog.create({
-      ...body,
-      slug,
-      user: dbUser._id, 
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    return NextResponse.json(newBlog, { status: 201 });
+    const newBlog = await Blog.create({...body,slug:generateSlug(body.title), createdAt: new Date(), updatedAt: new Date() });
+    return NextResponse.json(newBlog, { status: 201 }); 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
@@ -108,13 +84,8 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(request: Request) {
   await dbConnect();
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
+  console.log(body);
   const parsed = BlogSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -123,30 +94,18 @@ export async function PUT(request: Request) {
       { status: 400 }
     );
   }
-
   try {
-    const dbUser = await User.findOne({ email: session.user.email }).exec();
-    if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const slug = generateSlug(body.title);
-
     const updatedBlog = await Blog.findByIdAndUpdate(
       body.id,
-      {
-        ...body,
-        user: dbUser._id, 
-        updatedAt: new Date(),
-        slug,
-      },
+      { ...body,
+         updatedAt: new Date() ,
+         slug:generateSlug(body.title) 
+        },
       { new: true }
     );
-
     if (!updatedBlog) {
-      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
-
     return NextResponse.json(updatedBlog);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

@@ -9,6 +9,7 @@ import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
+import { useSession } from "next-auth/react";
 interface Role {
   _id?: string;
   name: string;
@@ -33,9 +34,10 @@ export default function RoleManagementPage() {
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  // useEffect(() => {
-  //   fetchRoles();
-  // }, [sortBy, sortOrder]); // Thêm sortBy, sortOrder vào dependency
+  const { data: session, status } = useSession();
+
+
+
 
   useEffect(() => {
     fetchRoles(search, currentPage, pageSize);
@@ -165,6 +167,10 @@ export default function RoleManagementPage() {
     setIsModalOpen(false);
     fetchRoles();
   };
+
+    if(session && session.user?.role != "admin" ){
+return null ; 
+}
 
   // Hàm render tiêu đề cột với icon sort
   const renderColumnHeader = (col: { id: keyof Role; label: string }) => (

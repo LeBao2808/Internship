@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Role from "../../api/models/Role";
 import { z } from 'zod';
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/resources/lib/auth.config"; 
 
 
 const RoleSchema = z.object({
@@ -12,6 +13,10 @@ const RoleSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
+      const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   await dbConnect();
   const { searchParams } = new URL(req.url);
   try {

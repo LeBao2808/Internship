@@ -96,26 +96,26 @@ export default function UserButton() {
         style={{
           fontFamily: "cursive"
         }}
-        className="text-white text-nav-btn-user mr-5 text-center"  
+        className="text-black text-nav-btn-user mr-5 text-center"  
         >{session.user?.email ||  session?.user?.name}</p>
 
-          {/* <button
+          <button
             style={{ marginTop: 12, width: "100%" }}
             className="nav-view-btn"
             onClick={() => {
               // Giả sử bạn có userId trong session.user.userId
               if (session?.user) {
-                router.push(`/admin/viewdetail-user`);
+                router.push(`/admin/blog-management`);
               }
             }}
           >
-            View Detail
-          </button> */}
+           Post Blog
+          </button>
 
           <button
             onClick={async () => {
               await fetch("/api/auth/logout", { method: "POST" });
-              signOut({ callbackUrl: "/authen/login", redirect: true });
+              signOut({ callbackUrl: "/UI/blog", redirect: true });
             }}
             className="nav-logout-btn"
             style={{ marginTop: 12, width: "100%" }}

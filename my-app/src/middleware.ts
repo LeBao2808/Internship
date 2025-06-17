@@ -21,9 +21,9 @@ export async function middleware(req: NextRequest) {
     if (!token) {
       return NextResponse.redirect(new URL("/authen/login", req.url));
     }
-    if (token.role !== "admin") {
-      return NextResponse.redirect(new URL("/UI/blog", req.url));
-    }
+    // if (token.role !== "admin") {
+    //   return NextResponse.redirect(new URL("/UI/blog", req.url));
+    // }
   }
 
 

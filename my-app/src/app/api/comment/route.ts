@@ -19,8 +19,10 @@ const CommentSchema = z.object({
 import Blog from "@/app/api/models/Blog";
 import { NextApiRequest, NextApiResponse } from "next";
 import { authOptions } from "@/resources/lib/auth.config";
+import mongoose from "mongoose";
 
 export async function GET(request: NextRequest) {
+      const session = await getServerSession(authOptions);
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);
@@ -47,6 +49,12 @@ export async function GET(request: NextRequest) {
         { content: { $regex: search, $options: "i" } },
         { blog: { $in: blogIds } },
       ];
+    }
+
+      console.log("session.user.id",session?.user?.id)
+       const dbUser = await User.findOne({ email: session?.user?.email  }).exec();
+    if (dbUser &&  session?.user?.role != "admin" ) {
+      query.user = dbUser.id;
     }
 
     let sort: any = {};

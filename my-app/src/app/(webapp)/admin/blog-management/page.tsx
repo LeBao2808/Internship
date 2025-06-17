@@ -13,6 +13,7 @@ import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
+import { useSession } from "next-auth/react";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 interface Blog {
@@ -30,7 +31,6 @@ interface Blog {
 const BlogSchema = z.object({
   title: z.string().trim().min(5, "Title must be at least 5 characters"),
   content: z.string().min(1, "Content is required"),
-  user: z.string().min(1, "User is required"),
   category: z.string().min(1, "Category is required"),
   image_url: z.string().optional(),
 });
@@ -65,7 +65,7 @@ export default function BlogManagementPage() {
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-
+  const { data: session, status } = useSession();
   useEffect(() => {
     fetchUsers();
     fetchCategories();
@@ -253,7 +253,7 @@ export default function BlogManagementPage() {
       setErrors({
         title: fieldErrors.title?.[0] || "",
         content: fieldErrors.content?.[0] || "",
-        user: fieldErrors.user?.[0] || "",
+        // user: session?.user?.id|| "",
         category: fieldErrors.category?.[0] || "",
       });
       return;
@@ -262,6 +262,7 @@ export default function BlogManagementPage() {
     // Đảm bảo image_url là string
     const payload = {
       ...form,
+      user: session?.user,
       image_url: typeof form.image_url === "string" ? form.image_url : "",
       category:
         typeof form.category === "object" && form.category !== null
@@ -445,57 +446,12 @@ export default function BlogManagementPage() {
           marginBottom: 16,
         }}
       >
-        {/* <input
-            type="text"
-            placeholder="Search blog..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: 8,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              minWidth: 220,
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "8px 16px",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-          >
-            Search
-          </button> */}
         <InputSearch
           onInput={(e) => {
             setSearch(e.target.value);
             fetchBlogs(e.target.value, currentPage, pageSize);
           }}
         />
-
-        {/* {isError && (
-          <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded shadow-lg flex items-center gap-2 animate-fade-in z-[1000] min-w-[320px] max-w-[90vw]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-red-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
-              />
-            </svg>
-            <span className="font-semibold">{error}</span>
-          </div>
-        )} */}
         <div className="btn-add flex gap-x-4">
           <button
             onClick={handleAddClick}
@@ -642,23 +598,8 @@ export default function BlogManagementPage() {
           submitLabel={editingBlog ? "Update" : "Create"}
           // onBack={() => setIsModalOpen(false)}
         >
-          <div>
+          {/* <div>
             <React.Suspense fallback={null}>
-              {/* {React.createElement(
-                require("../../components/AdminSelect").default,
-                {
-                  label: "User",
-                  name: "user",
-                  value: form.user,
-                  options: users.map((user: any) => ({
-                    value: user.id,
-                    label: user.name || user.email,
-                  })),
-                  onChange: (e: any) =>
-                    setForm({ ...form, user: e.target.value }),
-                  required: true,
-                }
-              )} */}
               <AdminSelect
                 label="User"
                 name="user"
@@ -681,7 +622,7 @@ export default function BlogManagementPage() {
                 }}
               />
             </React.Suspense>
-          </div>
+          </div> */}
 
           <div>
             {categories.length > 0 && (

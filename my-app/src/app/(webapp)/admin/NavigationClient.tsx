@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 // import { CiLogin } from "react-icons/ci";
 import UserButton from "./UserButton";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function NavigationClient() {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ export default function NavigationClient() {
   // const { lang, setLang } = useLanguage
   //   ? useLanguage()
   //   : { lang: "vi", setLang: () => {} };
+    const { data: session, status } = useSession(); 
 
   const router = useRouter();
   const navItems = [
@@ -26,6 +28,19 @@ export default function NavigationClient() {
     { label: "Comment", href: "/admin/comment-management" },
     // { label: t("Home"), href: "/UI/blog" },
   ];
+  const filteredNavItems = navItems.filter(item => {
+    // Chỉ ẩn "User" nếu không phải admin
+    if (item.label === "User") {
+      return session?.user?.role === "admin";
+    }
+    if (item.label === "Role"){
+      return session?.user?.role === "admin";
+    }
+     if (item.label === "Category"){
+      return session?.user?.role === "admin";
+    }
+    return true;
+  });
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -125,7 +140,7 @@ export default function NavigationClient() {
         style={{ width: "auto", height: "100px", cursor: "pointer" }}
         onClick={() => router.push("/admin")}
       />
-      {navItems.map((item) => (
+      {filteredNavItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
@@ -135,34 +150,8 @@ export default function NavigationClient() {
         </Link>
       ))}
       <div style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
-        {/* <button
-          onClick={() => {
-            router.push("/UI/blog");
-          }}
-          className="nav-home-btn"
-        >
-          Visit your blog
-        </button> */}
         <UserButton />
-
-        {/* <button
-          onClick={() => {
-            signOut({ callbackUrl: "/authen/login", redirect:true });
-            // window.location.href = "https://accounts.google.com/Logout";
-          }}
-          className="nav-logout-btn"
-        >
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-</svg>
-
-
-        </button> */}
       </div>
-      {/* <button onClick={() => i18n.changeLanguage(i18n.language === "vi" ? "en" : "vi")}
-        style={{marginLeft:8,background:"#fff",color:"#1976d2",border:"none",borderRadius:4,padding:"8px 16px",fontWeight:600,cursor:"pointer"}}>
-        {i18n.language === "vi" ? "English" : "Tiếng Việt"}
-      </button> */}
     </nav>
   );
 }

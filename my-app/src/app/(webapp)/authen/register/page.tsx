@@ -21,72 +21,17 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, password }),
       });
       if (res.ok) {
-        setSuccess("Đăng ký thành công! Đang chuyển hướng...");
+        alert("Registration successful! Redirecting...")
         setTimeout(() => router.push("/authen/login"), 100);
       } else {
         const data = await res.json();
-        setError(data.error || "Đăng ký thất bại");
+        setError(data.error || "Registration failed");
       }
     } catch (_) {
-      setError("Lỗi kết nối máy chủ");
+      setError("Server connection error");
     }
   };
 
-  // return (
-  //   <div
-  //     style={{
-  //       maxWidth: 400,
-  //       margin: "40px auto",
-  //       padding: 24,
-  //       border: "1px solid #ccc",
-  //       borderRadius: 8,
-  //     }}
-  //   >
-  //     <h2>Đăng ký</h2>
-  //     <form onSubmit={handleSubmit}>
-  //       <div style={{ marginBottom: 12 }}>
-  //         <label>Họ tên:</label>
-  //         <input
-  //           type="text"
-  //           value={name}
-  //           onChange={(e) => setName(e.target.value)}
-  //           required
-  //           style={{ width: "100%" }}
-  //         />
-  //       </div>
-  //       <div style={{ marginBottom: 12 }}>
-  //         <label>Email:</label>
-  //         <input
-  //           type="email"
-  //           value={email}
-  //           onChange={(e) => setEmail(e.target.value)}
-  //           required
-  //           style={{ width: "100%" }}
-  //         />
-  //       </div>
-  //       <div style={{ marginBottom: 12 }}>
-  //         <label>Mật khẩu:</label>
-  //         <input
-  //           type="password"
-  //           value={password}
-  //           onChange={(e) => setPassword(e.target.value)}
-  //           required
-  //           style={{ width: "100%" }}
-  //         />
-  //       </div>
-  //       {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
-  //       {success && (
-  //         <div style={{ color: "green", marginBottom: 12 }}>{success}</div>
-  //       )}
-  //       <button type="submit" style={{ width: "100%", padding: 8 }}>
-  //         Đăng ký
-  //       </button>
-  //     </form>
-  //     <div style={{ marginTop: 16 }}>
-  //       Đã có tài khoản? <a href="/authen/login">Đăng nhập</a>
-  //     </div>
-  //   </div>
-  // );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 w-full">
@@ -135,10 +80,6 @@ export default function RegisterPage() {
           {error && (
             <div style={{ color: "red", marginBottom: 12 }}>{error}</div>
           )}
-          {success && (
-            <div style={{ color: "green", marginBottom: 12 }}>{success}</div>
-          )}
-
           <button
             type="submit"
             className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition"

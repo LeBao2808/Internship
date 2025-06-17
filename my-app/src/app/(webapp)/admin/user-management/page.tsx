@@ -11,6 +11,7 @@ import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import "./user-management.css";
 import InputSearch from "../../components/InputSearch";
+import { useSession } from "next-auth/react";
 interface User {
   id?: number;
   name: string;
@@ -55,6 +56,8 @@ export default function UserManagementPage() {
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+  const { data: session, status } = useSession();
+
   useEffect(() => {
     fetchRoles();
   }, []);
@@ -80,7 +83,7 @@ export default function UserManagementPage() {
       const res = await fetch(url);
       const data = await res.json();
       setUsers(
-        data.users.map((user: any) => ({ ...user, id: user.id || user._id }))
+        data.users.map((user: any) => ({ ...user, id: user.id || user._id || null }))
       );
       setTotal(data.total);
     } finally {
@@ -244,6 +247,11 @@ export default function UserManagementPage() {
     setIsModalOpen(false);
     fetchUsers();
   };
+
+if(session && session.user?.role != "admin" ){
+return null ; 
+}
+
 
   const renderColumnHeader = (col: { id: keyof User; label: string }) => (
     <span

@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 interface AdminFormProps {
   title?: string;
   fields: Array<{
+
     name: string;
     label: string;
     type?: string;
@@ -12,6 +13,7 @@ interface AdminFormProps {
     required?: boolean;
     error?: boolean;
     helperText?: string;
+    display?:boolean; 
   }>;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   submitLabel?: string;
@@ -30,6 +32,7 @@ const AdminForm: React.FC<AdminFormProps> = ({
   return (
     <>
       <Box
+     
         component="form"
         onSubmit={onSubmit}
         sx={{
@@ -48,6 +51,9 @@ const AdminForm: React.FC<AdminFormProps> = ({
         )}
         {fields.map((field) => (
           <TextField
+             style={{
+          display: field.display ? "none" : "block",
+        }}
             key={field.name}
             label={field.label}
             name={field.name}

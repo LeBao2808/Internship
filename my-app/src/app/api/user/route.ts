@@ -4,6 +4,8 @@ import User from "../../api/models/User";
 import Role from "../../api/models/Role";
 import { z } from 'zod';
 import Email from "next-auth/providers/email";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/resources/lib/auth.config"; 
 const UserSchema = z.object({
   name: z.string()
     .min(3, 'Name must be at least 3 characters long')
@@ -20,6 +22,10 @@ const UserSchema = z.object({
 require('../../api/models/Role');
  
 export async function GET(request: NextRequest) {
+    const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);
@@ -62,6 +68,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
+    const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   await dbConnect();
   const body = await request.json();
   const parsed = UserSchema.safeParse(body);
@@ -80,6 +90,10 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+    const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   await dbConnect();
   const body = await request.json();
   console.log(body);
@@ -100,6 +114,10 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+    const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   await dbConnect();
   const body = await request.json();
   try {

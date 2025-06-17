@@ -109,7 +109,7 @@ export default function BlogPage() {
         ...(category ? { category } : {}),
       });
 
-      const res = await fetch(`/api/blog?${params.toString()}`);
+      const res = await fetch(`/api/bloghome?${params.toString()}`);
       const data = await res.json();
       setBlogs(data.blogs || []);
       setTotal(data.total || 0);
@@ -147,8 +147,8 @@ export default function BlogPage() {
  {session ? (
         <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
           <UserButton />
-          <span className="mx-2 text-gray-400">|</span>
-          <button
+          {/* <span className="mx-2 text-gray-400">|</span> */}
+          {/* <button
             onClick={async () => {
               await fetch("/api/auth/logout", { method: "POST" });
               signOut({ callbackUrl: "/authen/login", redirect: true });
@@ -170,7 +170,7 @@ export default function BlogPage() {
                 d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25v-4.25m-6-7l-3 3m0 0l3 3m-3-3h12"
               />
             </svg>
-          </button>
+          </button> */}
         </div>
       ) : (
           <div className="flex items-cente rounded-lg  mr-2 mt-2 p-1">
@@ -247,9 +247,7 @@ export default function BlogPage() {
             color: black; 
           }
 
-          .user-btn{
-          display: none ; 
-          }
+        
 
      `}</style>
       <div className="max-w-7xl mx-auto">

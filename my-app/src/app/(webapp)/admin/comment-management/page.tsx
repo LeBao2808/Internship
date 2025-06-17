@@ -11,6 +11,7 @@ import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
 import AdminSelect from "../../components/AdminSelect";
 import Blog from "@/app/api/models/Blog";
+import { useSession } from "next-auth/react";
 
 interface Comment {
   _id?: number;
@@ -37,11 +38,13 @@ export default function CommentManagementPage() {
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [form, setForm] = useState({ content: "", user: "", blog: "" });
   const [search, setSearch] = useState("");
+    const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState<keyof Comment>("content");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+    const { data: session, status } = useSession();
 
   useEffect(() => {
     fetchComments(search, currentPage, pageSize);
@@ -60,6 +63,7 @@ export default function CommentManagementPage() {
       const res = await fetch(url);
       const data = await res.json();
       setComments(Array.isArray(data.comments) ? data.comments : []);
+           setTotal(data.total);
     } finally {
       setLoading(false);
     }
@@ -222,7 +226,7 @@ export default function CommentManagementPage() {
             fetchComments(e.target.value);
           }}
         />
-        <button
+        {/* <button
           className="btn-add"
           onClick={handleAddClick}
           style={{
@@ -234,7 +238,7 @@ export default function CommentManagementPage() {
           }}
         >
           Add Comment
-        </button>
+        </button> */}
       </div>
 
       <AdminTable
@@ -289,14 +293,14 @@ export default function CommentManagementPage() {
               ? comment.blog._id
               : comment.blog,
         }))}
-        // onEdit={handleEditComment}
+       onEdit={session?.user?.role === "admin" ?  undefined : handleEditComment }
         onDelete={handleDeleteComment}
         loading={loading}
       />
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(0 / pageSize) || 1}
+        totalPages={Math.ceil(total / pageSize) || 1}
         onPageChange={(page) => setCurrentPage(page)}
         pageSize={pageSize}
         onPageSizeChange={(size) => setPageSize(size)}
@@ -324,6 +328,7 @@ export default function CommentManagementPage() {
               onChange: handleFormChange,
               error: !!errors.user,
               helperText: errors.user,
+              display: true ,
             },
             {
               name: "blog",
@@ -332,6 +337,7 @@ export default function CommentManagementPage() {
               onChange: handleFormChange,
               error: !!errors.blog,
               helperText: errors.blog,
+              display:true,
             },
           ]}
           onSubmit={handleSaveComment}
