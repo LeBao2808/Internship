@@ -15,10 +15,11 @@ export default function RegisterPage() {
     setError("");
     setSuccess("");
     try {
+      const image = "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png";
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password,image }),
       });
       if (res.ok) {
         alert("Registration successful! Redirecting...")
@@ -82,7 +83,7 @@ export default function RegisterPage() {
           )}
           <button
             type="submit"
-            className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition"
+            className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition cursor-pointer"
           >
             Sign Up
           </button>

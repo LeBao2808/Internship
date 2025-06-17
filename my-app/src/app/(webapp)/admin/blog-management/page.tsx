@@ -67,7 +67,7 @@ export default function BlogManagementPage() {
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   useEffect(() => {
-    fetchUsers();
+    // fetchUsers();
     fetchCategories();
   }, []);
 
@@ -187,40 +187,6 @@ export default function BlogManagementPage() {
     }
   };
 
-  // const handleDeleteModalBlog = (blog: Blog) => {
-  //   setEditingBlog(blog);
-  //   // setIsModalDelete(true);
-  // };
-
-  // const handleUploadImageSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!image || !blogId) {
-  //     setResult("Vui lòng chọn ảnh và nhập Blog ID");
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append("image", image);
-  //   formData.append("id", blogId);
-
-  //   try {
-  //     const res = await fetch("/api/blog/upload", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-  //     const data = await res.json();
-  //     if (res.ok) {
-  //       setResult("Upload thành công: " + data.image_url);
-  //       setIsUploadModalOpen(false);      // Đóng modal
-  //       setPreviewUpload(null);           // Reset preview
-  //       fetchBlogs();                     // Cập nhật lại danh sách blog (và hình ảnh)
-  //     } else {
-  //       setResult("Lỗi: " + data.error);
-  //     }
-  //   } catch (err) {
-  //     setResult("Lỗi kết nối server");
-  //   }
-  // };
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -586,13 +552,7 @@ export default function BlogManagementPage() {
               error: !!errors.title,
               helperText: errors.title,
             },
-            // {
-            //   name: "image_url",
-            //   label: "Image URL",
-            //   value: form.image_url,
-            //   onChange: handleFormChange,
-            //   required: true,
-            // },
+   
           ]}
           onSubmit={handleSaveBlog}
           submitLabel={editingBlog ? "Update" : "Create"}
@@ -649,7 +609,7 @@ export default function BlogManagementPage() {
             )}
           </div>
 
-          {editingBlog && (
+          {/* {editingBlog && ( */}
             <div style={{ marginTop: 12 }}>
               <label
                 style={{ fontWeight: 600, marginBottom: 6, display: "block" }}
@@ -686,11 +646,11 @@ export default function BlogManagementPage() {
                       if (e.target.files && e.target.files[0]) {
                         const file = e.target.files[0];
                         const formData = new FormData();
-                        formData.append("image", file);
-                        if (editingBlog && editingBlog._id) {
-                          formData.append("id", editingBlog._id);
-                        }
-                        const res = await fetch("/api/blog/upload", {
+                         formData.append("upload", file);
+                        // if (editingBlog && editingBlog._id) {
+                        //   formData.append("id", editingBlog._id);
+                        // }
+                        const res = await fetch("/api/upload", {
                           method: "POST",
                           body: formData,
                         });
@@ -714,58 +674,16 @@ export default function BlogManagementPage() {
                     }}
                   />
                 </label>
-                {/* {form.image_url && (
-                  <img
-                    src={form.image_url}
-                    alt="Preview"
-                    style={{
-                      maxWidth: 120,
-                      maxHeight: 80,
-                      borderRadius: 8,
-                      border: "1px solid #eee",
-                      boxShadow: "0 2px 8px #e3e3e3",
-                      background: "#fafbfc",
-                      objectFit: "cover",
-                    }}
-                  />
-                )} */}
+
                 {ImgUpload}
               </div>
             </div>
-          )}
-          {/* <div style={{ marginTop: 12 }}>
-            <label>Content:</label>
-            <textarea
-              name="content"
-              value={form.content}
-              onChange={handleFormChange}
-              required
-              style={{ width: "100%", minHeight: 100, marginTop: 4, borderRadius: 4, border: "1px solid #ccc", padding: 8 }}
-            />
-          </div> */}
 
           <div style={{ marginTop: 12 }}>
             <label>Content:</label>
-            {/* <CKEditor
-              editor={ClassicEditor as any}
-              data={form.content}
-              onChange={(_event, editor) => {
-                const data = editor.getData();
-                setForm({ ...form, content: data });
-              }}
-            /> */}
-            {/* <Editor
-              // value={form.content}
-              onChange={(data: any) => {
-                // const data = editor.getData();
-                console.log("Editor is ready to use!", data);
-                setForm({ ...form, content: data });
-              }}
-            /> */}
+        
             {EditorFormat}
-            {/* {errors &&
-              (console.log("errors.content", errors.content),
-              (<p className="text-red-500 mt-2">sssss</p>))} */}
+       
           </div>
         </AdminForm>
       </AdminModal>
@@ -923,56 +841,6 @@ export default function BlogManagementPage() {
           </div>
         )}
       </AdminModal>
-
-      {/* <AdminModal
-        open={isUploadModalOpen}
-        title="Uploah Blog"
-        onClose={() => {
-          setIsUploadModalOpen(false);
-          setPreviewUpload(null);
-        }}
-        onConfirm={undefined}
-        confirmLabel={undefined}
-        cancelLabel={undefined}
-      >
-        <form
-          className="flex flex-col items-center gap-4 p-4"
-          onSubmit={handleUploadImageSubmit}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                       file:rounded-full file:border-0
-                       file:text-sm file:font-semibold
-                       file:bg-blue-50 file:text-blue-700
-                       hover:file:bg-blue-100"
-            onChange={e => {
-              if (e.target.files && e.target.files[0]) {
-                setImage(e.target.files[0]);
-                setPreviewUpload(URL.createObjectURL(e.target.files[0]));
-              }
-            }}
-          />
-          {previewUpload && (
-            <img
-              src={previewUpload}
-              alt="Preview"
-              className="rounded-lg shadow-md max-h-60 object-contain border border-gray-200"
-            />
-          )}
-          <button
-            type="submit"
-            className="mt-2 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
-          >
-            Upload
-          </button>
-          {result && (
-            <div className="mt-2 text-center text-sm text-green-600">{result}</div>
-          )}
-        </form>
-      </AdminModal> */}
-
       <AdminModal
         open={!!previewImage}
         title="big size image"
@@ -994,23 +862,6 @@ export default function BlogManagementPage() {
           />
         )}
       </AdminModal>
-
-      {/* {isModalDelete && (
-        <AdminModal
-          open={isModalDelete}
-          title="Delete Blog"
-          onClose={() => setIsModalDelete(false)}
-          onConfirm={() => {
-            handleDeleteBlog(editingBlog!);
-            setIsModalDelete(false);
-          }}
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          isDelete={true}
-        >
-          <h2>Are you sure you want to delete this Blog?</h2>
-        </AdminModal>
-      )} */}
     </div>
   );
 }

@@ -431,13 +431,6 @@ export default function BlogPage() {
 
         {/* Search & All Posts */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-          {/* <input
-            type="text"
-            placeholder="Search blogs..."
-            value={search}
-            onChange={handleSearchChange}
-            className="p-3 w-full md:w-80 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-          /> */}
 
           <div className="flex px-6 py-3 rounded-md border-2 border-blue-500 overflow-hidden bg-white ">
             <input
@@ -539,17 +532,17 @@ export default function BlogPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition"
+            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer"
           >
             Previous
           </button>
-          <span className="text-gray-700 font-semibold">
+          <span className="text-gray-700 font-semibold cursor-pointer">
             Page {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || totalPages === 0}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition"
+            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer"
           >
             Next
           </button>

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     console.log("imageURL", imageUrl)
 
     // Trả về đúng format CKEditor mong muốn
-    return NextResponse.json({ url: imageUrl });
+    return NextResponse.json({ image_url: imageUrl });
   } catch (e) {
     console.error("Upload error:", e);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });

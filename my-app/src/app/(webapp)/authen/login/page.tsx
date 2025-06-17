@@ -67,7 +67,7 @@ export default function LoginPage() {
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <button
             type="submit"
-            className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition"
+            className="w-full py-2 mt-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-bold shadow transition cursor-pointer"
           >
             Login
           </button>
@@ -76,7 +76,7 @@ export default function LoginPage() {
           onClick={() =>
             signIn("google", { callbackUrl: "/UI/blog" })
           }
-          className="w-full py-2 mt-4 bg-white border border-blue-700 text-blue-900 rounded-lg font-semibold flex items-center justify-center gap-2 shadow hover:bg-blue-50 transition"
+          className="w-full py-2 mt-4 bg-white border border-blue-700 text-blue-900 rounded-lg font-semibold flex items-center justify-center gap-2 shadow hover:bg-blue-50 transition cursor-pointer"
         >
           <img
             src="https://developers.google.com/identity/images/g-logo.png"

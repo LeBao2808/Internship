@@ -47,7 +47,6 @@ export default function UserManagementPage() {
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState<keyof User>("name");
@@ -144,11 +143,6 @@ export default function UserManagementPage() {
     });
     // setMessage("Delete User Successful!", "error");
     fetchUsers();
-  };
-
-  const handleDeleteModalUser = (user: User) => {
-    setEditingUser(user);
-    setIsModalDelete(true);
   };
 
   const handleFormChange = (e: React.ChangeEvent<any>) => {
@@ -299,53 +293,6 @@ return null ;
           marginBottom: 16,
         }}
       >
-        {/* <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setCurrentPage(1);
-            fetchUsers(search);
-          }}
-          style={{ display: "flex", gap: 8 }}
-        >
-          <input
-            type="text"
-            placeholder="Search user..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: 8,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              maxWidth: 160,
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "8px 16px",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-              />
-            </svg>
-          </button>
-        </form> */}
 
         <InputSearch
           onInput={(e) => {
@@ -534,14 +481,7 @@ return null ;
           <div>
             {roles.length > 0 && (
               <React.Suspense fallback={null}>
-                {/* {React.createElement(require("../../components/AdminSelect").default, {
-                  label: "Role",
-                  name: "role",
-                  value: form.role,
-                  options: roles,
-                  onChange: (e: any) => setForm({ ...form, role: e.target.value }),
-                  required: true,
-                })} */}
+
                 <AdminSelect
                   label="Role"
                   name="role"
@@ -566,23 +506,6 @@ return null ;
           </div>
         </AdminForm>
       </AdminModal>
-
-      {/* {isModalDelete && (
-        <AdminModal
-          open={isModalDelete}
-          title="Delete User"
-          onClose={() => setIsModalDelete(false)}
-          onConfirm={() => {
-            handleDeleteUser(editingUser!);
-            setIsModalDelete(false);
-          }}
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          isDelete={true}
-        >
-          <h2>Are you sure you want to delete this User?</h2>
-        </AdminModal>
-      )} */}
     </div>
   );
 }
