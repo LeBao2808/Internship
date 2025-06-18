@@ -14,7 +14,7 @@ class MyUploadAdapter {
 
   async upload() {
     const file = await this.loader.file;
-    console.log('Uploading file: ', file.name); // 👈 để kiểm tra có gọi không
+    console.log('Uploading file: ', file.name); 
 
     const formData = new FormData();
     formData.append('upload', file);
@@ -25,7 +25,7 @@ class MyUploadAdapter {
     });
 
     const data = await res.json();
-    return { default: data.url };
+    return { default: data.image_url };
   }
 
   abort() {}
