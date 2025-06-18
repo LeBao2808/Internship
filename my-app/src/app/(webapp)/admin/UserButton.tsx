@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { useRouter, usePathname } from 'next/navigation';
 import Image from "next/image";
-// import "../../(webapp)/components/userButton.css"
+import "../../(webapp)/components/userButton.css"
 
 export default function UserButton() {
   const { data: session, status } = useSession();

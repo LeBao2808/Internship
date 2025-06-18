@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
 import UserButton from "../../admin/UserButton";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+
 interface Blog {
   _id: string;
   title: string;
@@ -24,6 +25,7 @@ interface Category {
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [blogFeatureds, setBlogFeatureds] = useState<Blog[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(6);
@@ -32,9 +34,7 @@ export default function BlogPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
-
   const [isMobile, setIsMobile] = useState(false);
-  const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -44,40 +44,31 @@ export default function BlogPage() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+    window.removeEventListener("resize", handleResize);
     };
   }, []);
-  // const savedSearch = localStorage.getItem("blog_search") || "";
-  useEffect(() => {
-    const fetchUserNames = async () => {
-      const ids = Array.from(
-        new Set(
-          blogs
-            .map((b) =>
-              typeof b.user === "object" && b.user !== null && "_id" in b.user
-                ? b.user._id
-                : b.user || ""
-            )
-            .filter(Boolean)
-        )
-      );
-      const newUserNames: { [key: string]: string } = { ...userNames };
-      for (const id of ids) {
-        if (id && !newUserNames[id]) {
-          const res = await fetch(`/api/user/${id}`);
-          const data = await res.json();
-          newUserNames[id] = data?.name || id;
-        }
-      }
-      setUserNames(newUserNames);
-    };
-    if (blogs.length > 0) fetchUserNames();
-  }, [blogs]);
 
-  // Lấy featured posts (giả lập: 3 bài đầu tiên)
-  const featuredPosts = blogs.slice(0, 3);
-  // Latest posts (giả lập: 3 bài mới nhất)
-  const latestPosts = blogs.slice(0, 3);
+  useEffect(() => {
+  if (categories.length === 0) {
+    fetchCategories();
+  }
+}, []);
+
+useEffect(() => {
+  const fetchData = async () => {
+    setPage(1); 
+    await fetchBlogs();
+  };
+  fetchData();
+}, [search, category]);
+
+useEffect(() => {
+  fetchBlogs();
+}, [page]);
+
+
+const featuredPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
+const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
 
   const fetchCategories = async () => {
     try {
@@ -120,19 +111,7 @@ export default function BlogPage() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    // This code only runs on the client
-    // const savedSearch = typeof window !== "undefined" ? localStorage.getItem("blog_search") || "" : "";
-    // setSearch(savedSearch);
-    // if (typeof window !== "undefined") {
-    //   localStorage.removeItem("blog_search");
-    // }
-    fetchCategories();
-  }, []);
 
-  useEffect(() => {
-    fetchBlogs();
-  }, [search, page, category, router]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -147,30 +126,6 @@ export default function BlogPage() {
  {session ? (
         <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
           <UserButton />
-          {/* <span className="mx-2 text-gray-400">|</span> */}
-          {/* <button
-            onClick={async () => {
-              await fetch("/api/auth/logout", { method: "POST" });
-              signOut({ callbackUrl: "/authen/login", redirect: true });
-            }}
-            className="text-gray-600 hover:text-red-500 hover:bg-gray-100 rounded-full transition cursor-pointer p-2"
-            aria-label="Logout"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25v-4.25m-6-7l-3 3m0 0l3 3m-3-3h12"
-              />
-            </svg>
-          </button> */}
         </div>
       ) : (
           <div className="flex items-cente rounded-lg  mr-2 mt-2 p-1">
@@ -179,86 +134,9 @@ export default function BlogPage() {
 
       )}
 </div>
-          
-      <style>{`
-      .nav-logout-btn {
-          margin-left: auto;
-          background: #d32f2f;
-          color: #fff;
-          border: none;
-          border-radius: 6px;
-          padding: 8px 18px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.25s, box-shadow 0.25s;
-        }
-        .nav-logout-btn:hover {
-          background: #b71c1c;
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
-        }
-           .nav-logout-btn {
-          margin-left: auto;
-          background: #d32f2f;
-          color: #fff;
-          border: none;
-          border-radius: 6px;
-          padding: 8px 18px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.25s, box-shadow 0.25s;
-        }
-        .nav-logout-btn:hover {
-          background: #b71c1c;
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
-        }
-
-
-       .nav-home-btn {
-          margin-left: auto;
-          background:#fff;
-          color: #1976d2;
-          border: none;
-          border-radius: 6px;
-          padding: 8px 18px;
-          font-weight: 600;
-          cursor: pointer;
-       }
-          .nav-home-btn:hover {
-          background:rgb(214, 214, 214);
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
-          }
-
-               .nav-view-btn {
-          margin-left: auto;
-          background:#rgb(168, 155, 137);
-          color: #1976d2;
-          border: none;
-          border-radius: 6px;
-          padding: 8px 18px;
-          font-weight: 600;
-          cursor: pointer;
-       }
-          .nav-view-btn:hover {
-          background:rgb(230, 231, 220);
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
-          }
-
-          .text-nav-btn-user{
-            color: black; 
-          }
- 
-
-     `}</style>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="flex w-full justify-end">
-          {/* <button
-            className=" py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition w-[200px] cursor-pointer border-10 border-blue-600 hover:border-blue-700 "
-            onClick={() => router.push("/authen/login")}
-          >
-            Login
-          </button> */}
-
         </div>
         {isMobile ? (
           <div className="text-center mb-12">
@@ -494,12 +372,12 @@ export default function BlogPage() {
                   </h2>
                   {blog.user && (
                     <p className="text-sm text-gray-500 mb-1">
-                      <b>Tác giả:</b>{" "}
+                      <b>Author:</b>{" "}
                       {typeof blog.user === "object" &&
                       blog.user !== null &&
                       "name" in blog.user
                         ? blog.user.name
-                        : userNames[blog.user as string] || blog.user}
+                        : ""}
                     </p>
                   )}
                   {blog.createdAt && (
