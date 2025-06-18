@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
 import UserButton from "../../admin/UserButton";
-import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import "./style.css";
 
 interface Blog {
   _id: string;
@@ -34,57 +34,33 @@ export default function BlogPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
-  const [isMobile, setIsMobile] = useState(false);
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => {
-    window.removeEventListener("resize", handleResize);
-    };
+    fetchCategories();
   }, []);
 
   useEffect(() => {
-  if (categories.length === 0) {
-    fetchCategories();
-  }
-}, []);
+    const fetchData = async () => {
+      setPage(1);
+      await fetchBlogs();
+    };
+    fetchData();
+  }, [search, category]);
 
-useEffect(() => {
-  const fetchData = async () => {
-    setPage(1); 
-    await fetchBlogs();
-  };
-  fetchData();
-}, [search, category]);
+  useEffect(() => {
+    fetchBlogs();
+  }, [page]);
 
-useEffect(() => {
-  fetchBlogs();
-}, [page]);
-
-
-const featuredPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
-const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
+  const featuredPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
+  const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
 
   const fetchCategories = async () => {
     try {
       const res = await fetch("/api/category");
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setCategories(
-          data.map((cat: any) => ({ _id: cat._id, name: cat.name }))
-        );
-      } else if (Array.isArray(data.categories)) {
-        setCategories(
-          data.categories.map((cat: any) => ({ _id: cat._id, name: cat.name }))
-        );
-      } else {
-        setCategories([]);
-      }
+      const { categories } = data;
+      setCategories(categories);
     } catch {
       setCategories([]);
     }
@@ -111,8 +87,6 @@ const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
     setLoading(false);
   };
 
-
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setPage(1);
@@ -122,48 +96,31 @@ const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
 
   return (
     <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
-   <div className="flex justify-end ">
- {session ? (
-        <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
-          <UserButton />
-        </div>
-      ) : (
-          <div className="flex items-cente rounded-lg  mr-2 mt-2 p-1">
-                   <UserButton />
-             </div>
-
-      )}
-</div>
-      <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <div className="flex w-full justify-end">
-        </div>
-        {isMobile ? (
-          <div className="text-center mb-12">
-            <h3 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900 drop-shadow-lg leading-tight">
-              Learn to Code
-              <br />
-              One Day at a Time
-            </h3>
-
-            <p className="text-sm md:text-base text-gray-600 mb-2">
-              A blog for beginners and aspiring developers to grow their coding
-              skills.
-            </p>
+      <div className="flex justify-end ">
+        {session ? (
+          <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
+            <UserButton />
           </div>
         ) : (
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
-              Learn to Code
-              <br />
-              One Day at a Time
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              A blog for beginners and aspiring developers to grow their coding
-              skills.
-            </p>
+          <div className="flex items-cente rounded-lg  mr-2 mt-2 p-1">
+            <UserButton />
           </div>
         )}
+      </div>
+      <div className="max-w-7xl mx-auto">
+        {/* Hero Section */}
+        <div className="flex w-full justify-end"></div>
+        <div className="text-center mb-12">
+          <h1 className="title font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
+            Learn to Code
+            <br />
+            One Day at a Time
+          </h1>
+          <p className="sub_title text-gray-600 mb-8 max-w-2xl mx-auto">
+            A blog for beginners and aspiring developers to grow their coding
+            skills.
+          </p>
+        </div>
 
         {/* Featured Posts */}
         <div className="mb-12">
@@ -180,7 +137,7 @@ const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredPosts.map((blog, idx) => (
+              {featuredPosts.map((blog) => (
                 <div
                   key={blog._id}
                   className="bg-white rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
@@ -207,7 +164,6 @@ const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
                   </div>
                   <button
                     onClick={() => router.push(`/UI/blog/${blog.slug}`)}
-                    // onClick={handleViewDetail}
                     className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
                   >
                     Read More
@@ -308,7 +264,6 @@ const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
 
         {/* Search & All Posts */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-
           <div className="flex px-6 py-3 rounded-md border-2 border-blue-500 overflow-hidden bg-white ">
             <input
               // type="email"
@@ -425,31 +380,7 @@ const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
           </button>
         </div>
       </div>
-
-      <style jsx global>{`
-        // .blog-home-bg {
-        //   padding-top: 20px;
-        // }
-        .line-clamp-3 {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
       <Footer />
     </div>
   );
-}
-
-{
-  /* <div className="w-full bg-white shadow-sm mb-8">
-  <nav className="max-w-5xl mx-auto flex items-center justify-between py-4 px-4 md:px-0">
-    <div className="text-xl md:text-2xl font-bold text-gray-900">Programming Blog</div>
-    <div className="flex gap-6 text-base font-medium">
-      <button className="hover:text-blue-600 transition" onClick={()=>router.push('/webapp/UI/blog')}>Home</button>
-      <button className="hover:text-blue-600 transition" onClick={()=>router.push('/webapp/UI/blog/about')}>About</button>
-    </div>
-  </nav>
-</div> */
 }
