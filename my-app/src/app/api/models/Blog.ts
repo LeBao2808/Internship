@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 import { IBaseTimestamps } from "./BaseTimestamps";
 import { baseTimestamps } from "./BaseTimestamps";
 import slugify from "slugify";
+import { boolean } from "zod";
 
 export interface IBlog extends Document, IBaseTimestamps {
   title: string;
@@ -10,6 +11,7 @@ export interface IBlog extends Document, IBaseTimestamps {
   user: mongoose.Schema.Types.ObjectId;
   category: mongoose.Schema.Types.ObjectId;
   slug: string;
+  featured : boolean;
 }
 
 const BlogSchema: Schema<IBlog> = new Schema({
@@ -22,6 +24,7 @@ const BlogSchema: Schema<IBlog> = new Schema({
     type: String,
     unique: true,
   },
+  featured: {type: Boolean},
   ...baseTimestamps
 });
 

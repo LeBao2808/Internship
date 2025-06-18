@@ -38,15 +38,20 @@ const isOnAdminPage = pathname.startsWith('/admin');
   // if (status === "loading") return null;
   // if (!session) return null;
   // hoặc refreshToken; // hoặc refreshToken
+if (status === "loading") {
+  return null; // hoặc hiển thị spinner
+}
 
-  if(!session){
-    return <a
-  href="/authen/login"
-  className="px-5 py-2 text-blue-600 font-medium border border-blue-600 rounded-full hover:bg-blue-50 transition-all bg-white"
->
-  Log in
-</a>
-  }
+if (!session) {
+  return (
+    <a
+      href="/authen/login"
+      className="px-5 py-2 text-blue-600 font-medium border border-blue-600 rounded-full hover:bg-blue-50 transition-all bg-white"
+    >
+      Log in
+    </a>
+  );
+}
   
   return (
     <div
@@ -81,7 +86,7 @@ const isOnAdminPage = pathname.startsWith('/admin');
           width={40}
           height={40}
           style={{ width: 40, height: 40 }}
-          className="rounded-full mr-4 w-[40px] h-[40px] object-cover"
+          className="rounded-full mr-4 w-[40px] h-[40px] object-cover image-userbutton"
         />
     
       </button>
@@ -96,12 +101,12 @@ const isOnAdminPage = pathname.startsWith('/admin');
       user-btn
     "
   >
-         <p 
+         {/* <p 
         style={{
           fontFamily: "cursive"
         }}
         className="text-black text-nav-btn-user mr-5 text-center"  
-        >{session.user?.email ||  session?.user?.name}</p>
+        >{session.user?.email ||  session?.user?.name}</p> */}
 
 <button
   style={{ marginTop: 12, width: "100%" }}

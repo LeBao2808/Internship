@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Footer from "../../components/Footer";
 import UserButton from "../../admin/UserButton";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import "./style.css";
 
 interface Blog {
@@ -34,10 +35,11 @@ export default function BlogPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
-  const { data: session, status } = useSession();
+
 
   useEffect(() => {
     fetchCategories();
+    fecthFeaturedBlog();
   }, []);
 
   useEffect(() => {
@@ -52,7 +54,8 @@ export default function BlogPage() {
     fetchBlogs();
   }, [page]);
 
-  const featuredPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
+  console.log("blogFeatured",blogFeatureds)
+  const featuredPosts = useMemo(() => blogFeatureds.slice(0, 3), [ blogFeatureds]);
   const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
 
   const fetchCategories = async () => {
@@ -65,6 +68,29 @@ export default function BlogPage() {
       setCategories([]);
     }
   };
+
+  const fecthFeaturedBlog = async () => {
+  try {
+    const res = await fetch("/api/blog/featured");
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    console.log("Raw data from API:", data);
+
+    if (data.success) {
+      const featuredList = data.data || [];
+      setBlogFeatureds(featuredList);
+    } else {
+      console.error("API returned error:", data.message);
+    }
+  } catch (error) {
+    console.error("Failed to fetch featured blogs:", error);
+  }
+  }
 
   const fetchBlogs = async () => {
     setLoading(true);
@@ -97,15 +123,11 @@ export default function BlogPage() {
   return (
     <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
       <div className="flex justify-end ">
-        {session ? (
+    
           <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
             <UserButton />
           </div>
-        ) : (
-          <div className="flex items-cente rounded-lg  mr-2 mt-2 p-1">
-            <UserButton />
-          </div>
-        )}
+     
       </div>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
@@ -128,14 +150,17 @@ export default function BlogPage() {
             Featured Posts
           </h2>
           {loading ? (
-            <div className="flex justify-center items-center h-40">
-              <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></span>
-            </div>
-          ) : blogs.length === 0 ? (
-            <div className="text-center text-gray-500 py-12 text-lg">
-              No blog found.
-            </div>
-          ) : (
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {[...Array(3)].map((_, i) => (
+      <div key={i} className="bg-white p-6 rounded-lg shadow-md animate-pulse">
+        <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+        <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+      </div>
+    ))}
+  </div>
+          )  : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredPosts.map((blog) => (
                 <div
@@ -282,9 +307,16 @@ export default function BlogPage() {
           </div>
         </div>
         {loading ? (
-          <div className="flex justify-center items-center h-40">
-            <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></span>
-          </div>
+           <div>
+             {[...Array(3)].map((_, i) => (
+      <div key={i} className="bg-white p-6 rounded-lg shadow-md animate-pulse">
+        <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+        <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+      </div>
+    ))}
+  </div>
         ) : blogs.length === 0 ? (
           <div className="text-center text-gray-500 py-12 text-lg">
             No blog found.
@@ -298,28 +330,13 @@ export default function BlogPage() {
                 className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl border border-gray-100 hover:border-blue-400 cursor-pointer"
               >
                 <div className="h-auto w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
-                  {blog.image_url ? (
                     <img
-                      src={blog.image_url}
+                      src={blog.image_url || "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"}
                       alt={blog.title}
                       className="h-auto aspect-[8/5] w-full object-cover"
                       style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    <svg
-                      className="h-auto aspect-[8/5] w-full text-blue-400 opacity-40"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6l4 2"
-                      />
-                    </svg>
-                  )}
+                    />     
+                
                 </div>
                 <div className="flex-1 flex flex-col p-6">
                   <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">
@@ -337,7 +354,7 @@ export default function BlogPage() {
                   )}
                   {blog.createdAt && (
                     <p className="text-xs text-gray-400 mb-2">
-                      Đăng lúc: {new Date(blog.createdAt).toLocaleString()}
+                      Posted at: {new Date(blog.createdAt).toLocaleString()}
                     </p>
                   )}
                   <div

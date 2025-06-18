@@ -27,6 +27,7 @@ interface Blog {
   namecategory?: string;
   nameuser?: string;
   updatedAt?: string;
+  featured?:boolean
 }
 const BlogSchema = z.object({
   title: z.string().trim().min(5, "Title must be at least 5 characters"),
@@ -100,7 +101,7 @@ export default function BlogManagementPage() {
       if (query) params.push(`search=${encodeURIComponent(query)}`);
       if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
       if (page) params.push(`page=${page}`);
-      if (size) params.push(`pageSize=${size}`);
+      if (size) params.push(`limit=${size}`);
       if (params.length > 0) url += "?" + params.join("&");
       const res = await fetch(url);
       const data = await res.json();
@@ -111,30 +112,7 @@ export default function BlogManagementPage() {
     }
   };
 
-  const fetchUsers = async () => {
-    const res = await fetch("/api/user");
-    const data = await res.json();
-    const arr = Array.isArray(data.users) ? data.users : [];
-    setUsers(
-      arr.map((user: any) => ({
-        id: user._id || user.id,
-        name: user.name || user.email,
-        email: user.email,
-      }))
-    );
-  };
 
-  // const hanleClose = () => {
-  //   setIsModalOpen(false);
-  //   setEditingBlog(null);
-  //   setForm({
-  //     title: "",
-  //     content: "",
-  //     user: "",
-  //     image_url: "",
-  //     category: "",
-  //   });
-  // };
 
   const handleAddClick = () => {
     // setIsUpload(false);
@@ -186,6 +164,23 @@ export default function BlogManagementPage() {
       setMessage("Delete Blog Failed!", "error");
     }
   };
+
+const handleFeatured = async (blog:Blog) => {
+  const res = await fetch(`/api/blog/featured/${blog._id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ featured: !blog.featured }),
+  });
+
+  if (res.ok) {
+    // Cập nhật lại state blogs ở client
+    setBlogs((prev) =>
+      prev.map((b) => (b._id === blog._id ? { ...b, featured: !b.featured } : b))
+    );
+  }
+};
 
 
   const handleFormChange = (
@@ -472,6 +467,7 @@ export default function BlogManagementPage() {
             id: "content",
             label: renderColumnHeader({ id: "content", label: "Content" }),
           },
+       
           // {
           //   id: "category",
           //   label: renderColumnHeader({ id: "category", label: "Category" }),
@@ -486,6 +482,7 @@ export default function BlogManagementPage() {
         ]}
         rows={blogs.map((blog) => ({
           ...blog,
+          featured: blog.featured || false,
           user:
             typeof blog.user === "object" &&
             blog.user !== null &&
@@ -516,6 +513,8 @@ export default function BlogManagementPage() {
 
           image_url: typeof blog.image_url === "string" ? blog.image_url : "",
         }))}
+ 
+       onFeatured={handleFeatured}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}

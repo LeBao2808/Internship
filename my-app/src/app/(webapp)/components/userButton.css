@@ -62,3 +62,12 @@
           .text-nav-btn-user{
             color: black; 
           }
+
+          @media screen and (width < 768px){
+            .text-nav-btn-user{
+              display: none;
+            }
+            .image-userbutton{
+              margin: 0;
+            }
+          }

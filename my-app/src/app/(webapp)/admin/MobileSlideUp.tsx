@@ -2,19 +2,21 @@
 
 import React from "react";
 import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 // import HomeMobile from "../home-mobile/page";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { FaUser, FaUserShield, FaBlog, FaList } from "react-icons/fa";
+import { FaUser, FaUserShield, FaBlog, FaList , FaHome, FaComment} from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { TbLogout } from "react-icons/tb";
 export default function MobileSlideUp() {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+    const { data: session, status } = useSession();
   // const router = useRouter();
   // const [shouldRender, setShouldRender] = useState(false);
-
+const role = session?.user?.role;
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -51,8 +53,22 @@ export default function MobileSlideUp() {
       href: "/admin/category-management",
       icon: <FaList className="absolute bottom-[11px]" />,
     },
-    // { label: t("Home"), href: "/UI/blog", icon: <FaHome /> },
-  ];
+ {
+      label: t("Comment"),
+      href: "/admin/comment-management",
+      icon: <FaComment className="absolute bottom-[11px]" />,
+    },
+    { label: t("Home"), 
+      href: "/UI/blog",
+       icon: <FaHome   className="absolute bottom-[11px]"/> },
+  ].filter(item => {
+  // Chỉ giữ lại User, Role, Category nếu là admin
+  if (["User", "Role", "Category"].includes(item.label)) {
+    return role === "admin";
+  }
+  return true;
+});
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

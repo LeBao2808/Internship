@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import { Popover, Button, Typography } from "@mui/material";
+import { FaStar } from "react-icons/fa";
 
 interface Column {
   id: string;
@@ -23,11 +24,13 @@ interface AdminTableProps {
   columns: Column[];
   rows: any[];
   onEdit?: (row: any) => void;
+  onFeatured?: (row: any) => void; 
   onDelete?: (row: any) => void;
   onViewDetail?: (row: any) => void; // Thêm props mới
   onUpload?: (row: any) => void; // Thêm props mới
   onVisible?: (row: any) => void; // Thêm props mới
   loading?: boolean;
+  isFeatured?:boolean; 
 }
 
 const AdminTable: React.FC<AdminTableProps> = ({
@@ -38,7 +41,9 @@ const AdminTable: React.FC<AdminTableProps> = ({
   onViewDetail,
   onUpload,
   onVisible,
+  onFeatured,
   loading = false,
+  isFeatured = false
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null); // Thêm state này
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -216,6 +221,14 @@ const AdminTable: React.FC<AdminTableProps> = ({
                           </span>
                         </IconButton>
                       )}
+
+                {onFeatured && (
+  <IconButton color="secondary" onClick={() => onFeatured(row)} title="featured blog">
+    <FaStar color={row.featured ? "gold" : "gray"} />
+  </IconButton>
+)}
+
+
                     </TableCell>
                   )}
                 </TableRow>
