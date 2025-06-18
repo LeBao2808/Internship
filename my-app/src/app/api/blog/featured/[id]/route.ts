@@ -2,8 +2,11 @@
 import { NextRequest } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../../models/Blog";
+import { promises } from "dns";
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> } ) {
   await dbConnect();
   const { id } = await params;
   const { featured } = await request.json();

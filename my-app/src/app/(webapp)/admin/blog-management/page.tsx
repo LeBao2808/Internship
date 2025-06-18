@@ -514,7 +514,7 @@ const handleFeatured = async (blog:Blog) => {
           image_url: typeof blog.image_url === "string" ? blog.image_url : "",
         }))}
  
-       onFeatured={handleFeatured}
+       onFeatured={session?.user?.role === "admin" ?  handleFeatured : undefined}
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
