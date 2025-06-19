@@ -35,6 +35,7 @@ export default function BlogPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     fetchCategories();
@@ -102,7 +103,7 @@ export default function BlogPage() {
         limit: limit.toString(),
         ...(category ? { category } : {}),
       });
-
+setLoading(true)
       const res = await fetch(`/api/bloghome?${params.toString()}`);
       const data = await res.json();
       setBlogs(data.blogs || []);
@@ -114,10 +115,20 @@ export default function BlogPage() {
     setLoading(false);
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+  const handleSearchChange = (value:string) => {
+    setSearch(value);
     setPage(1);
   };
+
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setSearchValue(e.target.value);
+};
+
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === "Enter") {
+    handleSearchChange(searchValue); // Hàm riêng để xử lý tìm kiếm
+  }
+};
 
   const totalPages = Math.ceil(total / limit);
 
@@ -299,7 +310,9 @@ export default function BlogPage() {
             <input
               // type="email"
               placeholder="Search Something..."
-              onChange={handleSearchChange}
+               value={searchValue}
+    onChange={handleInputChange}
+    onKeyDown={handleKeyDown}
               className="w-full outline-none bg-transparent text-gray-600 text-sm"
             />
             <svg
@@ -321,7 +334,7 @@ export default function BlogPage() {
               >
                 <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
                 <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-4"></div> 
                 <div className="h-8 bg-gray-200 rounded w-1/3"></div>
               </div>
             ))}
