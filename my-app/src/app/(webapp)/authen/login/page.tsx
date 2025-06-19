@@ -26,7 +26,7 @@ export default function LoginPage() {
       const role = session?.user?.role;
 
       if (role === "admin") {
-        router.push("/admin/user-management");
+        router.push("/admin");
       } else {
         router.push("/UI/blog");
       }

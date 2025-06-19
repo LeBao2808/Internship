@@ -59,9 +59,7 @@
           box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
           }
 
-          .text-nav-btn-user{
-            color: black; 
-          }
+      
 
           @media screen and (width < 768px){
             .text-nav-btn-user{

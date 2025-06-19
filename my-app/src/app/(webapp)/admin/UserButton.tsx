@@ -35,11 +35,9 @@ const isOnAdminPage = pathname.startsWith('/admin');
     };
   }, [show]);
 
-  // if (status === "loading") return null;
-  // if (!session) return null;
-  // hoặc refreshToken; // hoặc refreshToken
+
 if (status === "loading") {
-  return null; // hoặc hiển thị spinner
+  return null; 
 }
 
 if (!session) {
@@ -78,7 +76,7 @@ if (!session) {
         style={{
           fontFamily: "cursive"
         }}
-        className="text-white text-nav-btn-user mr-5 "  
+    className={`text-nav-btn-user mr-5 ${isOnAdminPage ? 'text-white' : 'text-black'}`}
         >{session?.user?.name}</p>
         <Image
           src={session?.user?.image || imageUrl}

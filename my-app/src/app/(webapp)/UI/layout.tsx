@@ -12,7 +12,7 @@ export default function AdminLayout({
         minHeight: "100vh",
       }}
     >
-      <main style={{}}>
+      <main>
         <Providers>{children}</Providers>
       </main>
     </div>
