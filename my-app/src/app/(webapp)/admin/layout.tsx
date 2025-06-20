@@ -4,6 +4,7 @@ import NavigationClient from "./NavigationClient";
 import { SessionProvider } from "next-auth/react";
 import MobileSlideUp from "./MobileSlideUp";
 import MessageToast from "../components/MessageToast";
+import "../../../styles/admin.css"; 
 
 export default function AdminLayout({
   children,

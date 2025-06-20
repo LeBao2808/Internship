@@ -5,14 +5,13 @@ import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
 import Pagination from "../../components/Pagination";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import "./user-management.css";
 import InputSearch from "../../components/InputSearch";
 import { useSession } from "next-auth/react";
-import { useSortableColumns } from "../hooks/useSortableColumns";
+import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { User } from "@/utils/type";
 
 const UserSchema = z.object({
@@ -35,13 +34,13 @@ export default function UserManagementPage() {
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const pageSize = 10;
 
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { sortBy, sortOrder, renderColumnHeader } =
     useSortableColumns<User>("name");
   useEffect(() => {
@@ -50,7 +49,7 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     fetchUsers(search, currentPage, pageSize);
-  }, [currentPage, pageSize, search, sortBy, sortOrder]);
+  }, [currentPage, search, sortBy, sortOrder]);
   const fetchUsers = async (query = "", page = currentPage, size = 10) => {
     try {
       setLoading(true);
@@ -92,7 +91,6 @@ export default function UserManagementPage() {
     setForm({
       name: "",
       email: "",
-      // role: roles.length > 0 ? roles[0].value : "",
       role: "",
       image: "",
     });
@@ -101,9 +99,6 @@ export default function UserManagementPage() {
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
-    console.log(user);
-    console.log(user.role);
-    console.log(editingUser);
     setForm({
       name: user.name,
       email: user.email,
@@ -112,14 +107,12 @@ export default function UserManagementPage() {
     });
     setIsModalOpen(true);
   };
-  console.log("editingUser", editingUser);
   const handleDeleteUser = async (user: User) => {
     await fetch("/api/user", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: user._id }),
     });
-    // setMessage("Delete User Successful!", "error");
     fetchUsers();
   };
 
@@ -225,17 +218,7 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div
-      style={{
-        width: "100%",
-        margin: 0,
-        padding: 24,
-        background: "#fff",
-        borderRadius: 0,
-        boxShadow: "0 2px 8px #eee",
-      }}
-    >
-      {/* <h1>User Management</h1> */}
+    <div className="user-management-container">
       <div
         className="container-header"
         style={{
@@ -251,18 +234,7 @@ export default function UserManagementPage() {
             fetchUsers(e.target.value);
           }}
         />
-        <button
-          className="btn-add"
-          onClick={handleAddClick}
-          style={{
-            padding: "8px 16px",
-            background: "#1976d2",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            cursor: "pointer",
-          }}
-        >
+        <button className="btn-add" onClick={handleAddClick}>
           Add User
         </button>
       </div>
@@ -302,10 +274,6 @@ export default function UserManagementPage() {
         totalPages={Math.ceil(total / pageSize) || 1}
         onPageChange={(page) => setCurrentPage(page)}
         pageSize={pageSize}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          // setCurrentPage(1);
-        }}
       />
       <AdminModal
         open={isModalOpen}
@@ -322,7 +290,6 @@ export default function UserManagementPage() {
               label: "User Name",
               value: form.name,
               onChange: handleFormChange,
-              // required: true,
               error: !!errors.name,
               helperText: errors.name,
             },
@@ -331,7 +298,6 @@ export default function UserManagementPage() {
               label: "Email",
               value: form.email,
               onChange: handleFormChange,
-              // required: true,
               error: !!errors.email,
               helperText: errors.email,
             },
@@ -349,7 +315,7 @@ export default function UserManagementPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <label
                   htmlFor="user-image-upload"
-                  style={{
+                       style={{
                     background: "#1976d2",
                     color: "#fff",
                     padding: "8px 20px",
@@ -401,15 +367,7 @@ export default function UserManagementPage() {
                   <img
                     src={form.image}
                     alt="Preview"
-                    style={{
-                      maxWidth: 120,
-                      maxHeight: 80,
-                      borderRadius: 8,
-                      border: "1px solid #eee",
-                      boxShadow: "0 2px 8px #e3e3e3",
-                      background: "#fafbfc",
-                      objectFit: "cover",
-                    }}
+                    className="image-preview"
                   />
                 )}
               </div>
@@ -435,7 +393,6 @@ export default function UserManagementPage() {
                       });
                     }
                   }}
-                  // required={true}
                 />
               </React.Suspense>
             )}

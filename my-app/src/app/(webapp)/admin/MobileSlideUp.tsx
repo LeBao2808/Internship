@@ -138,23 +138,6 @@ const role = session?.user?.role;
                 justifyContent: "center",
               }}
             >
-              {/* <button
-                className="hover:shadow-lg transition-all duration-300 ease-in-out"
-                onClick={() => setIsOpen(!isOpen)}
-                style={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  padding: "8px",
-                  borderRadius: "50%",
-                  color: "black",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              ></button> */}
-
-              {/* <HomeMobile onSelect={() => setIsOpen(false)} /> */}
-
               {navItems.map((item, index) => (
                 <a
                   className={`nav-link-mobile ${

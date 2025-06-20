@@ -1,30 +1,18 @@
-import React, { useState } from "react";
+"use client";
+import React from "react";
 import { useRouter } from "next/navigation";
-import Footer from "../../components/Footer";
-import UserButton from "../../admin/UserButton";
+import Footer from "../../../components/Footer";
+import UserButton from "../../../admin/UserButton";
 
 interface BlogLayoutProps {
   children: React.ReactNode;
 }
 
-const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
-  const [search, setSearch] = useState("");
+const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
   const router = useRouter();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (search.trim()) {
-      // router.push(`/UI/blog?search=${encodeURIComponent(search)}`) ;
-      localStorage.setItem("blog_search", search);
-      router.push("/UI/blog");
-    }
-  };
-
   return (
-
-    
     <div>
-           <style>{`
+      <style>{`
       .nav-logout-btn {
           margin-left: auto;
           background: #d32f2f;
@@ -90,19 +78,14 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
           .text-nav-btn-user{
             color: black; 
           }
- 
 
      `}</style>
-         <div className="flex justify-end ">
-                  <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
-                <UserButton />
-              
-              </div>
-              </div>
-    
-      {/* Thanh điều hướng */}
+      <div className="flex justify-end ">
+        <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
+          <UserButton />
+        </div>
+      </div>
       <div className="max-w-7xl mx-auto flex items-center gap-4 mb-6 px-4 ">
-     
         <button
           onClick={() => router.push("/UI/blog")}
           className="p-2 rounded-full hover:bg-blue-100 transition bg-white cursor-pointer "
@@ -123,34 +106,11 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children }) => {
             />
           </svg>
         </button>
-
-           
-        {/* <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
-          <input
-            type="text"
-            placeholder="Tìm kiếm blog..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-r-full hover:bg-blue-700 transition"
-            title="Tìm kiếm"
-          >
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-</svg>
-
-
-          </button>
-        </form> */}
       </div>
-      {/* Nội dung trang */}
       <div>{children}</div>
       <Footer />
     </div>
   );
 };
 
-export default BlogLayout;
+export default Layout;

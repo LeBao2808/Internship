@@ -9,7 +9,7 @@ import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
-import { useSortableColumns } from "../hooks/useSortableColumns";
+import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Category } from "@/utils/type";
 
 const CategogySchema = z.object({

@@ -103,7 +103,7 @@ export default function BlogPage() {
         limit: limit.toString(),
         ...(category ? { category } : {}),
       });
-setLoading(true)
+      setLoading(true);
       const res = await fetch(`/api/bloghome?${params.toString()}`);
       const data = await res.json();
       setBlogs(data.blogs || []);
@@ -115,20 +115,20 @@ setLoading(true)
     setLoading(false);
   };
 
-  const handleSearchChange = (value:string) => {
+  const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
 
-const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setSearchValue(e.target.value);
-};
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
 
-const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  if (e.key === "Enter") {
-    handleSearchChange(searchValue); 
-  }
-};
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearchChange(searchValue);
+    }
+  };
 
   const totalPages = Math.ceil(total / limit);
 
@@ -160,56 +160,56 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             Featured Posts
           </h2>
           {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {[...Array(3)].map((_, i) => (
-      <div
-        key={i}
-        className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 animate-pulse"
-      >
-        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 animate-pulse"
+                >
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
 
-        <div className="flex-grow min-h-0 space-y-2 mb-4">
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        </div>
+                  <div className="flex-grow min-h-0 space-y-2 mb-4">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  </div>
 
-        <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-        <div className="mt-auto h-8 bg-gray-200 rounded w-1/3"></div>
-      </div>
-    ))}
-  </div>
+                  <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+                  <div className="mt-auto h-8 bg-gray-200 rounded w-1/3"></div>
+                </div>
+              ))}
+            </div>
           ) : (
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-  {featuredPosts.map((blog) => (
-    <div
-      key={blog._id}
-      className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
-      onClick={() => router.push(`/UI/blog/${blog.slug}`)}
-    >
-      <div className="flex-grow min-h-0">
-        <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate">
-          {blog.title}
-        </h3>
-        
-        <div
-          className="text-gray-600 mb-3 line-clamp-3 overflow-hidden"
-          dangerouslySetInnerHTML={{
-            __html:
-              blog.content && blog.content.length > 90
-                ? blog.content.slice(0, 90) + "..."
-                : blog.content || "",
-          }}
-        />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredPosts.map((blog) => (
+                <div
+                  key={blog._id}
+                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
+                  onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                >
+                  <div className="flex-grow min-h-0">
+                    <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate">
+                      {blog.title}
+                    </h3>
 
-        <div className="flex flex-wrap gap-2 mb-4 mt-auto">
-          {blog.category && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-              {blog.category.name}
-            </span>
-          )}
-        </div>
-      </div>
+                    <div
+                      className="text-gray-600 mb-3 line-clamp-3 overflow-hidden"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          blog.content && blog.content.length > 90
+                            ? blog.content.slice(0, 90) + "..."
+                            : blog.content || "",
+                      }}
+                    />
+
+                    <div className="flex flex-wrap gap-2 mb-4 mt-auto">
+                      {blog.category && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                          {blog.category.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <button
                     onClick={() => router.push(`/UI/blog/${blog.slug}`)}
                     className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
@@ -315,9 +315,9 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             <input
               // type="email"
               placeholder="Search Something..."
-               value={searchValue}
-    onChange={handleInputChange}
-    onKeyDown={handleKeyDown}
+              value={searchValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               className="w-full outline-none bg-transparent text-gray-600 text-sm"
             />
             <svg
@@ -332,18 +332,21 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         </div>
         {loading ? (
           <div>
-           {[...Array(3)].map((_, i) => (
-      <div key={i} className="bg-white p-6 rounded-lg shadow-md animate-pulse">
-        <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-        <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-      </div>
-    ))}
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded-lg shadow-md animate-pulse"
+              >
+                <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+                <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                <div className="h-10 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            ))}
           </div>
         ) : blogs.length === 0 ? (
           <div className="text-center text-gray-500 py-12 text-lg">

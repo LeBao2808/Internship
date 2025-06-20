@@ -9,7 +9,7 @@ import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
 import { useSession } from "next-auth/react";
-import { useSortableColumns } from "../hooks/useSortableColumns";
+import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Comment } from "@/utils/type"
 
 const CommentSchema = z.object({

@@ -10,7 +10,7 @@ import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import { useSession } from "next-auth/react";
-import { useSortableColumns } from "../hooks/useSortableColumns";
+import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Blog } from "@/utils/type";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
@@ -349,17 +349,9 @@ export default function BlogManagementPage() {
             fetchBlogs(e.target.value, currentPage, pageSize);
           }}
         />
-        <div className="btn-add flex gap-x-4">
+        <div className="btn-add ">
           <button
             onClick={handleAddClick}
-            style={{
-              padding: "8px 16px",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
           >
             Add Blog
           </button>
@@ -476,16 +468,16 @@ export default function BlogManagementPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <label
                 htmlFor="blog-image-upload"
-                style={{
-                  background: "#1976d2",
-                  color: "#fff",
-                  padding: "8px 20px",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  boxShadow: "0 2px 8px #e3e3e3",
-                  transition: "background 0.2s",
-                }}
+                     style={{
+                    background: "#1976d2",
+                    color: "#fff",
+                    padding: "8px 20px",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    boxShadow: "0 2px 8px #e3e3e3",
+                    transition: "background 0.2s",
+                  }}
                 onMouseOver={(e) =>
                   (e.currentTarget.style.background = "#1251a3")
                 }
@@ -550,33 +542,13 @@ export default function BlogManagementPage() {
       >
         {detailBlog && (
           <div
-            style={{
-              background: "#f9f9fb",
-              borderRadius: 8,
-              padding: 24,
-              boxShadow: "0 2px 8px #eee",
-              fontSize: 16,
-              color: "#222",
-              minHeight: 400,
-              minWidth: 400,
-              maxWidth: 1000,
-              maxHeight: 700,
-              overflowY: "auto",
-              position: "relative",
-            }}
+          className="blog-detail-modal"
           >
             {detailBlog.image_url && (
               <img
                 src={detailBlog.image_url}
                 alt="Blog"
-                style={{
-                  width: "100%",
-                  maxHeight: 200,
-                  objectFit: "contain",
-                  borderRadius: 8,
-                  marginBottom: 18,
-                  border: "1px solid #eee",
-                }}
+                className="blog-detail-image"
               />
             )}
             <div style={{ marginBottom: 18 }}>

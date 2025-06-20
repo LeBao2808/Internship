@@ -1,5 +1,6 @@
+"use client"
+import { SessionProvider } from "next-auth/react";
 import React from "react";
-import { Providers } from "./providers";
 export default function AdminLayout({
   children,
 }: {
@@ -13,7 +14,7 @@ export default function AdminLayout({
       }}
     >
       <main>
-        <Providers>{children}</Providers>
+        <SessionProvider>{children}</SessionProvider>
       </main>
     </div>
   );

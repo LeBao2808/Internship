@@ -97,26 +97,6 @@ export default function RegisterPage() {
             </a>
           </div>
         </form>
-        {/* <button
-          onClick={() => signIn("google", { callbackUrl: "/admin" })}
-          className="w-full py-2 mt-4 bg-white border border-blue-700 text-blue-900 rounded-lg font-semibold flex items-center justify-center gap-2 shadow hover:bg-blue-50 transition"
-        >
-          <img
-            src="https://developers.google.com/identity/images/g-logo.png"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Đăng nhập với Google
-        </button> */}
-        {/* <div className="mt-6 text-blue-900">
-          Chưa có tài khoản?{" "}
-          <a
-            href="/authen/register"
-            className="text-blue-700 underline hover:text-blue-900"
-          >
-            Đăng ký
-          </a>
-        </div> */}
       </div>
     </div>
   );
