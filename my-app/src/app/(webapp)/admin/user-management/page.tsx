@@ -12,19 +12,8 @@ import { z } from "zod";
 import "./user-management.css";
 import InputSearch from "../../components/InputSearch";
 import { useSession } from "next-auth/react";
-interface User {
-  id?: number;
-  name: string;
-  email: string;
-  // role: Role; // Allow role to be string or object
-  role: string | { _id: string; name: string };
-  image: string;
-  nameRole: string;
-}
-interface Role {
-  _id?: number;
-  name: string;
-}
+import { useSortableColumns } from "../hooks/useSortableColumns";
+import { User } from "@/utils/type";
 
 const UserSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
@@ -36,7 +25,6 @@ export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [isModalDelete, setIsModalDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -49,25 +37,19 @@ export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState<keyof User>("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [user, setUserEdit] = useState<User | null>(null); // Add this line
+
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
-
+  const { sortBy, sortOrder, renderColumnHeader } =
+    useSortableColumns<User>("name");
   useEffect(() => {
     fetchRoles();
   }, []);
 
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [sortBy, sortOrder]);
-
   useEffect(() => {
     fetchUsers(search, currentPage, pageSize);
-    // fetchRoles();
   }, [currentPage, pageSize, search, sortBy, sortOrder]);
   const fetchUsers = async (query = "", page = currentPage, size = 10) => {
     try {
@@ -82,7 +64,10 @@ export default function UserManagementPage() {
       const res = await fetch(url);
       const data = await res.json();
       setUsers(
-        data.users.map((user: any) => ({ ...user, id: user.id || user._id || null }))
+        data.users.map((user: any) => ({
+          ...user,
+          id: user.id || user._id || null,
+        }))
       );
       setTotal(data.total);
     } finally {
@@ -118,18 +103,11 @@ export default function UserManagementPage() {
     setEditingUser(user);
     console.log(user);
     console.log(user.role);
-    setUserEdit(user);
     console.log(editingUser);
     setForm({
       name: user.name,
       email: user.email,
-      role:
-        typeof user.role === "object" && user.role !== null
-          ? user.role._id
-          : typeof user.role === "object" && user.role !== null
-          ? user.role || user.role
-          : user.role || "",
-
+      role: user.role._id || "",
       image: user.image || "",
     });
     setIsModalOpen(true);
@@ -139,7 +117,7 @@ export default function UserManagementPage() {
     await fetch("/api/user", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: user.id }),
+      body: JSON.stringify({ id: user._id }),
     });
     // setMessage("Delete User Successful!", "error");
     fetchUsers();
@@ -216,7 +194,7 @@ export default function UserManagementPage() {
       await fetch(`/api/user`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingUser.id, ...payload }),
+        body: JSON.stringify({ id: editingUser._id, ...payload }),
       });
       setMessage("Edit User Successful!", "success");
     } else {
@@ -242,35 +220,9 @@ export default function UserManagementPage() {
     fetchUsers();
   };
 
-if(session && session.user?.role != "admin" ){
-return null ; 
-}
-
-
-  const renderColumnHeader = (col: { id: keyof User; label: string }) => (
-    <span
-      className="flex items-center gap-1 cursor-pointer select-none"
-      onClick={() => {
-        if (sortBy === col.id) {
-          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-        } else {
-          setSortBy(col.id);
-          setSortOrder("asc");
-        }
-      }}
-    >
-      {col.label}
-      {sortBy === col.id ? (
-        sortOrder === "asc" ? (
-          <FaSortUp />
-        ) : (
-          <FaSortDown />
-        )
-      ) : (
-        <FaSort className="opacity-50" />
-      )}
-    </span>
-  );
+  if (session && session.user?.role != "admin") {
+    return null;
+  }
 
   return (
     <div
@@ -293,7 +245,6 @@ return null ;
           marginBottom: 16,
         }}
       >
-
         <InputSearch
           onInput={(e) => {
             setSearch(e.target.value);
@@ -333,26 +284,12 @@ return null ;
             id: "image",
             label: renderColumnHeader({ id: "image", label: "Image" }),
           },
-          // {
-          //   id: "nameRole",
-          //   label: renderColumnHeader({ id: "nameRole", label: "Name Role " }),
-          // },
         ]}
         rows={users.map((user) => ({
           ...user,
-          role:
-            typeof user.role === "object" &&
-            user.role !== null &&
-            "name" in user.role
-              ? user.role._id
-              : user.role,
+          role: user.role || "",
           image: typeof user.image === "string" ? user.image : "",
-          nameRole:
-            typeof user.role === "object" &&
-            user.role !== null &&
-            "name" in user.role
-              ? user.role.name
-              : user.role,
+          nameRole: user.role.name || "",
         }))}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
@@ -440,8 +377,8 @@ return null ;
                         const file = e.target.files[0];
                         const formData = new FormData();
                         formData.append("image", file);
-                        if (editingUser && editingUser.id) {
-                          formData.append("id", editingUser.id.toString());
+                        if (editingUser && editingUser._id) {
+                          formData.append("id", editingUser._id.toString());
                         }
                         const res = await fetch("/api/user/upload", {
                           method: "POST",
@@ -481,7 +418,6 @@ return null ;
           <div>
             {roles.length > 0 && (
               <React.Suspense fallback={null}>
-
                 <AdminSelect
                   label="Role"
                   name="role"

@@ -6,6 +6,7 @@ import UserButton from "../../admin/UserButton";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import "./style.css";
+// import { Blog } from "@/utils/type"
 
 interface Blog {
   _id: string;
@@ -54,7 +55,6 @@ export default function BlogPage() {
     fetchBlogs();
   }, [page]);
 
-  console.log("blogFeatured", blogFeatureds);
   const featuredPosts = useMemo(
     () => blogFeatureds.slice(0, 3),
     [blogFeatureds]
@@ -126,7 +126,7 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === "Enter") {
-    handleSearchChange(searchValue); // Hàm riêng để xử lý tìm kiếm
+    handleSearchChange(searchValue); 
   }
 };
 
@@ -166,20 +166,15 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         key={i}
         className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 animate-pulse"
       >
-        {/* Title */}
         <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
 
-        {/* Content lines */}
         <div className="flex-grow min-h-0 space-y-2 mb-4">
           <div className="h-4 bg-gray-200 rounded w-full"></div>
           <div className="h-4 bg-gray-200 rounded w-full"></div>
           <div className="h-4 bg-gray-200 rounded w-3/4"></div>
         </div>
 
-        {/* Category tag placeholder */}
         <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-
-        {/* Read more button */}
         <div className="mt-auto h-8 bg-gray-200 rounded w-1/3"></div>
       </div>
     ))}
@@ -192,7 +187,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
       onClick={() => router.push(`/UI/blog/${blog.slug}`)}
     >
-      <div className="flex-grow min-h-0"> {/* Giữ cho nội dung bên trong không bị tràn */}
+      <div className="flex-grow min-h-0">
         <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate">
           {blog.title}
         </h3>
@@ -227,7 +222,6 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
           )}
         </div>
 
-        {/* Browse by Category */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Browse by Category</h2>
           <div className="flex flex-wrap gap-3 mb-2">

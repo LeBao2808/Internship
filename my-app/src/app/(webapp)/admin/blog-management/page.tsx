@@ -3,32 +3,17 @@ import React, { useEffect, useState, useMemo } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
-// import { CKEditor } from "@ckeditor/ckeditor5-react";
-// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import AdminSelect from "../../components/AdminSelect";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import { useSession } from "next-auth/react";
+import { useSortableColumns } from "../hooks/useSortableColumns";
+import { Blog } from "@/utils/type";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
-interface Blog {
-  _id?: string;
-  title: string;
-  content: string;
-  user: string | { _id: string; name: string };
-  image_url: string;
-  category: string | { _id: string; name: string };
-  createdAt?: string;
-  namecategory?: string;
-  nameuser?: string;
-  updatedAt?: string;
-  featured?:boolean
-}
 const BlogSchema = z.object({
   title: z.string().trim().min(5, "Title must be at least 5 characters"),
   content: z.string().min(1, "Content is required"),
@@ -38,8 +23,8 @@ const BlogSchema = z.object({
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [isUpload, setIsUpload] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
+  const [detailBlog, setDetailBlog] = useState<Blog | null>(null);
   const [form, setForm] = useState({
     title: "",
     content: "",
@@ -47,35 +32,24 @@ export default function BlogManagementPage() {
     image_url: "",
     category: "",
   });
-  const [users, setUsers] = useState<
-    { id: string; name: string; email: string }[]
-  >([]);
+
   const [search, setSearch] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [detailBlog, setDetailBlog] = useState<Blog | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<
     { value: string; label: string }[]
   >([]);
-  const [sortBy, setSortBy] = useState<keyof Blog>("title");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const router = useRouter();
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
+  const { sortBy, sortOrder, renderColumnHeader } =
+    useSortableColumns<Blog>("title");
   useEffect(() => {
-    // fetchUsers();
     fetchCategories();
   }, []);
-
-  // useEffect(() => {
-  //   fetchBlogs();
-  //   // Thêm dòng này để lấy danh sách category
-  // }, [sortBy, sortOrder]);
 
   useEffect(() => {
     fetchBlogs(search, currentPage, pageSize);
@@ -112,10 +86,7 @@ export default function BlogManagementPage() {
     }
   };
 
-
-
   const handleAddClick = () => {
-    // setIsUpload(false);
     setEditingBlog(null);
     setForm({
       title: "",
@@ -126,27 +97,17 @@ export default function BlogManagementPage() {
     });
     setIsModalOpen(true);
   };
+
   const handleEditBlog = (blog: Blog) => {
-    // setIsUpload(true);
     setEditingBlog(blog);
     console.log("blog", blog);
 
     setForm({
       title: blog.title || "",
       content: blog.content || "",
-      user:
-        typeof blog.user === "object"
-          ? blog.user._id
-          : typeof blog.user === "object" && blog.user !== null
-          ? blog.user || blog.user
-          : blog.user || "",
+      user: blog.user._id || "",
+      category: blog.category._id || "",
       image_url: blog.image_url || "",
-      category:
-        typeof blog.category === "object" && blog.category !== null
-          ? blog.category._id
-          : typeof blog.category === "object" && blog.category !== null
-          ? blog.category || blog.category
-          : blog.category || "",
     });
     setIsModalOpen(true);
   };
@@ -165,23 +126,23 @@ export default function BlogManagementPage() {
     }
   };
 
-const handleFeatured = async (blog:Blog) => {
-  const res = await fetch(`/api/blog/featured/${blog._id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ featured: !blog.featured }),
-  });
+  const handleFeatured = async (blog: Blog) => {
+    const res = await fetch(`/api/blog/featured/${blog._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ featured: !blog.featured }),
+    });
 
-  if (res.ok) {
-    // Cập nhật lại state blogs ở client
-    setBlogs((prev) =>
-      prev.map((b) => (b._id === blog._id ? { ...b, featured: !b.featured } : b))
-    );
-  }
-};
-
+    if (res.ok) {
+      setBlogs((prev) =>
+        prev.map((b) =>
+          b._id === blog._id ? { ...b, featured: !b.featured } : b
+        )
+      );
+    }
+  };
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -205,7 +166,10 @@ const handleFeatured = async (blog:Blog) => {
       }
     }
   };
-  console.log(form);
+
+  console.log("form.user", form.user)
+    console.log("form", form.category)
+
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = BlogSchema.safeParse(form);
@@ -220,7 +184,6 @@ const handleFeatured = async (blog:Blog) => {
       return;
     }
     setErrors({});
-    // Đảm bảo image_url là string
     const payload = {
       ...form,
       user: session?.user,
@@ -231,9 +194,9 @@ const handleFeatured = async (blog:Blog) => {
           : form.category,
     };
     if (editingBlog) {
+      
       editingBlog.title = form.title;
-      editingBlog.user = form.user;
-      editingBlog.category = form.category;
+      editingBlog.category._id = form.category;
       const res = await fetch("/api/blog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -252,8 +215,6 @@ const handleFeatured = async (blog:Blog) => {
         if (res.ok) {
           setMessage("Add Blog Successful!", "success");
         } else {
-          // setIsError(true);
-          // const data = await res.json();
           return;
         }
       } catch {
@@ -277,35 +238,11 @@ const handleFeatured = async (blog:Blog) => {
 
     setIsModalOpen(false);
   };
-
   const handleViewDetail = (blog: Blog) => {
     setDetailBlog(blog);
+    console.log("blog detail",blog);
     setDetailModalOpen(true);
   };
-  const renderColumnHeader = (col: { id: keyof Blog; label: string }) => (
-    <span
-      className="flex items-center gap-1 cursor-pointer select-none"
-      onClick={() => {
-        if (sortBy === col.id) {
-          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-        } else {
-          setSortBy(col.id);
-          setSortOrder("asc");
-        }
-      }}
-    >
-      {col.label}
-      {sortBy === col.id ? (
-        sortOrder === "asc" ? (
-          <FaSortUp />
-        ) : (
-          <FaSortDown />
-        )
-      ) : (
-        <FaSort className="opacity-50" />
-      )}
-    </span>
-  );
   console.log("blogs", editingBlog);
   const EditorFormat = useMemo(
     () => (
@@ -397,7 +334,6 @@ const handleFeatured = async (blog:Blog) => {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      {/* <h1>Blog Management</h1> */}
       <div
         className="container-header"
         style={{
@@ -427,22 +363,6 @@ const handleFeatured = async (blog:Blog) => {
           >
             Add Blog
           </button>
-
-          {/* <button
-            onClick={() => {
-              router.push("/UI/blog");
-            }}
-            style={{
-              padding: "8px 16px",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-          >
-            Visit your blog
-          </button> */}
         </div>
       </div>
       <AdminTable
@@ -455,10 +375,6 @@ const handleFeatured = async (blog:Blog) => {
             id: "title",
             label: renderColumnHeader({ id: "title", label: "Title" }),
           },
-          // {
-          //   id: "user",
-          //   label: renderColumnHeader({ id: "user", label: "Author" }),
-          // },
           {
             id: "nameuser",
             label: renderColumnHeader({ id: "nameuser", label: "Name Author" }),
@@ -467,11 +383,7 @@ const handleFeatured = async (blog:Blog) => {
             id: "content",
             label: renderColumnHeader({ id: "content", label: "Content" }),
           },
-       
-          // {
-          //   id: "category",
-          //   label: renderColumnHeader({ id: "category", label: "Category" }),
-          // },
+
           {
             id: "namecategory",
             label: renderColumnHeader({
@@ -483,38 +395,15 @@ const handleFeatured = async (blog:Blog) => {
         rows={blogs.map((blog) => ({
           ...blog,
           featured: blog.featured || false,
-          user:
-            typeof blog.user === "object" &&
-            blog.user !== null &&
-            "name" in blog.user
-              ? blog.user._id
-              : blog.user,
-
-          nameuser:
-            typeof blog.user === "object" &&
-            blog.user !== null &&
-            "name" in blog.user
-              ? blog.user.name
-              : blog.user,
-
-          category:
-            typeof blog.category === "object" &&
-            blog.category !== null &&
-            "name" in blog.category
-              ? blog.category._id
-              : blog.category,
-
-          namecategory:
-            typeof blog.category === "object" &&
-            blog.category !== null &&
-            "name" in blog.category
-              ? blog.category.name
-              : blog.category,
-
-          image_url: typeof blog.image_url === "string" ? blog.image_url : "",
+          user: blog.user._id?.toString() || "",
+          nameuser: blog.user.name || "",
+          category: blog.category || "",
+          namecategory: blog.category.name || "",
+          image_url: blog.image_url || "",
         }))}
- 
-       onFeatured={session?.user?.role === "admin" ?  handleFeatured : undefined}
+        onFeatured={
+          session?.user?.role === "admin" ? handleFeatured : undefined
+        }
         onEdit={handleEditBlog}
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
@@ -529,7 +418,6 @@ const handleFeatured = async (blog:Blog) => {
         pageSize={pageSize}
         onPageSizeChange={(size) => {
           setPageSize(size);
-          // setCurrentPage(1);
         }}
       />
 
@@ -551,38 +439,10 @@ const handleFeatured = async (blog:Blog) => {
               error: !!errors.title,
               helperText: errors.title,
             },
-   
           ]}
           onSubmit={handleSaveBlog}
           submitLabel={editingBlog ? "Update" : "Create"}
-          // onBack={() => setIsModalOpen(false)}
         >
-          {/* <div>
-            <React.Suspense fallback={null}>
-              <AdminSelect
-                label="User"
-                name="user"
-                error={!!errors.user}
-                value={form.user}
-                helperText={errors.user}
-                options={users.map((user: any) => ({
-                  value: user.id,
-                  label: user.name || user.email,
-                }))}
-                onChange={(e: any) => {
-                  setForm({ ...form, user: e.target.value });
-                  if (e.target.value) {
-                    setErrors((prev) => {
-                      const newErrors = { ...prev };
-                      delete newErrors.user;
-                      return newErrors;
-                    });
-                  }
-                }}
-              />
-            </React.Suspense>
-          </div> */}
-
           <div>
             {categories.length > 0 && (
               <React.Suspense fallback={null}>
@@ -607,82 +467,75 @@ const handleFeatured = async (blog:Blog) => {
               </React.Suspense>
             )}
           </div>
-
-          {/* {editingBlog && ( */}
-            <div style={{ marginTop: 12 }}>
+          <div style={{ marginTop: 12 }}>
+            <label
+              style={{ fontWeight: 600, marginBottom: 6, display: "block" }}
+            >
+              Image:
+            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <label
-                style={{ fontWeight: 600, marginBottom: 6, display: "block" }}
+                htmlFor="blog-image-upload"
+                style={{
+                  background: "#1976d2",
+                  color: "#fff",
+                  padding: "8px 20px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  boxShadow: "0 2px 8px #e3e3e3",
+                  transition: "background 0.2s",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = "#1251a3")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.background = "#1976d2")
+                }
               >
-                Image:
-              </label>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <label
-                  htmlFor="blog-image-upload"
-                  style={{
-                    background: "#1976d2",
-                    color: "#fff",
-                    padding: "8px 20px",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    boxShadow: "0 2px 8px #e3e3e3",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.background = "#1251a3")
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background = "#1976d2")
-                  }
-                >
-                  Chọn ảnh
-                  <input
-                    id="blog-image-upload"
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={async (e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        const file = e.target.files[0];
-                        const formData = new FormData();
-                         formData.append("upload", file);
-                        // if (editingBlog && editingBlog._id) {
-                        //   formData.append("id", editingBlog._id);
-                        // }
-                        const res = await fetch("/api/upload", {
-                          method: "POST",
-                          body: formData,
-                        });
-                        const data = await res.json();
-                        if (res.ok && data.image_url) {
-                          if (editingBlog) {
-                            setEditingBlog({
-                              ...editingBlog,
-                              image_url: data.image_url,
-                            });
-                          } else {
-                            setForm({ ...form, image_url: data.image_url });
-                          }
+                Chọn ảnh
+                <input
+                  id="blog-image-upload"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={async (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      const file = e.target.files[0];
+                      const formData = new FormData();
+                      formData.append("upload", file);
+                      const res = await fetch("/api/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.image_url) {
+                        if (editingBlog) {
+                          setEditingBlog({
+                            ...editingBlog,
+                            image_url: data.image_url,
+                          });
                         } else {
-                          alert(
-                            "Upload thất bại: " +
-                              (data.error || "Unknown error")
-                          );
+                          setForm({ ...form, image_url: data.image_url });
                         }
+                      } else {
+                        alert(
+                          "Upload thất bại: " + (data.error || "Unknown error")
+                        );
                       }
-                    }}
-                  />
-                </label>
+                    }
+                  }}
+                />
+              </label>
 
-                {ImgUpload}
-              </div>
+              {ImgUpload}
             </div>
+          </div>
 
           <div style={{ marginTop: 12 }}>
             <label>Content:</label>
-        
+
             {EditorFormat}
-       
           </div>
         </AdminForm>
       </AdminModal>
@@ -735,22 +588,13 @@ const handleFeatured = async (blog:Blog) => {
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontWeight: 700 }}>Author:</span>
               <span style={{ marginLeft: 8 }}>
-                {typeof detailBlog.user === "object" &&
-                detailBlog.user !== null &&
-                "name" in detailBlog.user
-                  ? detailBlog.user.name
-                  : users.find((u) => u.id === detailBlog.user)?.name ||
-                    detailBlog.user}
+                {detailBlog.nameuser}
               </span>
             </div>
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontWeight: 700 }}>Category:</span>
               <span style={{ marginLeft: 8 }}>
-                {typeof detailBlog.category === "object" &&
-                detailBlog.category !== null
-                  ? detailBlog.category.name
-                  : categories.find((c) => c.value === detailBlog.category)
-                      ?.label || detailBlog.category}
+                {detailBlog.namecategory || ""}
               </span>
             </div>
             <div style={{ marginBottom: 10 }}>
@@ -766,9 +610,7 @@ const handleFeatured = async (blog:Blog) => {
                   color: "#333",
                 }}
                 dangerouslySetInnerHTML={{ __html: detailBlog.content }}
-              >
-                {/* {detailBlog.content} */}
-              </div>
+              ></div>
             </div>
             <div>
               <span style={{ fontWeight: 700 }}>Created At:</span>
@@ -789,19 +631,6 @@ const handleFeatured = async (blog:Blog) => {
               marginTop: 32,
             }}
           >
-            {/* <button
-              style={{
-                background: "#e0e0e0",
-                color: "#222",
-                border: "none",
-                borderRadius: 4,
-                padding: "8px 24px",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: 16
-              }}
-              onClick={() => setDetailModalOpen(false)}
-            >Back</button> */}
             <button
               style={{
                 background: "#1976d2",
@@ -820,17 +649,10 @@ const handleFeatured = async (blog:Blog) => {
                   title: detailBlog.title || "",
                   content: detailBlog.content || "",
                   user:
-                    typeof detailBlog.user === "object" &&
-                    detailBlog.user !== null &&
-                    "_id" in detailBlog.user
-                      ? detailBlog.user._id
-                      : detailBlog.user || "",
+                     detailBlog.user._id || "",
                   image_url: detailBlog.image_url || "",
                   category:
-                    typeof detailBlog.category === "object" &&
-                    detailBlog.category !== null
-                      ? detailBlog.category._id
-                      : detailBlog.category || "",
+                    detailBlog.category._id || "",
                 });
                 setIsModalOpen(true);
               }}
@@ -838,27 +660,6 @@ const handleFeatured = async (blog:Blog) => {
               Edit
             </button>
           </div>
-        )}
-      </AdminModal>
-      <AdminModal
-        open={!!previewImage}
-        title="big size image"
-        onClose={() => setPreviewImage(null)}
-        onConfirm={undefined}
-        confirmLabel={undefined}
-        cancelLabel={undefined}
-      >
-        {previewImage && (
-          <img
-            src={previewImage}
-            alt="Preview"
-            style={{
-              maxWidth: "100%",
-              maxHeight: "70vh",
-              display: "block",
-              margin: "0 auto",
-            }}
-          />
         )}
       </AdminModal>
     </div>

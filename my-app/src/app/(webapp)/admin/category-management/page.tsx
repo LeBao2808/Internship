@@ -9,11 +9,8 @@ import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
-interface Category {
-  _id?: string;
-  name: string;
-  description: string;
-}
+import { useSortableColumns } from "../hooks/useSortableColumns";
+import { Category } from "@/utils/type";
 
 const CategogySchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -23,21 +20,16 @@ const CategogySchema = z.object({
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [isModalDelete, setIsModalDelete] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  // const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<keyof Category>("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  // useEffect(() => {
-  //   fetchCategories();
-  // }, [sortBy, sortOrder]);
+ const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Category>("name");
 
   useEffect(() => {
     fetchCategories(search, currentPage, pageSize);
@@ -102,7 +94,6 @@ export default function CategoryManagementPage() {
         });
       }
     }
-
     if (name === "description") {
       const result = CategogySchema.shape.description.safeParse(value);
       if (!result.success) {
@@ -122,7 +113,6 @@ export default function CategoryManagementPage() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    // setIsModalDelete(false);
     setErrors({});
     setForm({
       description: "",
@@ -145,7 +135,6 @@ export default function CategoryManagementPage() {
     setErrors({});
 
     if (editingCategory) {
-      // Update
       await fetch("/api/category", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -153,7 +142,6 @@ export default function CategoryManagementPage() {
       });
       setMessage("Edit Catelogy Successful!", "success");
     } else {
-      // Create
       await fetch("/api/category", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,31 +152,6 @@ export default function CategoryManagementPage() {
     setIsModalOpen(false);
     fetchCategories();
   };
-
-  const renderColumnHeader = (col: { id: keyof Category; label: string }) => (
-    <span
-      className="flex items-center gap-1 cursor-pointer select-none"
-      onClick={() => {
-        if (sortBy === col.id) {
-          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-        } else {
-          setSortBy(col.id);
-          setSortOrder("asc");
-        }
-      }}
-    >
-      {col.label}
-      {sortBy === col.id ? (
-        sortOrder === "asc" ? (
-          <FaSortUp />
-        ) : (
-          <FaSortDown />
-        )
-      ) : (
-        <FaSort className="opacity-50" />
-      )}
-    </span>
-  );
 
   return (
     <div
@@ -201,7 +164,6 @@ export default function CategoryManagementPage() {
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      {/* <h1>Category Management</h1> */}
       <div
         className="container-header"
         style={{
@@ -261,7 +223,6 @@ export default function CategoryManagementPage() {
         pageSize={pageSize}
         onPageSizeChange={(size) => {
           setPageSize(size);
-          // setCurrentPage(1);
         }}
       />
       <AdminModal

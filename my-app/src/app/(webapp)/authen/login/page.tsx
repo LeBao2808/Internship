@@ -20,7 +20,6 @@ export default function LoginPage() {
     });
 
     if (result?.ok) {
-      // Lấy lại session để redirect theo role
       const res = await fetch("/api/auth/session");
       const session = await res.json();
       const role = session?.user?.role;

@@ -4,23 +4,13 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
-import AdminSelect from "../../components/AdminSelect";
-import Blog from "@/app/api/models/Blog";
 import { useSession } from "next-auth/react";
-
-interface Comment {
-  _id?: number;
-  content: string;
-  user: string | { _id: string; name: string };
-  nameUser: string;
-  blog: string | { _id: string; title: string };
-  titleBlog: string;
-}
+import { useSortableColumns } from "../hooks/useSortableColumns";
+import { Comment } from "@/utils/type"
 
 const CommentSchema = z.object({
   content: z.string().min(1, "Description is required"),
@@ -29,23 +19,18 @@ const CommentSchema = z.object({
 
 export default function CommentManagementPage() {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [users, setUsers] = useState<
-    { id: string; name: string; email: string }[]
-  >([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [form, setForm] = useState({ content: "", user: "", blog: "" });
   const [search, setSearch] = useState("");
-    const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState<keyof Comment>("content");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [total, setTotal] = useState(0);
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-    const { data: session, status } = useSession();
-
+  const { data: session, status } = useSession();
+  const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Comment>("content");
   useEffect(() => {
     fetchComments(search, currentPage, pageSize);
   }, [search, currentPage, pageSize, sortBy, sortOrder]);
@@ -67,11 +52,6 @@ export default function CommentManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
-  const handleAddClick = () => {
-    setEditingComment(null);
-    setForm({ content: "", user: "", blog: "" });
-    setIsModalOpen(true);
   };
 
   const handleEditComment = (comment: Comment) => {
@@ -113,7 +93,6 @@ export default function CommentManagementPage() {
         });
       }
     }
-
     if (name === "user") {
       const isValid = /^[a-f\d]{24}$/i.test(value);
       if (!isValid) {
@@ -143,17 +122,6 @@ export default function CommentManagementPage() {
 
   const handleSaveComment = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // const result = CommentSchema.safeParse(form);
-    // if (!result.success) {
-    //   const fieldErrors = result.error.flatten().fieldErrors;
-    //   setErrors({
-    //     content: fieldErrors.content?.[0] || "",
-    //     user: fieldErrors.user?.[0] || "",
-    //   });
-    //   return;
-    // }
-
     setErrors({});
 
     if (editingComment) {
@@ -175,31 +143,6 @@ export default function CommentManagementPage() {
     setIsModalOpen(false);
     fetchComments();
   };
-
-  const renderColumnHeader = (col: { id: keyof Comment; label: string }) => (
-    <span
-      className="flex items-center gap-1 cursor-pointer select-none"
-      onClick={() => {
-        if (sortBy === col.id) {
-          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-        } else {
-          setSortBy(col.id);
-          setSortOrder("asc");
-        }
-      }}
-    >
-      {col.label}
-      {sortBy === col.id ? (
-        sortOrder === "asc" ? (
-          <FaSortUp />
-        ) : (
-          <FaSortDown />
-        )
-      ) : (
-        <FaSort className="opacity-50" />
-      )}
-    </span>
-  );
 
   return (
     <div
@@ -226,19 +169,6 @@ export default function CommentManagementPage() {
             fetchComments(e.target.value);
           }}
         />
-        {/* <button
-          className="btn-add"
-          onClick={handleAddClick}
-          style={{
-            padding: "8px 16px",
-            background: "#1976d2",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-          }}
-        >
-          Add Comment
-        </button> */}
       </div>
 
       <AdminTable
@@ -247,18 +177,10 @@ export default function CommentManagementPage() {
             id: "content",
             label: renderColumnHeader({ id: "content", label: "Content" }),
           },
-          // {
-          //   id: "user",
-          //   label: renderColumnHeader({ id: "user", label: "User ID" }),
-          // },
           {
             id: "nameUser",
             label: renderColumnHeader({ id: "nameUser", label: "User Name" }),
           },
-          // {
-          //   id: "blog",
-          //   label: renderColumnHeader({ id: "blog", label: "Blog ID" }),
-          // },
           {
             id: "titleBlog",
             label: renderColumnHeader({ id: "titleBlog", label: "Blog Title" }),

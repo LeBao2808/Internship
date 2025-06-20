@@ -4,17 +4,14 @@ import React, { useEffect, useState } from "react";
 import AdminTable from "../../components/AdminTable";
 import AdminModal from "../../components/AdminModal";
 import AdminForm from "../../components/AdminForm";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useMessageStore } from "../../components/messageStore";
 import { z } from "zod";
 import InputSearch from "../../components/InputSearch";
 import Pagination from "../../components/Pagination";
 import { useSession } from "next-auth/react";
-interface Role {
-  _id?: string;
-  name: string;
-  description: string;
-}
+import { useSortableColumns } from "../hooks/useSortableColumns";
+import { Role } from "@/utils/type"
+
 const RoleSchema = z.object({
   description: z.string().min(1, "Description is required"),
   name: z.string().min(1, "Name is required"),
@@ -29,16 +26,11 @@ export default function RoleManagementPage() {
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [form, setForm] = useState({ name: "", description: "" });
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<keyof Role>("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
-
-
-
-
+  const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Role>("name");
   useEffect(() => {
     fetchRoles(search, currentPage, pageSize);
   }, [search, currentPage, pageSize, sortBy, sortOrder]);
@@ -82,12 +74,6 @@ export default function RoleManagementPage() {
     setMessage("Delete role Successful!", "error");
     fetchRoles();
   };
-
-  // const handleDeleteModalRole = (role: Role) => {
-  //   setEditingRole(role);
-  //   setIsModalDelete(true);
-  // };
-
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -171,33 +157,6 @@ export default function RoleManagementPage() {
     if(session && session.user?.role != "admin" ){
 return null ; 
 }
-
-  // Hàm render tiêu đề cột với icon sort
-  const renderColumnHeader = (col: { id: keyof Role; label: string }) => (
-    <span
-      className="flex items-center gap-1 cursor-pointer select-none"
-      onClick={() => {
-        if (sortBy === col.id) {
-          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-        } else {
-          setSortBy(col.id);
-          setSortOrder("asc");
-        }
-      }}
-    >
-      {col.label}
-      {sortBy === col.id ? (
-        sortOrder === "asc" ? (
-          <FaSortUp />
-        ) : (
-          <FaSortDown />
-        )
-      ) : (
-        <FaSort className="opacity-50" />
-      )}
-    </span>
-  );
-
   return (
     <div
       style={{
@@ -209,7 +168,6 @@ return null ;
         boxShadow: "0 2px 8px #eee",
       }}
     >
-      {/* <h1>Role Management</h1> */}
       <div
         className="container-header"
         style={{
@@ -219,39 +177,6 @@ return null ;
           marginBottom: 16,
         }}
       >
-        {/* <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchRoles(search);
-          }}
-          style={{ display: "flex", gap: 8 }}
-        >
-          <input
-            type="text"
-            placeholder="Search role..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: 8,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              minWidth: 220,
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "8px 16px",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-          >
-            Search
-          </button>
-        </form> */}
         <InputSearch
           onInput={(e) => {
             setSearch(e.target.value);
@@ -288,7 +213,7 @@ return null ;
             }),
           },
         ]}
-        rows={Array.isArray(roles) ? roles : []} // Dùng roles trực tiếp, không dùng sortedRoles
+        rows={Array.isArray(roles) ? roles : []} 
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
         loading={loading}
@@ -335,23 +260,6 @@ return null ;
           submitLabel={editingRole ? "Update" : "Create"}
         />
       </AdminModal>
-
-      {/* {isModalDelete && (
-        <AdminModal
-          open={isModalDelete}
-          title="Delete Role"
-          onClose={() => setIsModalDelete(false)}
-          onConfirm={() => {
-            handleDeleteRole(editingRole!);
-            setIsModalDelete(false);
-          }}
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          isDelete={true}
-        >
-          <h2>Are you sure you want to delete this role?</h2>
-        </AdminModal>
-      )} */}
     </div>
   );
 }
