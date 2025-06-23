@@ -13,7 +13,7 @@ import InputSearch from "../../components/InputSearch";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { User } from "@/utils/type";
-
+import ImageUploader from "../../components/ImageUploader";
 const UserSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
   name: z.string().min(1, "Name is required"),
@@ -306,72 +306,13 @@ export default function UserManagementPage() {
           submitLabel={editingUser ? "Update" : "Create"}
         >
           {editingUser && (
-            <div style={{ marginTop: 12 }}>
-              <label
-                style={{ fontWeight: 600, marginBottom: 6, display: "block" }}
-              >
-                Image:
-              </label>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <label
-                  htmlFor="user-image-upload"
-                       style={{
-                    background: "#1976d2",
-                    color: "#fff",
-                    padding: "8px 20px",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    boxShadow: "0 2px 8px #e3e3e3",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.background = "#1251a3")
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background = "#1976d2")
-                  }
-                >
-                  Chọn ảnh
-                  <input
-                    id="user-image-upload"
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={async (e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        const file = e.target.files[0];
-                        const formData = new FormData();
-                        formData.append("image", file);
-                        if (editingUser && editingUser._id) {
-                          formData.append("id", editingUser._id.toString());
-                        }
-                        const res = await fetch("/api/user/upload", {
-                          method: "POST",
-                          body: formData,
-                        });
-                        const data = await res.json();
-                        if (res.ok && data.image) {
-                          setForm({ ...form, image: data.image });
-                        } else {
-                          alert(
-                            "Upload thất bại: " +
-                              (data.error || "Unknown error")
-                          );
-                        }
-                      }
-                    }}
-                  />
-                </label>
-                {form.image && (
-                  <img
-                    src={form.image}
-                    alt="Preview"
-                    className="image-preview"
-                  />
-                )}
-              </div>
-            </div>
+            <ImageUploader
+              id="user-image-upload"
+              currentImage={form.image}
+              onUploadSuccess={(imageUrl: string) => {
+                setForm({ ...form, image: imageUrl });
+              }}
+            />
           )}
           <div>
             {roles.length > 0 && (

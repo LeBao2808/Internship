@@ -12,6 +12,7 @@ import InputSearch from "../../components/InputSearch";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Blog } from "@/utils/type";
+import ImageUploader from "../../components/ImageUploader";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 const BlogSchema = z.object({
@@ -167,8 +168,8 @@ export default function BlogManagementPage() {
     }
   };
 
-  console.log("form.user", form.user)
-    console.log("form", form.category)
+  console.log("form.user", form.user);
+  console.log("form", form.category);
 
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,7 +195,6 @@ export default function BlogManagementPage() {
           : form.category,
     };
     if (editingBlog) {
-      
       editingBlog.title = form.title;
       editingBlog.category._id = form.category;
       const res = await fetch("/api/blog", {
@@ -240,7 +240,7 @@ export default function BlogManagementPage() {
   };
   const handleViewDetail = (blog: Blog) => {
     setDetailBlog(blog);
-    console.log("blog detail",blog);
+    console.log("blog detail", blog);
     setDetailModalOpen(true);
   };
   console.log("blogs", editingBlog);
@@ -350,11 +350,7 @@ export default function BlogManagementPage() {
           }}
         />
         <div className="btn-add ">
-          <button
-            onClick={handleAddClick}
-          >
-            Add Blog
-          </button>
+          <button onClick={handleAddClick}>Add Blog</button>
         </div>
       </div>
       <AdminTable
@@ -459,71 +455,17 @@ export default function BlogManagementPage() {
               </React.Suspense>
             )}
           </div>
-          <div style={{ marginTop: 12 }}>
-            <label
-              style={{ fontWeight: 600, marginBottom: 6, display: "block" }}
-            >
-              Image:
-            </label>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <label
-                htmlFor="blog-image-upload"
-                     style={{
-                    background: "#1976d2",
-                    color: "#fff",
-                    padding: "8px 20px",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    boxShadow: "0 2px 8px #e3e3e3",
-                    transition: "background 0.2s",
-                  }}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.background = "#1251a3")
-                }
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.background = "#1976d2")
-                }
-              >
-                Chọn ảnh
-                <input
-                  id="blog-image-upload"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={async (e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      const file = e.target.files[0];
-                      const formData = new FormData();
-                      formData.append("upload", file);
-                      const res = await fetch("/api/upload", {
-                        method: "POST",
-                        body: formData,
-                      });
-                      const data = await res.json();
-                      if (res.ok && data.image_url) {
-                        if (editingBlog) {
-                          setEditingBlog({
-                            ...editingBlog,
-                            image_url: data.image_url,
-                          });
-                        } else {
-                          setForm({ ...form, image_url: data.image_url });
-                        }
-                      } else {
-                        alert(
-                          "Upload thất bại: " + (data.error || "Unknown error")
-                        );
-                      }
-                    }
-                  }}
-                />
-              </label>
-
-              {ImgUpload}
-            </div>
-          </div>
-
+          <ImageUploader
+            id="blog-image-upload"
+            currentImage={editingBlog?.image_url || form.image_url}
+            onUploadSuccess={(imageUrl: string) => {
+              if (editingBlog) {
+                setEditingBlog({ ...editingBlog, image_url: imageUrl });
+              } else {
+                setForm({ ...form, image_url: imageUrl });
+              }
+            }}
+          />
           <div style={{ marginTop: 12 }}>
             <label>Content:</label>
 
@@ -541,9 +483,7 @@ export default function BlogManagementPage() {
         cancelLabel={undefined}
       >
         {detailBlog && (
-          <div
-          className="blog-detail-modal"
-          >
+          <div className="blog-detail-modal">
             {detailBlog.image_url && (
               <img
                 src={detailBlog.image_url}
@@ -559,9 +499,7 @@ export default function BlogManagementPage() {
             </div>
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontWeight: 700 }}>Author:</span>
-              <span style={{ marginLeft: 8 }}>
-                {detailBlog.nameuser}
-              </span>
+              <span style={{ marginLeft: 8 }}>{detailBlog.nameuser}</span>
             </div>
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontWeight: 700 }}>Category:</span>
@@ -620,11 +558,9 @@ export default function BlogManagementPage() {
                 setForm({
                   title: detailBlog.title || "",
                   content: detailBlog.content || "",
-                  user:
-                     detailBlog.user._id || "",
+                  user: detailBlog.user._id || "",
                   image_url: detailBlog.image_url || "",
-                  category:
-                    detailBlog.category._id || "",
+                  category: detailBlog.category._id || "",
                 });
                 setIsModalOpen(true);
               }}
