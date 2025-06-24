@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -89,12 +90,12 @@ export default function RegisterPage() {
           </button>
           <div style={{ marginTop: 16 }}>
             Already have an account?{" "}
-            <a
+            <Link
               href="/login"
               className="text-blue-700 underline hover:text-blue-900"
             >
               Sign In
-            </a>
+            </Link>
           </div>
         </form>
       </div>

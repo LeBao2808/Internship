@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,7 +28,7 @@ export default function LoginPage() {
       if (role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/UI/blog");
+        router.push("/");
       }
     } else {
       setError("Invalid email or password");
@@ -73,7 +74,7 @@ export default function LoginPage() {
         </form>
         <button
           onClick={() =>
-            signIn("google", { callbackUrl: "/UI/blog" })
+            signIn("google", { callbackUrl: "/" })
           }
           className="w-full py-2 mt-4 bg-white border border-blue-700 text-blue-900 rounded-lg font-semibold flex items-center justify-center gap-2 shadow hover:bg-blue-50 transition cursor-pointer"
         >
@@ -84,14 +85,14 @@ export default function LoginPage() {
           />
           Sign in Google
         </button>
-        <div className="mt-6 text-blue-900">
+          <div className="mt-6 text-blue-900">
           Dont have an account?{" "}
-          <a
+          <Link
             href="/register"
             className="text-blue-700 underline hover:text-blue-900"
           >
             Sign up now.
-          </a>
+          </Link>
         </div>
       </div>
     </div>

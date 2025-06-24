@@ -21,7 +21,7 @@ export default function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const { id } = useParams();
+  // const { id } = useParams();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [authorName, setAuthorName] = useState<string>("");
@@ -69,7 +69,7 @@ export default function BlogDetailPage({
       } catch {}
     };
     fetchRelatedBlogs();
-  }, [blog?.category, id]);
+  }, [blog?.category, slug]);
 
   if (loading)
     return (
@@ -142,7 +142,7 @@ export default function BlogDetailPage({
                   latestBlogs.map((item) => (
                     <a
                       key={item.slug}
-                      href={`/UI/blog/${item.slug}`}
+                      href={`/${item.slug}`}
                       className="min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-3 sm:p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-36 sm:w-40"
                     >
                       {item.image_url ? (
