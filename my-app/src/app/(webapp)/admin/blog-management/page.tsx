@@ -1,18 +1,18 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
-import AdminTable from "../../components/AdminTable";
-import AdminModal from "../../components/AdminModal";
-import AdminForm from "../../components/AdminForm";
-import Pagination from "../../components/Pagination";
+import AdminTable from "../../../../components/AdminTable";
+import AdminModal from "../../../../components/AdminModal";
+import AdminForm from "../../../../components/AdminForm";
+import Pagination from "../../../../components/Pagination";
 import dynamic from "next/dynamic";
-import AdminSelect from "../../components/AdminSelect";
-import { useMessageStore } from "../../components/messageStore";
+import AdminSelect from "../../../../components/AdminSelect";
+import { useMessageStore } from "../../../../components/messageStore";
 import { z } from "zod";
-import InputSearch from "../../components/InputSearch";
+import InputSearch from "../../../../components/InputSearch";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Blog } from "@/utils/type";
-import ImageUploader from "../../components/ImageUploader";
+import ImageUploader from "../../../../components/ImageUploader";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 const BlogSchema = z.object({
@@ -283,45 +283,6 @@ export default function BlogManagementPage() {
     ),
     [editingBlog, form]
   );
-
-  const ImgUpload = useMemo(() => {
-    if (editingBlog) {
-      return (
-        editingBlog.image_url && (
-          <img
-            src={editingBlog.image_url}
-            alt="Preview"
-            style={{
-              maxWidth: 120,
-              maxHeight: 80,
-              borderRadius: 8,
-              border: "1px solid #eee",
-              boxShadow: "0 2px 8px #e3e3e3",
-              background: "#fafbfc",
-              objectFit: "cover",
-            }}
-          />
-        )
-      );
-    }
-    return (
-      form.image_url && (
-        <img
-          src={form.image_url}
-          alt="Preview"
-          style={{
-            maxWidth: 120,
-            maxHeight: 80,
-            borderRadius: 8,
-            border: "1px solid #eee",
-            boxShadow: "0 2px 8px #e3e3e3",
-            background: "#fafbfc",
-            objectFit: "cover",
-          }}
-        />
-      )
-    );
-  }, [form, editingBlog]);
 
   return (
     <div

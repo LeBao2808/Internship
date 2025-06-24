@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import AdminTable from "../../components/AdminTable";
-import AdminModal from "../../components/AdminModal";
-import AdminForm from "../../components/AdminForm";
-import { useMessageStore } from "../../components/messageStore";
+import AdminTable from "../../../../components/AdminTable";
+import AdminModal from "../../../../components/AdminModal";
+import AdminForm from "../../../../components/AdminForm";
+import { useMessageStore } from "../../../../components/messageStore";
 import { z } from "zod";
-import InputSearch from "../../components/InputSearch";
-import Pagination from "../../components/Pagination";
+import InputSearch from "../../../../components/InputSearch";
+import Pagination from "../../../../components/Pagination";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Comment } from "@/utils/type"

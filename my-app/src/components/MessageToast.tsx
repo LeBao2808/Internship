@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useMessageStore } from "../components/messageStore";
+import { useMessageStore } from "./messageStore";
 
 export default function MessageToast() {
   const { message, type, show, clearMessage } = useMessageStore();

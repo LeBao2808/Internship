@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     cookieName: "next-auth.session-token",
   };
   const token = await getToken(objRq);
-  const isLoginPage = req.nextUrl.pathname.startsWith("/authen/login");
+  const isLoginPage = req.nextUrl.pathname.startsWith("/login");
   const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
   console.log(isLoginPage, token, process.env.NEXTAUTH_SECRET);
 
@@ -19,7 +19,7 @@ export async function middleware(req: NextRequest) {
   }
   if (isAdminRoute) {
     if (!token) {
-      return NextResponse.redirect(new URL("/authen/login", req.url));
+      return NextResponse.redirect(new URL("/login", req.url));
     }
     // if (token.role !== "admin") {
     //   return NextResponse.redirect(new URL("/UI/blog", req.url));

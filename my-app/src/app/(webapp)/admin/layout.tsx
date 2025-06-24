@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import NavigationClient from "./NavigationClient";
+import NavigationClient from "../../../components/NavigationClient";
 import { SessionProvider } from "next-auth/react";
-import MobileSlideUp from "./MobileSlideUp";
-import MessageToast from "../components/MessageToast";
+import MobileSlideUp from "../../../components/MobileSlideUp";
+import MessageToast from "../../../components/MessageToast";
 import "../../../styles/admin.css"; 
 
 export default function AdminLayout({

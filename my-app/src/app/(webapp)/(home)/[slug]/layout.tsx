@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import Footer from "../../../components/Footer";
-import UserButton from "../../../admin/UserButton";
+import Footer from "../../../../components/Footer";
+import UserButton from "../../../../components/UserButton";
 
 interface BlogLayoutProps {
   children: React.ReactNode;
@@ -81,13 +81,13 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
 
      `}</style>
       <div className="flex justify-end ">
-        <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1">
+        <div className="flex items-center  rounded-lg  mr-2 mt-2 p-1">
           <UserButton />
         </div>
       </div>
       <div className="max-w-7xl mx-auto flex items-center gap-4 mb-6 px-4 ">
         <button
-          onClick={() => router.push("/UI/blog")}
+          onClick={() => router.push("/")}
           className="p-2 rounded-full hover:bg-blue-100 transition bg-white cursor-pointer "
           title="Về trang chủ blog"
         >
@@ -108,7 +108,7 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
         </button>
       </div>
       <div>{children}</div>
-      <Footer />
+
     </div>
   );
 };

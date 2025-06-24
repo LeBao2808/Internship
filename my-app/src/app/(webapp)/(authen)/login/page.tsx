@@ -87,7 +87,7 @@ export default function LoginPage() {
         <div className="mt-6 text-blue-900">
           Dont have an account?{" "}
           <a
-            href="/authen/register"
+            href="/register"
             className="text-blue-700 underline hover:text-blue-900"
           >
             Sign up now.

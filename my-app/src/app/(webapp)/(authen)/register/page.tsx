@@ -23,7 +23,7 @@ export default function RegisterPage() {
       });
       if (res.ok) {
         alert("Registration successful! Redirecting...")
-        setTimeout(() => router.push("/authen/login"), 100);
+        setTimeout(() => router.push("/login"), 100);
       } else {
         const data = await res.json();
         setError(data.error || "Registration failed");
@@ -90,7 +90,7 @@ export default function RegisterPage() {
           <div style={{ marginTop: 16 }}>
             Already have an account?{" "}
             <a
-              href="/authen/login"
+              href="/login"
               className="text-blue-700 underline hover:text-blue-900"
             >
               Sign In

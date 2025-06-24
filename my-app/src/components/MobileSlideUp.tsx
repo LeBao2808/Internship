@@ -4,19 +4,15 @@ import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-// import HomeMobile from "../home-mobile/page";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
 import { FaUser, FaUserShield, FaBlog, FaList , FaHome, FaComment} from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { TbLogout } from "react-icons/tb";
 export default function MobileSlideUp() {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-    const { data: session, status } = useSession();
-  // const router = useRouter();
-  // const [shouldRender, setShouldRender] = useState(false);
-const role = session?.user?.role;
+  const { data: session, status } = useSession();
+  const role = session?.user?.role;
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -62,7 +58,6 @@ const role = session?.user?.role;
       href: "/UI/blog",
        icon: <FaHome   className="absolute bottom-[11px]"/> },
   ].filter(item => {
-  // Chỉ giữ lại User, Role, Category nếu là admin
   if (["User", "Role", "Category"].includes(item.label)) {
     return role === "admin";
   }
@@ -87,15 +82,6 @@ const role = session?.user?.role;
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-  //   useEffect(() => {
-  //     if (isOpen) {
-  //       setShouldRender(true);
-  //     } else {
-  //       // Delay để chạy animation trượt xuống rồi mới unmount
-  //       const timer = setTimeout(() => setShouldRender(false), 3000); // khớp với transition time
-  //       return () => clearTimeout(timer);
-  //     }
-  //   }, [isOpen]);
   if (!isMobile) return null;
   console.log("menuref", menuRef.current);
   return (
@@ -126,7 +112,6 @@ const role = session?.user?.role;
                 bottom: 90,
                 right: 30,
                 width: "200px",
-                // height: "25%", // Change from "100%" to "60%"
                 backgroundColor: "#fff",
                 padding: "16px",
                 borderRadius: "12px",
@@ -153,7 +138,7 @@ const role = session?.user?.role;
               <button
                 onClick={async () => {
                   await fetch("/api/auth/logout", { method: "POST" });
-                  signOut({ callbackUrl: "/authen/login", redirect: true });
+                  signOut({ callbackUrl: "/login", redirect: true });
                 }}
                 className="nav-logout-btn width-96  flex  bg-red-500 w-full justify-center text-white p-[5px] font-semibold mt-[3px] cursor-pointer rounded-sm "
               >

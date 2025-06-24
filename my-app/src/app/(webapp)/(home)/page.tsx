@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Footer from "../../components/Footer";
-import UserButton from "../../admin/UserButton";
+import Footer from "../../../components/Footer";
+import UserButton from "../../../components/UserButton";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import "./style.css";
@@ -135,7 +135,7 @@ export default function BlogPage() {
   return (
     <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
       <div className="flex justify-end ">
-        <div className="flex items-center bg-white rounded-lg shadow-sm mr-2 mt-2 p-1 absolute right-0 top-0">
+        <div className="flex items-center rounded-lg mr-2 mt-2 p-1 absolute right-0 top-0">
           <UserButton />
         </div>
       </div>
@@ -185,7 +185,7 @@ export default function BlogPage() {
                 <div
                   key={blog._id}
                   className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
-                  onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                  onClick={() => router.push(`/${blog.slug}`)}
                 >
                   <div className="flex-grow min-h-0">
                     <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate">
@@ -211,7 +211,7 @@ export default function BlogPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                    onClick={() => router.push(`/${blog.slug}`)}
                     className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
                   >
                     Read More
@@ -266,7 +266,7 @@ export default function BlogPage() {
               <div
                 key={blog._id}
                 className="flex items-center px-6 py-4 hover:bg-blue-50 transition cursor-pointer"
-                onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                onClick={() => router.push(`/${blog.slug}`)}
               >
                 <svg
                   className="w-6 h-6 text-blue-500 mr-3"
@@ -356,7 +356,7 @@ export default function BlogPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {blogs.map((blog) => (
               <div
-                onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                onClick={() => router.push(`/${blog.slug}`)}
                 key={blog._id}
                 className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl border border-gray-100 hover:border-blue-400 cursor-pointer"
               >
@@ -400,7 +400,7 @@ export default function BlogPage() {
                     }}
                   />
                   <button
-                    onClick={() => router.push(`/UI/blog/${blog.slug}`)}
+                    onClick={() => router.push(`/${blog.slug}`)}
                     className="mt-auto px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
                   >
                     Read more

@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import AdminTable from "../../components/AdminTable";
-import AdminModal from "../../components/AdminModal";
-import AdminForm from "../../components/AdminForm";
-import Pagination from "../../components/Pagination";
-import AdminSelect from "../../components/AdminSelect";
-import { useMessageStore } from "../../components/messageStore";
+import AdminTable from "../../../../components/AdminTable";
+import AdminModal from "../../../../components/AdminModal";
+import AdminForm from "../../../../components/AdminForm";
+import Pagination from "../../../../components/Pagination";
+import AdminSelect from "../../../../components/AdminSelect";
+import { useMessageStore } from "../../../../components/messageStore";
 import { z } from "zod";
 import "./user-management.css";
-import InputSearch from "../../components/InputSearch";
+import InputSearch from "../../../../components/InputSearch";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { User } from "@/utils/type";
-import ImageUploader from "../../components/ImageUploader";
+import ImageUploader from "../../../../components/ImageUploader";
 const UserSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
   name: z.string().min(1, "Name is required"),

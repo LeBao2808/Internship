@@ -2,21 +2,13 @@
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-// import { signOut } from "next-auth/react";
-// import { useLanguage } from "../LanguageContext";
-import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-// import { CiLogin } from "react-icons/ci";
 import UserButton from "./UserButton";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
 export default function NavigationClient() {
   const pathname = usePathname();
-
-  // const { lang, setLang } = useLanguage
-  //   ? useLanguage()
-  //   : { lang: "vi", setLang: () => {} };
     const { data: session, status } = useSession(); 
 
   const router = useRouter();
@@ -26,10 +18,8 @@ export default function NavigationClient() {
     { label: "Blog", href: "/admin/blog-management" },
     { label: "Category", href: "/admin/category-management" },
     { label: "Comment", href: "/admin/comment-management" },
-    // { label: t("Home"), href: "/UI/blog" },
   ];
   const filteredNavItems = navItems.filter(item => {
-    // Chỉ ẩn "User" nếu không phải admin
     if (item.label === "User") {
       return session?.user?.role === "admin";
     }
