@@ -1,6 +1,5 @@
 "use client";
 import { use, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import CommentSection from "../../../../components/CommentSection";
 import Footer from "../../../../components/Footer";
 interface Blog {
@@ -80,11 +79,11 @@ export default function BlogDetailPage({
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
   return (
-    <div className="">
+    <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
       <div className="max-w-6xl mx-auto flex flex-col gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-gray-900 leading-tight">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-gray-900 dark:text-white leading-tight">
               {blog.title}
             </h1>
             <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 text-gray-500 text-xs sm:text-sm gap-2 sm:gap-4">
@@ -129,12 +128,12 @@ export default function BlogDetailPage({
             ) : null}
 
             <div
-              className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed"
+              className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed dark:prose-invert dark:text-gray-200"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
             <hr className="text-gray-100 mt-10" />
             <div className="max-w-6xl mx-auto mt-6 sm:mt-8 px-2 sm:px-0 md:px-2">
-              <h2 className="text-xl sm:text-xl font-semibold mb-3 sm:mb-4  ">
+              <h2 className="text-xl sm:text-xl font-semibold mb-3 sm:mb-4 dark:text-white">
                 Related articles
               </h2>
               <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-2">
@@ -143,7 +142,7 @@ export default function BlogDetailPage({
                     <a
                       key={item.slug}
                       href={`/${item.slug}`}
-                      className="min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-lg p-3 sm:p-4 flex-shrink-0 hover:bg-blue-50 transition h-auto aspect-[8/5] w-36 sm:w-40"
+                      className="group min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-2xl p-3 sm:p-4 flex-shrink-0 transition h-auto aspect-[8/5] w-36 sm:w-40 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700"
                     >
                       {item.image_url ? (
                         <img
@@ -166,10 +165,10 @@ export default function BlogDetailPage({
                           />
                         </svg>
                       )}
-                      <div className="font-semibold text-gray-900 line-clamp-2">
+                      <div className="font-semibold text-gray-900 line-clamp-2 dark:text-white group-hover:text-blue-700 transition">
                         {item.title}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {item.createdAt
                           ? new Date(item.createdAt).toLocaleDateString()
                           : ""}
@@ -177,7 +176,7 @@ export default function BlogDetailPage({
                     </a>
                   ))
                 ) : (
-                  <div className="text-gray-400 text-sm">
+                  <div className="text-gray-400 text-sm dark:text-gray-500">
                     There are no posts.
                   </div>
                 )}

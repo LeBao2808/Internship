@@ -3,8 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../../components/Footer";
 import UserButton from "../../../components/UserButton";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
 import "./style.css";
 // import { Blog } from "@/utils/type"
 
@@ -133,14 +131,13 @@ export default function BlogPage() {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className={`blog-home-bg min-h-screen px-5  sm:px-2 md:px-0`}>
+    <div className={`blog-home-bg min-h-screen px-5 sm:px-2 md:px-0 dark:bg-[#121618] dark:text-white`}>
       <div className="flex justify-end ">
         <div className="flex items-center rounded-lg mr-2 mt-2 p-1 absolute right-0 top-0">
           <UserButton />
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-16">
-        {/* Hero Section */}
         <div className="flex w-full justify-end"></div>
         <div className="text-center mb-12">
           <h1 className="title font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
@@ -155,7 +152,7 @@ export default function BlogPage() {
         </div>
 
         {/* Featured Posts */}
-        <div className="mb-12">
+        <div className="mb-12 ">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Featured Posts
           </h2>
@@ -164,7 +161,7 @@ export default function BlogPage() {
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 animate-pulse"
+                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 animate-pulse dark:bg-gray-900 dark:border-gray-800"
                 >
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
 
@@ -180,15 +177,15 @@ export default function BlogPage() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 dark:border-gray-800">
               {featuredPosts.map((blog) => (
                 <div
                   key={blog._id}
-                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 hover:border-blue-400 transition group cursor-pointer"
+                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col  transition group cursor-pointer featured-post"
                   onClick={() => router.push(`/${blog.slug}`)}
                 >
                   <div className="flex-grow min-h-0">
-                    <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate">
+                    <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate dark:text-white">
                       {blog.title}
                     </h3>
 
@@ -202,9 +199,9 @@ export default function BlogPage() {
                       }}
                     />
 
-                    <div className="flex flex-wrap gap-2 mb-4 mt-auto">
+                    <div className="flex flex-wrap gap-2 mb-4 mt-auto ">
                       {blog.category && (
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200">
                           {blog.category.name}
                         </span>
                       )}
@@ -242,7 +239,7 @@ export default function BlogPage() {
             {categories.map((cat) => (
               <button
                 key={cat._id}
-                className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${
+                className={`px-4 py-2 border-2 bg-blue-100 text-blue-700 rounded-lg font-medium transition cursor-pointer ${
                   category === cat._id
                     ? "bg-blue-600 text-white border-blue-600"
                     : "border-blue-600 text-blue-600 hover:bg-blue-50 bg-white"
@@ -258,14 +255,13 @@ export default function BlogPage() {
           </div>
         </div>
 
-        {/* Latest Posts */}
         <div className="mb-10">
           <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
-          <div className="bg-white rounded-xl shadow divide-y divide-gray-200">
+          <div className="bg-white rounded-xl shadow divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-800  ">
             {latestPosts.map((blog) => (
               <div
                 key={blog._id}
-                className="flex items-center px-6 py-4 hover:bg-blue-50 transition cursor-pointer"
+                className="flex items-center px-6 py-4 hover:bg-blue-50 transition cursor-pointer dark:hover:bg-gray-800"
                 onClick={() => router.push(`/${blog.slug}`)}
               >
                 <svg
@@ -281,8 +277,8 @@ export default function BlogPage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-900">
+                <div className="flex-1 ">
+                  <div className="font-semibold text-gray-900 dark:text-white">
                     {blog.title}
                   </div>
                   <div className="text-xs text-gray-500">
@@ -335,7 +331,7 @@ export default function BlogPage() {
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white p-6 rounded-lg shadow-md animate-pulse"
+                className="bg-white p-6 rounded-lg shadow-md animate-pulse dark:bg-gray-900 dark:border-gray-800"
               >
                 <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
                 <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
@@ -358,7 +354,7 @@ export default function BlogPage() {
               <div
                 onClick={() => router.push(`/${blog.slug}`)}
                 key={blog._id}
-                className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl border border-gray-100 hover:border-blue-400 cursor-pointer"
+                className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer dark:bg-gray-900 dark:border-gray-800 dark:hover:shadow-[0_8px_32px_0_rgba(255,255,255,0.15)]"
               >
                 <div className="h-auto w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
                   <img
@@ -372,7 +368,7 @@ export default function BlogPage() {
                   />
                 </div>
                 <div className="flex-1 flex flex-col p-6">
-                  <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition">
+                  <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition dark:text-white">
                     {blog.title}
                   </h2>
                   {blog.user && (
@@ -414,7 +410,7 @@ export default function BlogPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer"
+            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer dark:text-white dark:bg-gray-500"
           >
             Previous
           </button>
@@ -424,7 +420,7 @@ export default function BlogPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || totalPages === 0}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer"
+            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer dark:text-white dark:bg-gray-500"
           >
             Next
           </button>

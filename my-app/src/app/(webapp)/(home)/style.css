@@ -19,3 +19,75 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* style-dark.css */
+body.dark {
+  background-color: #121618; /* Màu nền tối */
+  color: white; /* Màu chữ trắng */
+}
+
+/* Header & Hero Section */
+.dark .title {
+  color: white;
+}
+
+.sub_title {
+  font-size: 1.2rem;
+  text-align: center;
+  max-width: 80%;
+  margin: 0 auto;
+  color: #aaa; /* Màu chữ phụ */
+}
+
+
+.dark .featured-post {
+  background-color: #1a1e24; /* Màu card bài viết */
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* margin-bottom: 20px; */
+}
+
+/* .dark .featured-post h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+
+} */
+
+.dark .featured-post p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ccc; /* Màu chữ phụ */
+}
+
+.dark .featured-post .category-tag {
+  display: inline-block;
+  background-color: #3b82f6; /* Màu tag category */
+  color: white;
+  padding: 5px 10px;
+  margin-top: 10px;
+}
+
+.dark .featured-post .read-more-button {
+  display: block;
+  width: 100%;
+  background-color: #3b82f6; /* Nút "Read More" */
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dark .featured-post .read-more-button:hover {
+  background-color: #2c7ae0; 
+}
+
+.dark .text-dark{
+  color: white;
+}
+
+.dark .text:hover {
+  color: #3b82f6; /* Màu chữ khi hover */
+}

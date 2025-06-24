@@ -11,9 +11,9 @@ interface BlogLayoutProps {
 const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
   const router = useRouter();
   return (
-    <div>
+    <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
       <style>{`
-      .nav-logout-btn {
+        .nav-logout-btn {
           margin-left: auto;
           background: #d32f2f;
           color: #fff;
@@ -28,68 +28,60 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
           background: #b71c1c;
           box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
         }
-           .nav-logout-btn {
+        .nav-home-btn {
           margin-left: auto;
-          background: #d32f2f;
-          color: #fff;
+          background: #fff;
+          color: #1976d2;
           border: none;
           border-radius: 6px;
           padding: 8px 18px;
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.25s, box-shadow 0.25s;
         }
-        .nav-logout-btn:hover {
+        .nav-home-btn:hover {
+          background: rgb(214, 214, 214);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+        }
+        .nav-view-btn {
+          margin-left: auto;
+          background: rgb(168, 155, 137);
+          color: #1976d2;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .nav-view-btn:hover {
+          background: rgb(230, 231, 220);
+          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
+        }
+        .text-nav-btn-user {
+          color: black; 
+        }
+        .dark .nav-home-btn {
+          background: #1f2937;
+          color: #3b82f6;
+        }
+        .dark .nav-home-btn:hover {
+          background: #374151;
+        }
+        .dark .nav-logout-btn {
           background: #b71c1c;
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
         }
-
-
-       .nav-home-btn {
-          margin-left: auto;
-          background:#fff;
-          color: #1976d2;
-          border: none;
-          border-radius: 6px;
-          padding: 8px 18px;
-          font-weight: 600;
-          cursor: pointer;
-       }
-          .nav-home-btn:hover {
-          background:rgb(214, 214, 214);
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
-          }
-
-               .nav-view-btn {
-          margin-left: auto;
-          background:#rgb(168, 155, 137);
-          color: #1976d2;
-          border: none;
-          border-radius: 6px;
-          padding: 8px 18px;
-          font-weight: 600;
-          cursor: pointer;
-       }
-          .nav-view-btn:hover {
-          background:rgb(230, 231, 220);
-          box-shadow: 0 2px 12px 0 rgba(211,47,47,0.18);
-          }
-
-          .text-nav-btn-user{
-            color: black; 
-          }
-
-     `}</style>
-      <div className="flex justify-end ">
-        <div className="flex items-center  rounded-lg  mr-2 mt-2 p-1">
-          <UserButton />
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto flex items-center gap-4 mb-6 px-4 ">
-        <button
+        .dark .nav-view-btn {
+          background: #4b5563;
+          color: #3b82f6;
+        }
+        .dark .nav-view-btn:hover {
+          background: #6b7280;
+        }
+      `}</style>
+      <div className="flex justify-end items-center ">
+          <button
           onClick={() => router.push("/")}
-          className="p-2 rounded-full hover:bg-blue-100 transition bg-white cursor-pointer "
-          title="Về trang chủ blog"
+          className=" rounded-full hover:bg-blue-100 transition gap-5 px-4 mt-[7px] bg-white h-[48px] dark:bg-[#121618] dark:text-white dark:hover:bg-gray-300 dark:hover:text-black cursor-pointer"
+          title="Back home"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +89,7 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-6"
+            className="size-5"
           >
             <path
               strokeLinecap="round"
@@ -106,9 +98,14 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
             />
           </svg>
         </button>
+        <div className="flex items-center rounded-lg mr-2 mt-2 p-1">
+          <UserButton />
+        </div>
       </div>
+      {/* <div className="max-w-7xl mx-auto flex items-center gap-4 mb-6 px-4 ">
+      
+      </div> */}
       <div>{children}</div>
-
     </div>
   );
 };

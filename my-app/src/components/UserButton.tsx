@@ -26,11 +26,21 @@ export default function UserButton() {
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") === "dark";
-    setIsDarkMode(savedTheme);
-    if (savedTheme) {
-      document.documentElement.classList.add("dark");
+    // Ưu tiên localStorage, nếu không có thì lấy theo system
+    const savedTheme = localStorage.getItem("theme");
+    let isDark = false;
+    if (savedTheme === "dark") {
+      isDark = true;
+    } else if (!savedTheme) {
+      isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     }
+    setIsDarkMode(isDark);
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -56,6 +66,7 @@ export default function UserButton() {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
       }
+      console.log(document.documentElement.className); 
       return newMode;
     });
   };
@@ -92,7 +103,7 @@ export default function UserButton() {
       </button>
 
       <div
-        className={`dropdown-content absolute right-0 mt-2 w-72 bg-white rounded-lg overflow-hidden z-50 shadow-xl ${
+        className={`dropdown-content absolute right-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-lg overflow-hidden z-50 shadow-xl ${
           showDropdown
             ? "opacity-100 visible translate-y-0"
             : "opacity-0 invisible translate-y-4"
@@ -100,8 +111,8 @@ export default function UserButton() {
       >
         <div
           className={`px-4 py-3 ${
-            isOnAdminPage ? "bg-gradient-to-r" : "bg-white"
-          }  from-blue-50 to-indigo-50 border-b border-gray-200`}
+            isOnAdminPage ? " dark:bg-gray-900" : "bg-white dark:bg-gray-900"
+          }  from-blue-50 to-indigo-50 border-b border-gray-200 dark:border-gray-700 `}
         >
           <div className="flex items-center gap-3">
             <Image
@@ -112,8 +123,12 @@ export default function UserButton() {
               className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
             />
             <div>
-              <p className="font-medium text-gray-900">{userName}</p>
-              <p className="text-sm text-gray-500">{userEmail}</p>
+              <p className="font-medium text-gray-900 dark:text-white">
+                {userName}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-300">
+                {userEmail}
+              </p>
             </div>
           </div>
         </div>
@@ -122,7 +137,7 @@ export default function UserButton() {
           {isOnAdminPage ? (
             <Link
               href="/"
-              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <FaHome className="text-purple-500 w-5" />
               <span>Home</span>
@@ -130,7 +145,7 @@ export default function UserButton() {
           ) : session?.user ? (
             <Link
               href="/admin/blog-management"
-              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800  transition-colors"
             >
               <FaBlog className="text-purple-500 w-5" />
               <span>Blog Management</span>
@@ -138,7 +153,7 @@ export default function UserButton() {
           ) : null}
 
           <div
-            className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer"
+            className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             onClick={() => setIsOpen((prev) => !prev)}
           >
             <IoLanguage className="text-orange-500 w-5" />
@@ -146,12 +161,12 @@ export default function UserButton() {
           </div>
 
           {isOpen && (
-            <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-10 py-1">
+            <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-900 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-10 py-1">
               <button
                 className={`block w-full text-left px-4 py-2 text-sm ${
                   selectedLang === "en"
-                    ? "bg-orange-50 text-orange-700"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-orange-50 dark:bg-gray-800 text-orange-700"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
                 onClick={() => {
                   setSelectedLang("en");
@@ -165,8 +180,8 @@ export default function UserButton() {
               <button
                 className={`block w-full text-left px-4 py-2 text-sm ${
                   selectedLang === "vi"
-                    ? "bg-orange-50 text-orange-700"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-orange-50 dark:bg-gray-800 text-orange-700"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
                 onClick={() => {
                   setSelectedLang("vi");
@@ -181,19 +196,19 @@ export default function UserButton() {
           )}
         </div>
 
-        <div className="border-t border-gray-200"></div>
+        <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
         <div className="py-1">
           {!session?.user ? (
             <Link
               href="/login"
-              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-gray-800 transition-colors"
             >
               <RiLoginBoxFill className="text-green-500 w-5 text-2xl" />
               <span>{t("Login")}</span>
             </Link>
           ) : null}
-          <div className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
+          <div className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
             <FaPaintbrush className="text-blue-500 w-5" />
             <span>{t("Theme")}</span>
             {/* Toggle Switch */}
@@ -205,10 +220,10 @@ export default function UserButton() {
                 onChange={toggleTheme}
               />
 
-              <div className="relative w-14 h-7 bg-gray-100 rounded-full peer peer-checked:bg-black transition-colors duration-300 cursor-pointer">
+              <div className="relative w-14 h-7 bg-white border-gray-2  00 border dark:bg-gray-800 rounded-full peer peer-checked:bg-black transition-colors duration-300 cursor-pointer">
                 <div
                   className={`absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5 transition-all duration-300 ${
-                    isDarkMode ? "left-8 text-white" : "left-1 text-yellow-500"
+                    isDarkMode ? "left-8 text-white" : "left-1 text-yellow-400"
                   }`}
                 >
                   {isDarkMode ? (
@@ -222,10 +237,8 @@ export default function UserButton() {
           </div>
         </div>
 
-        <div className="border-t border-gray-200"></div>
-
-        {/* Logout */}
-
+        <div className="border-t border-gray-200 dark:border-gray-700"></div>
+        
         {session?.user ? (
           <Link
             href="/api/auth/logout"
@@ -235,7 +248,7 @@ export default function UserButton() {
                 router.push("/");
               });
             }}
-            className="menu-item flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors"
+            className="menu-item flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <FaSignOutAlt className="text-red-500 w-5" />
             <span>Logout</span>

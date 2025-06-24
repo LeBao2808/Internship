@@ -13,7 +13,7 @@ export default function RootLayout({
         minHeight: "100vh",
       }}
     >
-      <main>
+      <main className=".dark:bg-[#121618]">
         <SessionProvider>{children}</SessionProvider>
       </main>
     </div>

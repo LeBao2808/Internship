@@ -9,7 +9,6 @@ import socket from "@/resources/lib/socket";
 interface CommentSectionProps {
   slug: string;
 }
-// types.ts
 interface Comment {
   user: {
     name: string;
@@ -25,12 +24,8 @@ export default function CommentSection({ slug }: CommentSectionProps) {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
-  // Kết nối socket
-
   useEffect(() => {
     fetchComments();
-
-    // Lắng nghe bình luận mới từ socket
   }, [slug]);
   useEffect(() => {
     console.log("abc");
@@ -104,11 +99,11 @@ export default function CommentSection({ slug }: CommentSectionProps) {
   };
 
   return (
-    <div className="max-full mx-auto mt-10 p-4 bg-gray-50 rounded-2xl border border-gray-200 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">💬 Comments</h2>
+    <div className="max-full mx-auto mt-10 p-4 bg-gray-50 rounded-2xl border border-gray-200 shadow-lg dark:bg-gray-900 dark:border-gray-700">
+      <h2 className="text-xl font-semibold mb-4 dark:text-white">💬 Comments</h2>
 
       {/* Input */}
-      <div className="flex mt-4 gap-2 items-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 px-4 py-2 rounded-xl mb-3">
+      <div className="flex mt-4 gap-2 items-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 px-4 py-2 rounded-xl mb-3 dark:bg-gray-800 dark:border-gray-700">
         <input
           type="text"
           placeholder="Nhập bình luận..."
@@ -139,7 +134,7 @@ export default function CommentSection({ slug }: CommentSectionProps) {
               handleSubmit();
             }
           }}
-          className="flex-1 border-none outline-none"
+          className="flex-1 border-none outline-none bg-transparent dark:text-white"
         />
         <Send
           className="cursor-pointer text-blue-500 hover:text-blue-700 transition"
@@ -151,13 +146,13 @@ export default function CommentSection({ slug }: CommentSectionProps) {
       {/* Danh sách bình luận */}
       <div className="space-y-4 max-h-64 overflow-y-auto pr-2">
         {loading ? (
-          <p>Loading Comment...</p>
+          <p className="dark:text-gray-300">Loading Comment...</p>
         ) : comments.length === 0 ? (
-          <p className="text-gray-500 italic">Chưa có bình luận nào.</p>
+          <p className="text-gray-500 italic dark:text-gray-400">No comments yet.</p>
         ) : (
           comments.map((cmt, idx) => (
             <div key={idx} className="flex gap-3 items-start">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 my-auto">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 my-auto dark:bg-gray-700">
                 <img
                   src={cmt.user.image || "/BlueHead.png"}
                   alt="avatar"
@@ -165,16 +160,16 @@ export default function CommentSection({ slug }: CommentSectionProps) {
                 />
               </div>
 
-              <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1">
+              <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1 dark:bg-gray-800">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold">{cmt.user.name}</span>
-                  <span className="text-xs text-gray-500">
+                  <span className="font-semibold dark:text-white">{cmt.user.name}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDistanceToNow(new Date(cmt.createdAt), {
                       addSuffix: true,
                     })}
                   </span>
                 </div>
-                <div className="break-words">{cmt.content}</div>
+                <div className="break-words dark:text-gray-200">{cmt.content}</div>
               </div>
             </div>
           ))
