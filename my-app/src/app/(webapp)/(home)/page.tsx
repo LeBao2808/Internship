@@ -133,7 +133,7 @@ export default function BlogPage() {
 
   return (
     <div
-      className={`blog-home-bg min-h-screen px-5 sm:px-2 md:px-0 dark:bg-[#121618] dark:text-white`}
+      className={`blog-home-bg min-h-screen px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white`}
     >
       <div className="flex justify-end ">
         <div className="flex items-center rounded-lg mr-2 mt-2 p-1 absolute right-0 top-0">
@@ -161,16 +161,19 @@ export default function BlogPage() {
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800"
+                  className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800 flex flex-col min-h-[420px]"
                 >
-                  <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-10 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-48 w-full bg-gray-200 rounded-lg mb-6"></div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
+                  </div>
+                  <div className="h-6 w-3/4 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 w-2/3 bg-gray-200 rounded mb-6"></div>
+
+                  <div className="h-10 w-28 bg-gray-200 rounded mt-auto"></div>
                 </div>
               ))}
             </div>
@@ -179,17 +182,17 @@ export default function BlogPage() {
               {featuredPosts.map((blog) => (
                 <div
                   key={blog._id}
-                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer min-h-[420px]"
                   onClick={() => router.push(`/${blog.slug}`)}
                 >
-                  <div className="h-48 w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
+                  <div className="w-full sm:aspect-[8/5] md:h-48 bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
                     <img
                       src={
                         blog.image_url ||
                         "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
                       }
                       alt={blog.title}
-                      className="h-full w-full object-cover"
+                      className="w-full h-48 sm:h-full object-cover"
                     />
                   </div>
                   <div className="flex-1 flex flex-col p-6">
@@ -205,11 +208,11 @@ export default function BlogPage() {
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">
+                    <h3 className="text-lg font-bold mb-2 hover:text-blue-700 text-gray-800 dark:text-white">
                       {blog.title}
                     </h3>
                     <div
-                      className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+                      className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 flex-1"
                       dangerouslySetInnerHTML={{
                         __html:
                           blog.content && blog.content.length > 90
@@ -222,7 +225,7 @@ export default function BlogPage() {
                         e.stopPropagation();
                         router.push(`/${blog.slug}`);
                       }}
-                      className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold text-base hover:bg-blue-700 transition shadow cursor-pointer w-max"
+                      className="mt-auto px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold text-base hover:bg-blue-700 transition shadow cursor-pointer w-max"
                     >
                       {t("readMore", "Read More")}
                     </button>
@@ -281,14 +284,9 @@ export default function BlogPage() {
                   key={i}
                   className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800"
                 >
-                  <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-10 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-2 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-2 bg-gray-200 rounded w-3/4 mb-4"></div>
                 </div>
               ))}
             </div>
@@ -313,7 +311,7 @@ export default function BlogPage() {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-1 text-base">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1 text-base hover:text-blue-700">
                       {blog.title}
                     </h3>
                     <div
@@ -340,23 +338,28 @@ export default function BlogPage() {
 
         {/* Search & All Posts */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-          <div className="flex px-6 py-3 rounded-md border-2 border-blue-500 overflow-hidden bg-white ">
+          <div className="flex px-6 py-3 rounded-xl border-2 border-blue-400 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-300 transition-all duration-200 items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              className="text-blue-500 mr-2"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
             <input
-              // type="email"
-              placeholder="Search Something..."
+              placeholder={t("searchPlaceholder")}
               value={searchValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              className="w-full outline-none bg-transparent text-gray-600 text-sm"
+              className="w-full outline-none bg-transparent text-gray-700 text-base font-semibold font-sans placeholder:font-normal placeholder:text-gray-400"
+              style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 192.904 192.904"
-              width="16px"
-              className="fill-gray-600"
-            >
-              <path d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z"></path>
-            </svg>
           </div>
         </div>
         {loading ? (
@@ -382,45 +385,54 @@ export default function BlogPage() {
             No blog found.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {blogs.map((blog) => (
               <div
-                onClick={() => router.push(`/${blog.slug}`)}
                 key={blog._id}
-                className="group bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition transform hover:-translate-y-1 hover:shadow-2xl cursor-pointer dark:bg-gray-900 dark:border-gray-800 dark:hover:shadow-[0_8px_32px_0_rgba(255,255,255,0.15)]"
+                onClick={() => router.push(`/${blog.slug}`)}
+                className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
               >
-                <div className="h-auto w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
+                <div className="w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-68 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none sm:rounded-b-none">
                   <img
                     src={
                       blog.image_url ||
                       "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
                     }
                     alt={blog.title}
-                    className="h-auto aspect-[8/5] w-full object-cover"
-                    style={{ objectFit: "cover" }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 </div>
-                <div className="flex-1 flex flex-col p-6">
-                  <h2 className="text-2xl font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition dark:text-white">
+                <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-4 min-h-[180px]">
+                  {blog.category && (
+                    <div className="mb-2">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200">
+                        {blog.category.name}
+                      </span>
+                    </div>
+                  )}
+                  <h2 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-700 transition line-clamp-2 dark:text-white">
                     {blog.title}
                   </h2>
-                  {blog.user && (
-                    <p className="text-sm text-gray-500 mb-1">
-                      <b>Author:</b>{" "}
-                      {typeof blog.user === "object" &&
-                      blog.user !== null &&
-                      "name" in blog.user
-                        ? blog.user.name
-                        : ""}
-                    </p>
-                  )}
                   {blog.createdAt && (
-                    <p className="text-xs text-gray-400 mb-2">
-                      Posted at: {new Date(blog.createdAt).toLocaleString()}
-                    </p>
+                    <div className="flex items-center text-sm text-gray-400 mb-2">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      {new Date(blog.createdAt).toLocaleDateString()}
+                    </div>
                   )}
                   <div
-                    className="text-gray-600 mb-4 line-clamp-3"
+                    className="text-gray-700 text-base mb-3 line-clamp-2 dark:text-gray-300 flex-1"
                     dangerouslySetInnerHTML={{
                       __html:
                         blog.content && blog.content.length > 120
@@ -428,15 +440,17 @@ export default function BlogPage() {
                           : blog.content || "",
                     }}
                   />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/${blog.slug}`);
-                    }}
-                    className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold text-base hover:bg-blue-700 transition shadow cursor-pointer w-max"
-                  >
-                    {t("readMore", "Read More")}
-                  </button>
+                  <div className="mt-auto">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/${blog.slug}`);
+                      }}
+                      className="text-blue-600 hover:underline text-sm font-medium self-start"
+                    >
+                      {t("readMore", "Đọc tiếp")} →
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

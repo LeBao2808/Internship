@@ -6,6 +6,7 @@
   "login": "Login",
   "English": "English",
   "Vietnamese": "Vietnamese",
+  "blogManagement": "Blog Management",
   "learnToCode": "Learn to Code",
   "oneDayAtATime": "One Day at a Time",
   "aBlogForBeginners": "A blog for beginners and aspiring developers to grow their coding skills.",
@@ -18,4 +19,5 @@
   "previous": "Previous",
   "next": "Next",
   "readMore": "Read More"
+  ,"searchPlaceholder": "Search something..."
 }

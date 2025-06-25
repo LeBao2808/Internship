@@ -5,6 +5,7 @@
   "logout": "Đăng xuất",
   "login": "Đăng nhập",
   "English": "Tiếng Anh",
+  "blogManagement": "Quản lý blog",
   "Vietnamese": "Tiếng Việt",
   "learnToCode": "Học lập trình",
   "oneDayAtATime": "Mỗi ngày một bước tiến",
@@ -17,5 +18,6 @@
   "noBlogFound": "Không tìm thấy bài viết nào.",
   "previous": "Trước",
   "next": "Sau",
-  "readMore": "Xem thêm"
+  "readMore": "Xem thêm",
+  "searchPlaceholder": "Tìm kiếm bài viết..."
 }
