@@ -104,13 +104,13 @@ export default function CommentSection({ slug }: CommentSectionProps) {
 
       {/* Input */}
       <div className="flex mt-4 gap-2 items-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 px-4 py-2 rounded-xl mb-3 dark:bg-gray-800 dark:border-gray-700">
-        <input
-          type="text"
+        <textarea
           placeholder="Nhập bình luận..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           onKeyDown={(e: any) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
               setComments((prev) => [
                 {
                   user: {
@@ -134,7 +134,8 @@ export default function CommentSection({ slug }: CommentSectionProps) {
               handleSubmit();
             }
           }}
-          className="flex-1 border-none outline-none bg-transparent dark:text-white"
+          rows={4}
+          className="flex-1 border-none outline-none bg-transparent resize-none dark:text-white"
         />
         <Send
           className="cursor-pointer text-blue-500 hover:text-blue-700 transition"
@@ -160,7 +161,7 @@ export default function CommentSection({ slug }: CommentSectionProps) {
                 />
               </div>
 
-              <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1 dark:bg-gray-800">
+              <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1 dark:bg-gray-800 w-[200px]">
                 <div className="flex justify-between items-center mb-1">
                   <span className="font-semibold dark:text-white">{cmt.user.name}</span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">

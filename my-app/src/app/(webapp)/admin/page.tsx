@@ -3,6 +3,18 @@ import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Bar } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface Blog {
   _id: string;
@@ -48,7 +60,6 @@ export default function AdminHomePage() {
   ]);
 
   const [popularPosts, setPopularPosts] = useState<any[]>([]);
-  const [loadingPopular, setLoadingPopular] = useState(true);
   const [chartData, setChartData] = useState<{
     postCounts: number[];
     commentCounts: number[];
@@ -206,6 +217,36 @@ export default function AdminHomePage() {
 
   const { newUserCount, oldUserCount, percent } = calculateUserStats();
 
+  const commentData = {
+    labels: ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6"],
+    datasets: [
+      {
+        label: "Bình luận",
+        data: chartData.commentCounts,
+        backgroundColor: [
+          "#4ade80",
+          "#22d3ee",
+          "#818cf8",
+          "#fbbf24",
+          "#f87171",
+          "#38bdf8",
+        ],
+        borderRadius: 8,
+      },
+    ],
+  };
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+      tooltip: { enabled: true },
+    },
+    scales: {
+      y: { beginAtZero: true },
+    },
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Main Content */}
@@ -258,28 +299,51 @@ export default function AdminHomePage() {
               <h2 className="text-lg font-semibold text-gray-800">
                 Post Statistics
               </h2>
-              {renderBarChart(chartData.postCounts, [
-                "bg-blue-400",
-                "bg-blue-500",
-                "bg-blue-400",
-                "bg-blue-500",
-                "bg-blue-400",
-                "bg-blue-500",
-              ])}
+              <div className="chart-container mt-4">
+                <Bar
+                  data={{
+                    labels: ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6"],
+                    datasets: [
+                      {
+                        label: "Bài viết",
+                        data: chartData.postCounts,
+                        backgroundColor: [
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
+                        ],
+                        borderRadius: 8,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: { display: false },
+                      title: { display: false },
+                      tooltip: { enabled: true },
+                    },
+                    scales: {
+                      y: { beginAtZero: true },
+                    },
+                  }}
+                />
+              </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Comment Statistics
-              </h2>
-              {renderBarChart(chartData.commentCounts, [
-                "bg-green-400",
-                "bg-green-500",
-                "bg-green-400",
-                "bg-green-500",
-                "bg-green-400",
-                "bg-green-500",
-              ])}
+            <div className="bg-white rounded-xl shadow-md p-6 transition duration-300 card-hover">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Thống kê bình luận
+                </h2>
+    
+              </div>
+              <div className="chart-container">
+                <Bar data={commentData} options={options} />
+              </div>
             </div>
           </div>
 

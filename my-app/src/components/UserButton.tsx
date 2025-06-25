@@ -11,7 +11,7 @@ import { FaBlog, FaHome, FaSignOutAlt } from "react-icons/fa";
 import { RiLoginBoxFill } from "react-icons/ri";
 import { FaPaintbrush } from "react-icons/fa6";
 import { useTranslation } from "next-i18next";
-
+import i18n from "@/app/i18n";
 export default function UserButton() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -22,11 +22,10 @@ export default function UserButton() {
   const isOnAdminPage = pathname.startsWith("/admin");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState("vi");
-  const { t, i18n } = useTranslation();
+  const [selectedLang, setSelectedLang] = useState("en");
+  const { t } = useTranslation("common");
 
   useEffect(() => {
-    // Ưu tiên localStorage, nếu không có thì lấy theo system
     const savedTheme = localStorage.getItem("theme");
     let isDark = false;
     if (savedTheme === "dark") {
@@ -66,7 +65,7 @@ export default function UserButton() {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
       }
-      console.log(document.documentElement.className); 
+      console.log(document.documentElement.className);
       return newMode;
     });
   };
@@ -140,15 +139,15 @@ export default function UserButton() {
               className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <FaHome className="text-purple-500 w-5" />
-              <span>Home</span>
+              <span>{t("home")}</span>
             </Link>
           ) : session?.user ? (
             <Link
               href="/admin/blog-management"
-              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800  transition-colors"
+              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <FaBlog className="text-purple-500 w-5" />
-              <span>Blog Management</span>
+              <span>{t("blogManagement")}</span>
             </Link>
           ) : null}
 
@@ -157,7 +156,7 @@ export default function UserButton() {
             onClick={() => setIsOpen((prev) => !prev)}
           >
             <IoLanguage className="text-orange-500 w-5" />
-            <span>{selectedLang === "vi" ? "VietNamease" : "English"}</span>
+            <span>{selectedLang === "en" ? "English" : "VietNamease"}</span>
           </div>
 
           {isOpen && (
@@ -171,6 +170,7 @@ export default function UserButton() {
                 onClick={() => {
                   setSelectedLang("en");
                   const newPath = pathname.replace(/^\/(vi|en)/, "/en");
+                  i18n.changeLanguage("en");
                   router.push(newPath, { scroll: false });
                   setIsOpen(false);
                 }}
@@ -186,6 +186,7 @@ export default function UserButton() {
                 onClick={() => {
                   setSelectedLang("vi");
                   const newPath = pathname.replace(/^\/(vi|en)/, "/vi");
+                  i18n.changeLanguage("vi");
                   router.push(newPath, { scroll: false });
                   setIsOpen(false);
                 }}
@@ -205,12 +206,12 @@ export default function UserButton() {
               className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-gray-800 transition-colors"
             >
               <RiLoginBoxFill className="text-green-500 w-5 text-2xl" />
-              <span>{t("Login")}</span>
+              <span>{t("login")}</span>
             </Link>
           ) : null}
           <div className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
             <FaPaintbrush className="text-blue-500 w-5" />
-            <span>{t("Theme")}</span>
+            <span>{t("theme")}</span>
             {/* Toggle Switch */}
             <label className="inline-flex items-center ml-auto">
               <input
@@ -238,7 +239,7 @@ export default function UserButton() {
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700"></div>
-        
+
         {session?.user ? (
           <Link
             href="/api/auth/logout"
@@ -251,7 +252,7 @@ export default function UserButton() {
             className="menu-item flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <FaSignOutAlt className="text-red-500 w-5" />
-            <span>Logout</span>
+            <span>{t("logout")}</span>
           </Link>
         ) : null}
       </div>

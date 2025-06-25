@@ -1,7 +1,21 @@
 {
   "home": "Trang chủ",
-  "theme": "Giao diện",
   "language": "Ngôn ngữ",
+  "theme": "Giao diện",
   "logout": "Đăng xuất",
-  "login": "Đăng nhập"
+  "login": "Đăng nhập",
+  "English": "Tiếng Anh",
+  "Vietnamese": "Tiếng Việt",
+  "learnToCode": "Học lập trình",
+  "oneDayAtATime": "Mỗi ngày một bước tiến",
+  "aBlogForBeginners": "Blog dành cho người mới bắt đầu và những ai muốn phát triển kỹ năng lập trình.",
+  "featuredPosts": "Bài viết nổi bật",
+  "browseByCategory": "Duyệt theo danh mục",
+  "allCategory": "Tất cả danh mục",
+  "latestPosts": "Bài viết mới nhất",
+  "searchSomething": "Tìm kiếm...",
+  "noBlogFound": "Không tìm thấy bài viết nào.",
+  "previous": "Trước",
+  "next": "Sau",
+  "readMore": "Xem thêm"
 }

@@ -1,7 +1,21 @@
 {
   "home": "Home",
-  "theme": "Theme",
   "language": "Language",
+  "theme": "Theme",
   "logout": "Logout",
-  "login": "Login"
+  "login": "Login",
+  "English": "English",
+  "Vietnamese": "Vietnamese",
+  "learnToCode": "Learn to Code",
+  "oneDayAtATime": "One Day at a Time",
+  "aBlogForBeginners": "A blog for beginners and aspiring developers to grow their coding skills.",
+  "featuredPosts": "Featured Posts",
+  "browseByCategory": "Browse by Category",
+  "allCategory": "All Category",
+  "latestPosts": "Latest Posts",
+  "searchSomething": "Search Something...",
+  "noBlogFound": "No blog found.",
+  "previous": "Previous",
+  "next": "Next",
+  "readMore": "Read More"
 }

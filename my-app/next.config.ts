@@ -3,6 +3,7 @@
 const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: false,
+  trailingSlash: true,
   i18n: {
     locales: ["en", "vi"],
     defaultLocale: "en",

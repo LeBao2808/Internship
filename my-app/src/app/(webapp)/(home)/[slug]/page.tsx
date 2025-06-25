@@ -25,6 +25,7 @@ export default function BlogDetailPage({
   const [loading, setLoading] = useState(true);
   const [authorName, setAuthorName] = useState<string>("");
   const [latestBlogs, setLatestBlogs] = useState<Blog[]>([]);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -70,19 +71,51 @@ export default function BlogDetailPage({
     fetchRelatedBlogs();
   }, [blog?.category, slug]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   if (loading)
     return (
-      <div className="flex justify-center items-center h-40">
-        <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></span>
+      <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse">
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6 w-2/3"></div>
+        <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3  mb-2"></div>
+       <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded  mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
+               <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
       </div>
     );
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
   return (
     <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
-      <div className="max-w-6xl mx-auto flex flex-col gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
+      <div className="max-w-7xl mx-auto flex flex-col gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
+            {blog.image_url ? (
+              <div className="mb-6 sm:mb-8">
+                <img
+                  src={blog.image_url}
+                  alt={blog.title}
+                  className="w-full h-auto aspect-[8/5] object-cover rounded-lg shadow"
+                />
+              </div>
+            ) : null}
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-gray-900 dark:text-white leading-tight">
               {blog.title}
             </h1>
@@ -116,16 +149,6 @@ export default function BlogDetailPage({
                 </span>
               )}
             </div>
-
-            {blog.image_url ? (
-              <div className="mb-6 sm:mb-8">
-                <img
-                  src={blog.image_url}
-                  alt={blog.title}
-                  className="w-full h-auto aspect-[8/5] object-cover rounded-lg shadow"
-                />
-              </div>
-            ) : null}
 
             <div
               className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed dark:prose-invert dark:text-gray-200"
@@ -187,6 +210,24 @@ export default function BlogDetailPage({
         </div>
       </div>
       <Footer />
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white p-3 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-200 flex items-center justify-center cursor-pointer"
+          aria-label="Scroll to top"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

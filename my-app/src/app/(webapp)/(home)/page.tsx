@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Footer from "../../../components/Footer";
 import UserButton from "../../../components/UserButton";
 import "./style.css";
+import { useTranslation } from "react-i18next";
 // import { Blog } from "@/utils/type"
 
 interface Blog {
@@ -35,7 +36,7 @@ export default function BlogPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
-
+  const { t } = useTranslation("common");
   useEffect(() => {
     fetchCategories();
     fecthFeaturedBlog();
@@ -57,7 +58,7 @@ export default function BlogPage() {
     () => blogFeatureds.slice(0, 3),
     [blogFeatureds]
   );
-  const latestPosts = useMemo(() => blogs.slice(0, 3), [blogs]);
+  const latestPosts = useMemo(() => blogs.slice(0, 4), [blogs]);
 
   const fetchCategories = async () => {
     try {
@@ -131,7 +132,9 @@ export default function BlogPage() {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className={`blog-home-bg min-h-screen px-5 sm:px-2 md:px-0 dark:bg-[#121618] dark:text-white`}>
+    <div
+      className={`blog-home-bg min-h-screen px-5 sm:px-2 md:px-0 dark:bg-[#121618] dark:text-white`}
+    >
       <div className="flex justify-end ">
         <div className="flex items-center rounded-lg mr-2 mt-2 p-1 absolute right-0 top-0">
           <UserButton />
@@ -141,56 +144,72 @@ export default function BlogPage() {
         <div className="flex w-full justify-end"></div>
         <div className="text-center mb-12">
           <h1 className="title font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
-            Learn to Code
+            {t("learnToCode")}
             <br />
-            One Day at a Time
+            {t("oneDayAtATime")}
           </h1>
           <p className="sub_title text-gray-600 mb-8 max-w-2xl mx-auto">
-            A blog for beginners and aspiring developers to grow their coding
-            skills.
+            {t("aBlogForBeginners")}
           </p>
         </div>
 
         {/* Featured Posts */}
-        <div className="mb-12 ">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">
-            Featured Posts
-          </h2>
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">{t("featuredPosts")}</h2>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col border border-gray-100 animate-pulse dark:bg-gray-900 dark:border-gray-800"
+                  className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800"
                 >
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-
-                  <div className="flex-grow min-h-0 space-y-2 mb-4">
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  </div>
-
-                  <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                  <div className="mt-auto h-8 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-10 bg-gray-200 rounded w-1/3"></div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 dark:border-gray-800">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredPosts.map((blog) => (
                 <div
                   key={blog._id}
-                  className="bg-white h-[250px] rounded-xl shadow-lg p-6 flex flex-col  transition group cursor-pointer featured-post"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
                   onClick={() => router.push(`/${blog.slug}`)}
                 >
-                  <div className="flex-grow min-h-0">
-                    <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-700 transition truncate dark:text-white">
+                  <div className="h-48 w-full bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
+                    <img
+                      src={
+                        blog.image_url ||
+                        "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
+                      }
+                      alt={blog.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 flex flex-col p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      {blog.category && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200">
+                          {blog.category.name}
+                        </span>
+                      )}
+                      {blog.createdAt && (
+                        <span className="text-xs text-gray-400 ml-auto">
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">
                       {blog.title}
                     </h3>
-
                     <div
-                      className="text-gray-600 mb-3 line-clamp-3 overflow-hidden"
+                      className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
                       dangerouslySetInnerHTML={{
                         __html:
                           blog.content && blog.content.length > 90
@@ -198,21 +217,16 @@ export default function BlogPage() {
                             : blog.content || "",
                       }}
                     />
-
-                    <div className="flex flex-wrap gap-2 mb-4 mt-auto ">
-                      {blog.category && (
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200">
-                          {blog.category.name}
-                        </span>
-                      )}
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/${blog.slug}`);
+                      }}
+                      className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold text-base hover:bg-blue-700 transition shadow cursor-pointer w-max"
+                    >
+                      {t("readMore", "Read More")}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => router.push(`/${blog.slug}`)}
-                    className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
-                  >
-                    Read More
-                  </button>
                 </div>
               ))}
             </div>
@@ -220,7 +234,7 @@ export default function BlogPage() {
         </div>
 
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Browse by Category</h2>
+          <h2 className="text-2xl font-bold mb-4">{t("browseByCategory")}</h2>
           <div className="flex flex-wrap gap-3 mb-2">
             <button
               key="all"
@@ -234,7 +248,7 @@ export default function BlogPage() {
                 setPage(1);
               }}
             >
-              All Category
+              {t("allCategory")}
             </button>
             {categories.map((cat) => (
               <button
@@ -255,54 +269,73 @@ export default function BlogPage() {
           </div>
         </div>
 
+        {/* Latest Posts */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
-          <div className="bg-white rounded-xl shadow divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-800  ">
-            {latestPosts.map((blog) => (
-              <div
-                key={blog._id}
-                className="flex items-center px-6 py-4 hover:bg-blue-50 transition cursor-pointer dark:hover:bg-gray-800"
-                onClick={() => router.push(`/${blog.slug}`)}
-              >
-                <svg
-                  className="w-6 h-6 text-blue-500 mr-3"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+          <h2 className="text-2xl font-bold mb-4">
+            {t("latestPosts", "Bài viết mới nhất")}
+          </h2>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <div className="flex-1 ">
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {blog.title}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {blog.createdAt
-                      ? new Date(blog.createdAt).toLocaleDateString()
-                      : ""}
+                  <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-10 bg-gray-200 rounded w-1/3"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {latestPosts.map((blog) => (
+                <div
+                  key={blog._id}
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+                  onClick={() => router.push(`/${blog.slug}`)}
+                >
+                  <div className="p-4 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {blog.category && (
+                        <span className="text-xs text-blue-600 font-semibold">
+                          {blog.category.name}
+                        </span>
+                      )}
+                      {blog.createdAt && (
+                        <span className="text-xs text-gray-400 ml-auto">
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1 text-base">
+                      {blog.title}
+                    </h3>
+                    <div
+                      className="text-gray-600 dark:text-gray-300 text-sm mb-2 line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          blog.content && blog.content.length > 60
+                            ? blog.content.slice(0, 60) + "..."
+                            : blog.content || "",
+                      }}
+                    />
+                    <button
+                      onClick={() => router.push(`/${blog.slug}`)}
+                      className="text-blue-600 hover:underline text-sm font-medium mt-auto self-start"
+                    >
+                      {t("readMore", "Đọc tiếp")} →
+                    </button>
                   </div>
                 </div>
-                <svg
-                  className="w-5 h-5 text-gray-400 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Search & All Posts */}
@@ -396,10 +429,13 @@ export default function BlogPage() {
                     }}
                   />
                   <button
-                    onClick={() => router.push(`/${blog.slug}`)}
-                    className="mt-auto px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/${blog.slug}`);
+                    }}
+                    className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold text-base hover:bg-blue-700 transition shadow cursor-pointer w-max"
                   >
-                    Read more
+                    {t("readMore", "Read More")}
                   </button>
                 </div>
               </div>
