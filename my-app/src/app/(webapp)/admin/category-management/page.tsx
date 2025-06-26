@@ -11,6 +11,7 @@ import InputSearch from "../../../../components/InputSearch";
 import Pagination from "../../../../components/Pagination";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Category } from "@/utils/type";
+import { useTranslation } from "react-i18next"; // hoặc "next-i18next"
 
 const CategogySchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -18,6 +19,7 @@ const CategogySchema = z.object({
 });
 
 export default function CategoryManagementPage() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,7 +31,7 @@ export default function CategoryManagementPage() {
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
- const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Category>("name");
+  const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Category>("name");
 
   useEffect(() => {
     fetchCategories(search, currentPage, pageSize);
@@ -71,7 +73,7 @@ export default function CategoryManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: category._id }),
     });
-    setMessage("Delete Catelogy Successful!", "error");
+    setMessage(t("Delete Category Successful!"), "error");
     fetchCategories();
   };
 
@@ -84,7 +86,7 @@ export default function CategoryManagementPage() {
       if (!result.success) {
         setErrors((prev) => ({
           ...prev,
-          title: result.error.errors[0]?.message || "Invalid title",
+          name: t("Name is required"),
         }));
       } else {
         setErrors((prev) => {
@@ -99,7 +101,7 @@ export default function CategoryManagementPage() {
       if (!result.success) {
         setErrors((prev) => ({
           ...prev,
-          description: result.error.errors[0]?.message || "Invalid description",
+          description: t("Description is required"),
         }));
       } else {
         setErrors((prev) => {
@@ -127,8 +129,8 @@ export default function CategoryManagementPage() {
     if (!result.success) {
       const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
-        name: fieldErrors.name?.[0] || "",
-        description: fieldErrors.description?.[0] || "",
+        name: t(fieldErrors.name?.[0] || "Name is required"),
+        description: t(fieldErrors.description?.[0] || "Description is required"),
       });
       return;
     }
@@ -140,14 +142,14 @@ export default function CategoryManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingCategory._id, ...form }),
       });
-      setMessage("Edit Catelogy Successful!", "success");
+      setMessage(t("Edit Category Successful!"), "success");
     } else {
       await fetch("/api/category", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      setMessage("Add Catelogy Successful!", "success");
+      setMessage(t("Add Category Successful!"), "success");
     }
     setIsModalOpen(false);
     fetchCategories();
@@ -193,20 +195,20 @@ export default function CategoryManagementPage() {
             cursor: "pointer",
           }}
         >
-          Add Category
+          {t("Add Category")}
         </button>
       </div>
       <AdminTable
         columns={[
           {
             id: "name",
-            label: renderColumnHeader({ id: "name", label: "Name" }),
+            label: renderColumnHeader({ id: "name", label: t("Category Name") }),
           },
           {
             id: "description",
             label: renderColumnHeader({
               id: "description",
-              label: "Description",
+              label: t("Description"),
             }),
           },
         ]}
@@ -218,7 +220,7 @@ export default function CategoryManagementPage() {
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(0 / pageSize) || 1}
+        totalPages={Math.ceil(total / pageSize) || 1}
         onPageChange={(page) => setCurrentPage(page)}
         pageSize={pageSize}
         onPageSizeChange={(size) => {
@@ -227,7 +229,7 @@ export default function CategoryManagementPage() {
       />
       <AdminModal
         open={isModalOpen}
-        title={editingCategory ? "Edit Category" : "Add Category"}
+        title={editingCategory ? t("Edit Category") : t("Add Category")}
         onClose={() => handleCloseModal()}
         onConfirm={undefined}
         confirmLabel={undefined}
@@ -237,25 +239,23 @@ export default function CategoryManagementPage() {
           fields={[
             {
               name: "name",
-              label: "Category Name",
+              label: t("Category Name"),
               value: form.name,
               onChange: handleFormChange,
               error: !!errors.name,
               helperText: errors.name,
-              // required: true,
             },
             {
               name: "description",
-              label: "Description",
+              label: t("Description"),
               value: form.description,
               onChange: handleFormChange,
               error: !!errors.description,
               helperText: errors.description,
-              // required: true,
             },
           ]}
           onSubmit={handleSaveCategory}
-          submitLabel={editingCategory ? "Update" : "Create"}
+          submitLabel={editingCategory ? t("Update") : t("Create")}
         />
       </AdminModal>
     </div>

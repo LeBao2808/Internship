@@ -14,6 +14,8 @@ import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { User } from "@/utils/type";
 import ImageUploader from "../../../../components/ImageUploader";
+import { useTranslation } from "react-i18next";
+
 const UserSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
   name: z.string().min(1, "Name is required"),
@@ -21,6 +23,7 @@ const UserSchema = z.object({
 });
 
 export default function UserManagementPage() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -58,7 +61,7 @@ export default function UserManagementPage() {
       if (query) params.push(`search=${encodeURIComponent(query)}`);
       if (sortBy) params.push(`sort=${sortBy}:${sortOrder}`);
       if (page) params.push(`page=${page}`);
-      if (size) params.push(`pageSize=${size}`);
+      if (size) params.push(`limit=${size}`);
       if (params.length > 0) url += "?" + params.join("&");
       const res = await fetch(url);
       const data = await res.json();
@@ -235,26 +238,26 @@ export default function UserManagementPage() {
           }}
         />
         <button className="btn-add" onClick={handleAddClick}>
-          Add User
+          {t("Add User")}
         </button>
       </div>
       <AdminTable
         columns={[
           {
             id: "name",
-            label: renderColumnHeader({ id: "name", label: "Name" }),
+            label: renderColumnHeader({ id: "name", label: t("User Name") }),
           },
           {
             id: "email",
-            label: renderColumnHeader({ id: "email", label: "Email" }),
+            label: renderColumnHeader({ id: "email", label: t("Email") }),
           },
           {
             id: "nameRole",
-            label: renderColumnHeader({ id: "role", label: "Role" }),
+            label: renderColumnHeader({ id: "role", label: t("Role") }),
           },
           {
             id: "image",
-            label: renderColumnHeader({ id: "image", label: "Image" }),
+            label: renderColumnHeader({ id: "image", label: t("Image") }),
           },
         ]}
         rows={users.map((user) => ({
@@ -277,7 +280,7 @@ export default function UserManagementPage() {
       />
       <AdminModal
         open={isModalOpen}
-        title={editingUser ? "Edit User" : "Add User"}
+        title={editingUser ? t("Edit User") : t("Add User")}
         onClose={() => handleCloseModal()}
         onConfirm={undefined}
         confirmLabel={undefined}
@@ -287,7 +290,7 @@ export default function UserManagementPage() {
           fields={[
             {
               name: "name",
-              label: "User Name",
+              label: t("User Name"),
               value: form.name,
               onChange: handleFormChange,
               error: !!errors.name,
@@ -295,7 +298,7 @@ export default function UserManagementPage() {
             },
             {
               name: "email",
-              label: "Email",
+              label: t("Email"),
               value: form.email,
               onChange: handleFormChange,
               error: !!errors.email,
@@ -303,7 +306,7 @@ export default function UserManagementPage() {
             },
           ]}
           onSubmit={handleSaveUser}
-          submitLabel={editingUser ? "Update" : "Create"}
+          submitLabel={editingUser ? t("Update") : t("Create")}
         >
           {editingUser && (
             <ImageUploader
@@ -318,7 +321,7 @@ export default function UserManagementPage() {
             {roles.length > 0 && (
               <React.Suspense fallback={null}>
                 <AdminSelect
-                  label="Role"
+                  label={t("Role")}
                   name="role"
                   error={!!errors.role}
                   value={form.role}

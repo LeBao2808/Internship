@@ -10,13 +10,16 @@ import InputSearch from "../../../../components/InputSearch";
 import Pagination from "../../../../components/Pagination";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
-import { Role } from "@/utils/type"
+import { Role } from "@/utils/type";
+import { useTranslation } from "react-i18next"; // Thêm dòng này
 
 const RoleSchema = z.object({
   description: z.string().min(1, "Description is required"),
   name: z.string().min(1, "Name is required"),
 });
+
 export default function RoleManagementPage() {
+  const { t } = useTranslation(); // Thêm dòng này
   const [roles, setRoles] = useState<Role[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,9 +34,11 @@ export default function RoleManagementPage() {
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Role>("name");
+
   useEffect(() => {
     fetchRoles(search, currentPage, pageSize);
   }, [search, currentPage, pageSize, sortBy, sortOrder]);
+
   const fetchRoles = async (query = "", page = currentPage, size = 10) => {
     try {
       setLoading(true);
@@ -50,7 +55,6 @@ export default function RoleManagementPage() {
     } finally {
       setLoading(false);
     }
-    // setLoading(true);
   };
 
   const handleAddClick = () => {
@@ -71,9 +75,10 @@ export default function RoleManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: role._id }),
     });
-    setMessage("Delete role Successful!", "error");
+    setMessage(t("Delete Role Successful!"), "error");
     fetchRoles();
   };
+
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -83,7 +88,7 @@ export default function RoleManagementPage() {
       if (!result.success) {
         setErrors((prev) => ({
           ...prev,
-          title: result.error.errors[0]?.message || "Invalid title",
+          name: t(result.error.errors[0]?.message || "Name is required"),
         }));
       } else {
         setErrors((prev) => {
@@ -99,7 +104,7 @@ export default function RoleManagementPage() {
       if (!result.success) {
         setErrors((prev) => ({
           ...prev,
-          description: result.error.errors[0]?.message || "Invalid description",
+          description: t(result.error.errors[0]?.message || "Description is required"),
         }));
       } else {
         setErrors((prev) => {
@@ -127,8 +132,8 @@ export default function RoleManagementPage() {
     if (!result.success) {
       const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
-        name: fieldErrors.name?.[0] || "",
-        description: fieldErrors.description?.[0] || "",
+        name: t(fieldErrors.name?.[0] || "Name is required"),
+        description: t(fieldErrors.description?.[0] || "Description is required"),
       });
       return;
     }
@@ -140,7 +145,7 @@ export default function RoleManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingRole._id, ...form }),
       });
-      setMessage("Edit role Successful!", "success");
+      setMessage(t("Edit Role Successful!"), "success");
     } else {
       // Create
       await fetch("/api/role", {
@@ -148,15 +153,16 @@ export default function RoleManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      setMessage("Add role Successful!", "success");
+      setMessage(t("Add Role Successful!"), "success");
     }
     setIsModalOpen(false);
     fetchRoles();
   };
 
-    if(session && session.user?.role != "admin" ){
-return null ; 
-}
+  if (session && session.user?.role != "admin") {
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -196,24 +202,24 @@ return null ;
             cursor: "pointer",
           }}
         >
-          Add Role
+          {t("Add Role")}
         </button>
       </div>
       <AdminTable
         columns={[
           {
             id: "name",
-            label: renderColumnHeader({ id: "name", label: "Role Name" }),
+            label: renderColumnHeader({ id: "name", label: t("Role Name") }),
           },
           {
             id: "description",
             label: renderColumnHeader({
               id: "description",
-              label: "Description",
+              label: t("Description"),
             }),
           },
         ]}
-        rows={Array.isArray(roles) ? roles : []} 
+        rows={Array.isArray(roles) ? roles : []}
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
         loading={loading}
@@ -226,12 +232,11 @@ return null ;
         pageSize={pageSize}
         onPageSizeChange={(size) => {
           setPageSize(size);
-          // setCurrentPage(1);
         }}
       />
       <AdminModal
         open={isModalOpen}
-        title={editingRole ? "Edit Role" : "Add Role"}
+        title={editingRole ? t("Edit Role") : t("Add Role")}
         onClose={() => handleCloseModal()}
         onConfirm={undefined}
         confirmLabel={undefined}
@@ -241,7 +246,7 @@ return null ;
           fields={[
             {
               name: "name",
-              label: "Role Name",
+              label: t("Role Name"),
               value: form.name,
               onChange: handleFormChange,
               error: !!errors.name,
@@ -249,7 +254,7 @@ return null ;
             },
             {
               name: "description",
-              label: "Description",
+              label: t("Description"),
               value: form.description,
               onChange: handleFormChange,
               error: !!errors.description,
@@ -257,7 +262,7 @@ return null ;
             },
           ]}
           onSubmit={handleSaveRole}
-          submitLabel={editingRole ? "Update" : "Create"}
+          submitLabel={editingRole ? t("Update") : t("Create")}
         />
       </AdminModal>
     </div>

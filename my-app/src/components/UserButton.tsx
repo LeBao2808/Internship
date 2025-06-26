@@ -102,7 +102,7 @@ export default function UserButton() {
       </button>
 
       <div
-        className={`dropdown-content absolute right-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-lg overflow-hidden z-50 shadow-xl ${
+        className={`dropdown-content absolute right-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-lg overflow-visible z-50 shadow-xl ${
           showDropdown
             ? "opacity-100 visible translate-y-0"
             : "opacity-0 invisible translate-y-4"
@@ -199,44 +199,47 @@ export default function UserButton() {
 
         <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-        <div className="py-1">
-          {!session?.user ? (
-            <Link
-              href="/login"
-              className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              <RiLoginBoxFill className="text-green-500 w-5 text-2xl" />
-              <span>{t("login")}</span>
-            </Link>
-          ) : null}
-          <div className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
-            <FaPaintbrush className="text-blue-500 w-5" />
-            <span>{t("theme")}</span>
-            {/* Toggle Switch */}
-            <label className="inline-flex items-center ml-auto">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={isDarkMode}
-                onChange={toggleTheme}
-              />
-
-              <div className="relative w-14 h-7 bg-white border-gray-2  00 border dark:bg-gray-800 rounded-full peer peer-checked:bg-black transition-colors duration-300 cursor-pointer">
-                <div
-                  className={`absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5 transition-all duration-300 ${
-                    isDarkMode ? "left-8 text-white" : "left-1 text-yellow-400"
-                  }`}
+        {!isOnAdminPage && (
+          <>
+            <div className="py-1">
+              {!session?.user ? (
+                <Link
+                  href="/login"
+                  className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-gray-800 transition-colors"
                 >
-                  {isDarkMode ? (
-                    <MdDarkMode className="w-4 h-4" />
-                  ) : (
-                    <MdOutlineLightMode className="w-4 h-4" />
-                  )}
-                </div>
+                  <RiLoginBoxFill className="text-green-500 w-5 text-2xl" />
+                  <span>{t("login")}</span>
+                </Link>
+              ) : null}
+              <div className="menu-item flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+                <FaPaintbrush className="text-blue-500 w-5" />
+                <span>{t("theme")}</span>
+                {/* Toggle Switch */}
+                <label className="inline-flex items-center ml-auto">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={isDarkMode}
+                    onChange={toggleTheme}
+                  />
+                  <div className="relative w-14 h-7 bg-white border-gray-2  00 border dark:bg-gray-800 rounded-full peer peer-checked:bg-black transition-colors duration-300 cursor-pointer">
+                    <div
+                      className={`absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5 transition-all duration-300 ${
+                        isDarkMode ? "left-8 text-white" : "left-1 text-yellow-400"
+                      }`}
+                    >
+                      {isDarkMode ? (
+                        <MdDarkMode className="w-4 h-4" />
+                      ) : (
+                        <MdOutlineLightMode className="w-4 h-4" />
+                      )}
+                    </div>
+                  </div>
+                </label>
               </div>
-            </label>
-          </div>
-        </div>
+            </div>
+          </>
+        )}
 
         <div className="border-t border-gray-200 dark:border-gray-700"></div>
 

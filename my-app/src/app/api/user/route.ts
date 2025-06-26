@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const sortParam = searchParams.get("sort") || ""; 
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const limit = searchParams.has("limit") ? parseInt(searchParams.get("limit")!, 10) : 0;
     const skip = (page - 1) * limit;
 
     const query = search

@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Blog } from "@/utils/type";
 import ImageUploader from "../../../../components/ImageUploader";
+import { useTranslation } from "next-i18next";
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 const BlogSchema = z.object({
@@ -22,6 +23,7 @@ const BlogSchema = z.object({
   image_url: z.string().optional(),
 });
 export default function BlogManagementPage() {
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
@@ -311,33 +313,32 @@ export default function BlogManagementPage() {
           }}
         />
         <div className="btn-add ">
-          <button onClick={handleAddClick}>Add Blog</button>
+          <button onClick={handleAddClick}>{t("Add Blog")}</button>
         </div>
       </div>
       <AdminTable
         columns={[
           {
             id: "image_url",
-            label: renderColumnHeader({ id: "image_url", label: "Image" }),
+            label: renderColumnHeader({ id: "image_url", label: t("Image") }),
           },
           {
             id: "title",
-            label: renderColumnHeader({ id: "title", label: "Title" }),
+            label: renderColumnHeader({ id: "title", label: t("Title") }),
           },
           {
             id: "nameuser",
-            label: renderColumnHeader({ id: "nameuser", label: "Name Author" }),
+            label: renderColumnHeader({ id: "nameuser", label: t("Name Author") }),
           },
           {
             id: "content",
-            label: renderColumnHeader({ id: "content", label: "Content" }),
+            label: renderColumnHeader({ id: "content", label: t("Content") }),
           },
-
           {
             id: "namecategory",
             label: renderColumnHeader({
               id: "namecategory",
-              label: "Name Category",
+              label: t("Name Category"),
             }),
           },
         ]}
@@ -372,7 +373,7 @@ export default function BlogManagementPage() {
 
       <AdminModal
         open={isModalOpen}
-        title={editingBlog ? "Edit Blog" : "Add Blog"}
+        title={editingBlog ? t("Edit Blog") : t("Add Blog")}
         onClose={handleCloseModal}
         onConfirm={undefined}
         confirmLabel={undefined}
@@ -382,7 +383,7 @@ export default function BlogManagementPage() {
           fields={[
             {
               name: "title",
-              label: "Title",
+              label: t("Title"),
               value: form.title,
               onChange: handleFormChange,
               error: !!errors.title,
@@ -390,13 +391,13 @@ export default function BlogManagementPage() {
             },
           ]}
           onSubmit={handleSaveBlog}
-          submitLabel={editingBlog ? "Update" : "Create"}
+          submitLabel={editingBlog ? t("Update") : t("Create")}
         >
           <div>
             {categories.length > 0 && (
               <React.Suspense fallback={null}>
                 <AdminSelect
-                  label="Category"
+                  label={t("Category")}
                   name="category"
                   error={!!errors.category}
                   helperText={errors.category}
@@ -428,7 +429,7 @@ export default function BlogManagementPage() {
             }}
           />
           <div style={{ marginTop: 12 }}>
-            <label>Content:</label>
+            <label>{t("Content")}:</label>
 
             {EditorFormat}
           </div>
@@ -437,7 +438,7 @@ export default function BlogManagementPage() {
       {/* Detail Modal */}
       <AdminModal
         open={detailModalOpen}
-        title="Blog Detail"
+        title={t("Blog Detail")}
         onClose={() => setDetailModalOpen(false)}
         onConfirm={undefined}
         confirmLabel={undefined}
@@ -454,22 +455,22 @@ export default function BlogManagementPage() {
             )}
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontWeight: 700, fontSize: 20, color: "#1976d2" }}>
-                Title:
+                {t("Title")}:
               </span>
               <span style={{ marginLeft: 8 }}>{detailBlog.title}</span>
             </div>
             <div style={{ marginBottom: 18 }}>
-              <span style={{ fontWeight: 700 }}>Author:</span>
+              <span style={{ fontWeight: 700 }}>{t("Author")}:</span>
               <span style={{ marginLeft: 8 }}>{detailBlog.nameuser}</span>
             </div>
             <div style={{ marginBottom: 18 }}>
-              <span style={{ fontWeight: 700 }}>Category:</span>
+              <span style={{ fontWeight: 700 }}>{t("Category")}:</span>
               <span style={{ marginLeft: 8 }}>
                 {detailBlog.namecategory || ""}
               </span>
             </div>
             <div style={{ marginBottom: 10 }}>
-              <span style={{ fontWeight: 700 }}>Content:</span>
+              <span style={{ fontWeight: 700 }}>{t("Content")}:</span>
               <div
                 style={{
                   whiteSpace: "pre-line",
@@ -484,7 +485,7 @@ export default function BlogManagementPage() {
               ></div>
             </div>
             <div>
-              <span style={{ fontWeight: 700 }}>Created At:</span>
+              <span style={{ fontWeight: 700 }}>{t("Created At")}:</span>
               <span style={{ marginLeft: 8 }}>
                 {detailBlog.createdAt
                   ? new Date(detailBlog.createdAt).toLocaleString()
@@ -526,7 +527,7 @@ export default function BlogManagementPage() {
                 setIsModalOpen(true);
               }}
             >
-              Edit
+              {t("Edit")}
             </button>
           </div>
         )}

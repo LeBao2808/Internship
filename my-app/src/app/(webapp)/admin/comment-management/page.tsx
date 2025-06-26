@@ -10,7 +10,8 @@ import InputSearch from "../../../../components/InputSearch";
 import Pagination from "../../../../components/Pagination";
 import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
-import { Comment } from "@/utils/type"
+import { Comment } from "@/utils/type";
+import { useTranslation } from "react-i18next"; // Thêm dòng này
 
 const CommentSchema = z.object({
   content: z.string().min(1, "Description is required"),
@@ -18,6 +19,7 @@ const CommentSchema = z.object({
 });
 
 export default function CommentManagementPage() {
+  const { t } = useTranslation(); // Thêm dòng này
   const [comments, setComments] = useState<Comment[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +33,7 @@ export default function CommentManagementPage() {
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Comment>("content");
+
   useEffect(() => {
     fetchComments(search, currentPage, pageSize);
   }, [search, currentPage, pageSize, sortBy, sortOrder]);
@@ -48,7 +51,7 @@ export default function CommentManagementPage() {
       const res = await fetch(url);
       const data = await res.json();
       setComments(Array.isArray(data.comments) ? data.comments : []);
-           setTotal(data.total);
+      setTotal(data.total);
     } finally {
       setLoading(false);
     }
@@ -70,7 +73,7 @@ export default function CommentManagementPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: comment._id }),
     });
-    setMessage("Delete Comment Successful!", "error");
+    setMessage(t("Delete Comment Successful!"), "error");
     fetchComments();
   };
 
@@ -83,7 +86,7 @@ export default function CommentManagementPage() {
       if (!result.success) {
         setErrors((prev) => ({
           ...prev,
-          content: result.error.errors[0]?.message || "Invalid content",
+          content: t(result.error.errors[0]?.message || "Invalid content"),
         }));
       } else {
         setErrors((prev) => {
@@ -98,7 +101,7 @@ export default function CommentManagementPage() {
       if (!isValid) {
         setErrors((prev) => ({
           ...prev,
-          user: "Invalid user ID",
+          user: t("Invalid user ID"),
         }));
       } else {
         setErrors((prev) => {
@@ -130,14 +133,14 @@ export default function CommentManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingComment._id, ...form }),
       });
-      setMessage("Edit Comment Successful!", "success");
+      setMessage(t("Edit Comment Successful!"), "success");
     } else {
       await fetch("/api/comment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      setMessage("Add Comment Successful!", "success");
+      setMessage(t("Add Comment Successful!"), "success");
     }
 
     setIsModalOpen(false);
@@ -175,15 +178,15 @@ export default function CommentManagementPage() {
         columns={[
           {
             id: "content",
-            label: renderColumnHeader({ id: "content", label: "Content" }),
+            label: renderColumnHeader({ id: "content", label: t("Content") }),
           },
           {
             id: "nameUser",
-            label: renderColumnHeader({ id: "nameUser", label: "User Name" }),
+            label: renderColumnHeader({ id: "nameUser", label: t("User Name") }),
           },
           {
             id: "titleBlog",
-            label: renderColumnHeader({ id: "titleBlog", label: "Blog Title" }),
+            label: renderColumnHeader({ id: "titleBlog", label: t("Blog Title") }),
           },
         ]}
         rows={comments.map((comment) => ({
@@ -215,7 +218,7 @@ export default function CommentManagementPage() {
               ? comment.blog._id
               : comment.blog,
         }))}
-       onEdit={session?.user?.role === "admin" ?  undefined : handleEditComment }
+        onEdit={session?.user?.role === "admin" ? undefined : handleEditComment}
         onDelete={handleDeleteComment}
         loading={loading}
       />
@@ -230,14 +233,14 @@ export default function CommentManagementPage() {
 
       <AdminModal
         open={isModalOpen}
-        title={editingComment ? "Edit Comment" : "Add Comment"}
+        title={editingComment ? t("Edit Comment") : t("Add Comment")}
         onClose={handleCloseModal}
       >
         <AdminForm
           fields={[
             {
               name: "content",
-              label: "Content",
+              label: t("Content"),
               value: form.content,
               onChange: handleFormChange,
               error: !!errors.content,
@@ -245,25 +248,25 @@ export default function CommentManagementPage() {
             },
             {
               name: "user",
-              label: "User ID",
+              label: t("User ID"),
               value: form.user,
               onChange: handleFormChange,
               error: !!errors.user,
               helperText: errors.user,
-              display: true ,
+              display: true,
             },
             {
               name: "blog",
-              label: "Blog ID",
+              label: t("Blog ID"),
               value: form.blog,
               onChange: handleFormChange,
               error: !!errors.blog,
               helperText: errors.blog,
-              display:true,
+              display: true,
             },
           ]}
           onSubmit={handleSaveComment}
-          submitLabel={editingComment ? "Update" : "Create"}
+          submitLabel={editingComment ? t("Update") : t("Create")}
         />
       </AdminModal>
     </div>

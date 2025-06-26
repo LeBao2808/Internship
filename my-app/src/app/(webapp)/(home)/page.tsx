@@ -32,11 +32,13 @@ export default function BlogPage() {
   const [limit] = useState(6);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingFeatures, setLoadingFeatures] = useState(true);
   const [category, setCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const { t } = useTranslation("common");
+  const [showScrollTop, setShowScrollTop] = useState(false);
   useEffect(() => {
     fetchCategories();
     fecthFeaturedBlog();
@@ -53,6 +55,18 @@ export default function BlogPage() {
   useEffect(() => {
     fetchBlogs();
   }, [page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const featuredPosts = useMemo(
     () => blogFeatureds.slice(0, 3),
@@ -84,11 +98,13 @@ export default function BlogPage() {
       console.log("Raw data from API:", data);
 
       if (data.success) {
+        setLoadingFeatures(true);
         const featuredList = data.data || [];
         setBlogFeatureds(featuredList);
       } else {
         console.error("API returned error:", data.message);
       }
+      setLoadingFeatures(false);
     } catch (error) {
       console.error("Failed to fetch featured blogs:", error);
     }
@@ -156,7 +172,7 @@ export default function BlogPage() {
         {/* Featured Posts */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-4">{t("featuredPosts")}</h2>
-          {loading ? (
+          {loadingFeatures ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[...Array(3)].map((_, i) => (
                 <div
@@ -392,7 +408,7 @@ export default function BlogPage() {
                 onClick={() => router.push(`/${blog.slug}`)}
                 className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
               >
-                <div className="w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-68 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none sm:rounded-b-none">
+                <div className="w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-65 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none">
                   <img
                     src={
                       blog.image_url ||
@@ -477,6 +493,25 @@ export default function BlogPage() {
         </div>
       </div>
       <Footer />
+
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white p-3 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-200 flex items-center justify-center cursor-pointer"
+          aria-label="Scroll to top"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
