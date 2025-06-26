@@ -78,9 +78,9 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
         }
       `}</style>
       <div className="flex justify-end items-center ">
-          <button
+        <button
           onClick={() => router.push("/")}
-          className=" rounded-full hover:bg-blue-100 transition gap-5 px-4 mt-[7px] bg-white h-[48px] dark:bg-[#121618] dark:text-white dark:hover:bg-gray-300 dark:hover:text-black cursor-pointer"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-[#121618] dark:text-white hover:bg-blue-100 dark:hover:bg-gray-300 d dark:hover:text-black transition mt-2 mr-2 shadow border border-blue-400"
           title="Back home"
         >
           <svg
@@ -89,7 +89,7 @@ const Layout: React.FC<BlogLayoutProps> = ({ children }) => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-5"
+            className="w-5 h-5"
           >
             <path
               strokeLinecap="round"

@@ -201,35 +201,62 @@ export default function AdminHomePage() {
 
   const renderDoughnutChart = (percent: number) => (
     <div className="relative w-40 h-40 mx-auto mt-4">
-      <div className="absolute inset-0 rounded-full border-8 border-blue-200"></div>
-      <div
-        className="absolute inset-0 rounded-full border-8 border-blue-500 border-r-transparent border-b-transparent"
-        style={{
-          transform: `rotate(${percent * 3.6}deg)`,
-          clipPath: "inset(0 0 0 50%)",
-        }}
-      ></div>
-      <div className="absolute inset-4 rounded-full bg-white flex items-center justify-center">
-        <span className="text-xl font-bold">{percent}%</span>
+      {/* Track */}
+      <svg width="160" height="160" className="absolute inset-0">
+        <circle
+          cx="80"
+          cy="80"
+          r="64"
+          stroke="#dbeafe"
+          strokeWidth="16"
+          fill="none"
+        />
+        <circle
+          cx="80"
+          cy="80"
+          r="64"
+          stroke="url(#blue-gradient)"
+          strokeWidth="16"
+          fill="none"
+          strokeDasharray={2 * Math.PI * 64}
+          strokeDashoffset={2 * Math.PI * 64 * (1 - percent / 100)}
+          strokeLinecap="round"
+          style={{
+            transition: "stroke-dashoffset 1s cubic-bezier(.4,2,.6,1)",
+            filter: "drop-shadow(0 2px 8px #60a5fa88)",
+          }}
+        />
+        <defs>
+          <linearGradient id="blue-gradient" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#3b82f6" />
+            <stop offset="1" stopColor="#60a5fa" />
+          </linearGradient>
+        </defs>
+      </svg>
+      {/* Center content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-bold text-blue-600 drop-shadow">{percent}%</span>
+        <span className="text-xs text-gray-400 mt-1">New Users</span>
       </div>
+      {/* Legend */}
+    
     </div>
   );
 
   const { newUserCount, oldUserCount, percent } = calculateUserStats();
 
+  // labels cho 12 tháng
+  const monthLabels = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
+
   const commentData = {
-    labels: ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6"],
+    labels: monthLabels,
     datasets: [
       {
         label: "Bình luận",
-        data: chartData.commentCounts,
+        data: chartData.commentCounts, // phải là mảng 12 phần tử
         backgroundColor: [
-          "#4ade80",
-          "#22d3ee",
-          "#818cf8",
-          "#fbbf24",
-          "#f87171",
-          "#38bdf8",
+          "#4ade80", "#22d3ee", "#818cf8", "#fbbf24", "#f87171", "#38bdf8",
+          "#4ade80", "#22d3ee", "#818cf8", "#fbbf24", "#f87171", "#38bdf8"
         ],
         borderRadius: 8,
       },
@@ -302,18 +329,14 @@ export default function AdminHomePage() {
               <div className="chart-container mt-4">
                 <Bar
                   data={{
-                    labels: ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6"],
+                    labels: monthLabels,
                     datasets: [
                       {
                         label: "Bài viết",
-                        data: chartData.postCounts,
+                        data: chartData.postCounts, // phải là mảng 12 phần tử
                         backgroundColor: [
-                          "#60a5fa",
-                          "#3b82f6",
-                          "#60a5fa",
-                          "#3b82f6",
-                          "#60a5fa",
-                          "#3b82f6",
+                          "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6",
+                          "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6"
                         ],
                         borderRadius: 8,
                       },
@@ -337,7 +360,7 @@ export default function AdminHomePage() {
             <div className="bg-white rounded-xl shadow-md p-6 transition duration-300 card-hover">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-800">
-                  Thống kê bình luận
+                  Comment Statistics
                 </h2>
     
               </div>

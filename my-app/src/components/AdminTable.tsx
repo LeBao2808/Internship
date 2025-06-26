@@ -14,6 +14,7 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import { Popover, Button, Typography } from "@mui/material";
 import { FaStar } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 interface Column {
   id: string;
@@ -24,13 +25,13 @@ interface AdminTableProps {
   columns: Column[];
   rows: any[];
   onEdit?: (row: any) => void;
-  onFeatured?: (row: any) => void; 
+  onFeatured?: (row: any) => void;
   onDelete?: (row: any) => void;
   onViewDetail?: (row: any) => void; // Thêm props mới
   onUpload?: (row: any) => void; // Thêm props mới
   onVisible?: (row: any) => void; // Thêm props mới
   loading?: boolean;
-  isFeatured?:boolean; 
+  isFeatured?: boolean;
 }
 
 const AdminTable: React.FC<AdminTableProps> = ({
@@ -43,12 +44,12 @@ const AdminTable: React.FC<AdminTableProps> = ({
   onVisible,
   onFeatured,
   loading = false,
-  isFeatured = false
+  isFeatured = false,
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null); // Thêm state này
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [rowToDelete, setRowToDelete] = useState<any>(null);
-
+  const { t } = useTranslation();
   // Hàm cắt ngắn chuỗi
   const truncate = (str: string, max: number) => {
     if (typeof str !== "string") return str;
@@ -65,7 +66,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
                 <TableCell key={col.id}>{col.label}</TableCell>
               ))}
               {(onEdit || onDelete || onViewDetail || onUpload) && (
-                <TableCell>action</TableCell>
+                <TableCell>{t("Actions")}</TableCell>
               )}
             </TableRow>
           </TableHead>
@@ -176,7 +177,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
                           >
                             <div style={{ padding: 16, maxWidth: 220 }}>
                               <Typography variant="body1" gutterBottom>
-                                Are you sure you want to delete?
+                                {t("Delete Confirmation")}
                               </Typography>
                               <div
                                 style={{
@@ -192,7 +193,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
                                   }}
                                   size="small"
                                 >
-                                  Cancel
+                                  {t("Cancel")}
                                 </Button>
                                 <Button
                                   color="error"
@@ -204,7 +205,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
                                   }}
                                   size="small"
                                 >
-                                  Confirm
+                                  {t("Confirm")}
                                 </Button>
                               </div>
                             </div>
@@ -222,13 +223,15 @@ const AdminTable: React.FC<AdminTableProps> = ({
                         </IconButton>
                       )}
 
-                {onFeatured && (
-  <IconButton color="secondary" onClick={() => onFeatured(row)} title="featured blog">
-    <FaStar color={row.featured ? "gold" : "gray"} />
-  </IconButton>
-)}
-
-
+                      {onFeatured && (
+                        <IconButton
+                          color="secondary"
+                          onClick={() => onFeatured(row)}
+                          title="featured blog"
+                        >
+                          <FaStar color={row.featured ? "gold" : "gray"} />
+                        </IconButton>
+                      )}
                     </TableCell>
                   )}
                 </TableRow>
@@ -237,7 +240,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
           </TableBody>
         </Table>
       </TableContainer>
-     
+
       {previewImage && (
         <div
           style={{

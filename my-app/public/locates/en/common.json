@@ -62,6 +62,10 @@
     "Add User": "Add User",
   "Edit User": "Edit User",
   "Email": "Email",
-  "Role": "Role"
+  "Role": "Role",
+  "Delete Confirmation":"Are you sure you want to delete ?",
+  "Confirm":"Confirm",
+  "Cancel":"Cancel",
+  "Action":"Action"
 }
 

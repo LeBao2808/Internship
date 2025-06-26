@@ -6,27 +6,29 @@ import { useRouter } from "next/navigation";
 import UserButton from "./UserButton";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 
 export default function NavigationClient() {
+  const { t } = useTranslation("common"); // hoặc namespace bạn dùng
   const pathname = usePathname();
-    const { data: session, status } = useSession(); 
+  const { data: session, status } = useSession();
 
   const router = useRouter();
   const navItems = [
-    { label: "User", href: "/admin/user-management" },
-    { label: "Role", href: "/admin/role-management" },
-    { label: "Blog", href: "/admin/blog-management" },
-    { label: "Category", href: "/admin/category-management" },
-    { label: "Comment", href: "/admin/comment-management" },
+    { label: t("User", "User"), href: "/admin/user-management" },
+    { label: t("Role", "Role"), href: "/admin/role-management" },
+    { label: t("Blog", "Blog"), href: "/admin/blog-management" },
+    { label: t("Category", "Category"), href: "/admin/category-management" },
+    { label: t("Comment", "Comment"), href: "/admin/comment-management" },
   ];
-  const filteredNavItems = navItems.filter(item => {
+  const filteredNavItems = navItems.filter((item) => {
     if (item.label === "User") {
       return session?.user?.role === "admin";
     }
-    if (item.label === "Role"){
+    if (item.label === "Role") {
       return session?.user?.role === "admin";
     }
-     if (item.label === "Category"){
+    if (item.label === "Category") {
       return session?.user?.role === "admin";
     }
     return true;

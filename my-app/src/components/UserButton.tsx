@@ -156,7 +156,7 @@ export default function UserButton() {
             onClick={() => setIsOpen((prev) => !prev)}
           >
             <IoLanguage className="text-orange-500 w-5" />
-            <span>{selectedLang === "en" ? "English" : "VietNamease"}</span>
+         <span>{selectedLang === "en" ? t("English") : t("Vietnamese")}</span>
           </div>
 
           {isOpen && (
