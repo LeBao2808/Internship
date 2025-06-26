@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/resources/lib/mongodb';
 import Blog from '../../models/Blog'; // Điều chỉnh đường dẫn nếu cần
 require('../../models/Blog');
-require('../../api/models/Category');
+require('../../models/Category');
 require('../../models/User');
 export async function GET() {
   try {
