@@ -86,18 +86,19 @@ export default function BlogDetailPage({
   if (loading)
     return (
       <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse">
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
-        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6 w-2/3"></div>
-        <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+        <div className="w-full aspect-[8/5] h-150 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
+        <div className="h-4 bg-gray-150 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3  mb-2"></div>
-       <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded  mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
-               <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+        <div className="flex gap-4">
+          <div className="h-32 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+          <div className="h-32 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+          <div className="h-32 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+        </div>
       </div>
     );
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
@@ -112,7 +113,7 @@ export default function BlogDetailPage({
                 <img
                   src={blog.image_url}
                   alt={blog.title}
-                  className="w-full h-auto aspect-[8/5] object-cover rounded-lg shadow"
+                  className="w-full h-150 aspect-[8/5] object-cover rounded-lg shadow"
                 />
               </div>
             ) : null}

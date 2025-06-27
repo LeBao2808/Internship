@@ -4,8 +4,6 @@ import Category from "../models/Category";
 import { z } from 'zod';
 
 const CategorySchema = z.object({
-  name: z.string().min(3, 'name limit 3 characters')
-  .regex(/^[\p{L}0-9\s]+$/u, 'Name must not contain special characters'),
   description: z.string().max(200).optional(),
 });
 

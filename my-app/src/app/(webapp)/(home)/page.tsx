@@ -440,9 +440,10 @@ export default function BlogPage() {
               <div
                 key={blog._id}
                 onClick={() => router.push(`/${blog.slug}`)}
+                style={{ height: "180px" }} 
                 className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
               >
-                <div className="relative w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-65 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none">
+                <div className="relative w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-60 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none">
                   <img
                     src={
                       blog.image_url ||
@@ -457,7 +458,7 @@ export default function BlogPage() {
                     </span>
                   )}
                 </div>
-                <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-4 min-h-[180px]">
+                <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-4 min-h-[120px]">
                   <h2 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-700 transition line-clamp-2 dark:text-white">
                     {blog.title}
                   </h2>
