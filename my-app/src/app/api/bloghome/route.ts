@@ -32,9 +32,13 @@ export async function GET(req: NextRequest) {
       { content: { $regex: search, $options: "i" } }
     ];
   }
-  if (category) {
+ if (category) {
+  if (category.includes(",")) {
+    query.category = { $in: category.split(",") };
+  } else {
     query.category = category;
   }
+}
 
   // Handle sort
   let sort: any = {};

@@ -5,7 +5,7 @@ import Footer from "../../../components/Footer";
 import UserButton from "../../../components/UserButton";
 import "./style.css";
 import { useTranslation } from "react-i18next";
-// import { Blog } from "@/utils/type"
+import { useSession } from "next-auth/react";
 
 interface Blog {
   _id: string;
@@ -33,15 +33,16 @@ export default function BlogPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingFeatures, setLoadingFeatures] = useState(true);
-  const [category, setCategory] = useState<string | null>(null);
+  const [category, setCategory] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const { t } = useTranslation("common");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const { data: session } = useSession();
+
   useEffect(() => {
     fetchCategories();
-    fecthFeaturedBlog();
   }, []);
 
   useEffect(() => {
@@ -51,6 +52,21 @@ export default function BlogPage() {
     };
     fetchData();
   }, [search, category]);
+
+  useEffect(() => {
+    if (!session) {
+      fetchFeaturedBlog();
+    } else {
+      const fetchData = async () => {
+        if (session) {
+          const res = await fetch("/api/recommend");
+          const data = await res.json();
+          setBlogFeatureds(data.recommendations || []);
+      }
+    };
+    fetchData();
+  }
+  }, [session]);
 
   useEffect(() => {
     fetchBlogs();
@@ -85,7 +101,7 @@ export default function BlogPage() {
     }
   };
 
-  const fecthFeaturedBlog = async () => {
+  const fetchFeaturedBlog = async () => {
     try {
       const res = await fetch("/api/blog/featured");
 
@@ -116,7 +132,7 @@ export default function BlogPage() {
         search,
         page: page.toString(),
         limit: limit.toString(),
-        ...(category ? { category } : {}),
+        ...(category.length > 0 ? { category: category.join(",") } : {}),
       });
       setLoading(true);
       const res = await fetch(`/api/bloghome?${params.toString()}`);
@@ -283,40 +299,46 @@ export default function BlogPage() {
             </div>
           )}
         </div>
-
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-4">{t("browseByCategory")}</h2>
           <div className="flex flex-wrap gap-3 mb-2">
             <button
               key="all"
               className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${
-                !category
+                category.length === 0
                   ? "bg-blue-600 text-white border-blue-600"
                   : "border-blue-600 text-blue-600 hover:bg-blue-50 bg-white"
               }`}
               onClick={() => {
-                setCategory(null);
+                setCategory([]);
                 setPage(1);
               }}
             >
               {t("allCategory")}
             </button>
-            {categories.map((cat) => (
-              <button
-                key={cat._id}
-                className={`px-4 py-2 border-2 bg-blue-100 text-blue-700 rounded-lg font-medium transition cursor-pointer ${
-                  category === cat._id
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "border-blue-600 text-blue-600 hover:bg-blue-50 bg-white"
-                }`}
-                onClick={() => {
-                  setCategory(cat._id);
-                  setPage(1);
-                }}
-              >
-                {cat.name}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const isSelected = category.includes(cat._id);
+              return (
+                <button
+                  key={cat._id}
+                  className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${
+                    isSelected
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "border-blue-600 text-blue-600 hover:bg-blue-50 bg-white"
+                  }`}
+                  onClick={() => {
+                    setCategory((prev) =>
+                      isSelected
+                        ? prev.filter((id) => id !== cat._id)
+                        : [...prev, cat._id]
+                    );
+                    setPage(1);
+                  }}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -440,7 +462,7 @@ export default function BlogPage() {
               <div
                 key={blog._id}
                 onClick={() => router.push(`/${blog.slug}`)}
-                style={{ height: "180px" }} 
+                style={{ height: "180px" }}
                 className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
               >
                 <div className="relative w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-60 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none">
@@ -494,7 +516,9 @@ export default function BlogPage() {
                         >
                           <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        {typeof blog.user === "object" ? blog.user.name : blog.user}
+                        {typeof blog.user === "object"
+                          ? blog.user.name
+                          : blog.user}
                       </span>
                     )}
                   </div>

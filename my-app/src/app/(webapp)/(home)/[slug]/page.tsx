@@ -1,5 +1,6 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import CommentSection from "../../../../components/CommentSection";
 import Footer from "../../../../components/Footer";
 interface Blog {
@@ -20,12 +21,18 @@ export default function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  // const { id } = useParams();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [authorName, setAuthorName] = useState<string>("");
   const [latestBlogs, setLatestBlogs] = useState<Blog[]>([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showTocMobile, setShowTocMobile] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [toc, setToc] = useState<
+    { id: string; text: string; level: number }[]
+  >([]);
+  const { data: session } = useSession();
+  const viewedRef = useRef(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -83,9 +90,62 @@ export default function BlogDetailPage({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const contentWithIds = useMemo(() => {
+    if (!blog?.content) return "";
+    let idx = 0;
+    return blog.content.replace(
+      /<(h[1-6])([^>]*)>(.*?)<\/h[1-6]>/gi,
+      (match, tag, attrs, text) => {
+        const id = toc[idx]?.id || `toc-heading-${idx}`;
+        idx++;
+        return `<${tag}${attrs} id="${id}">${text}</${tag}>`;
+      }
+    );
+  }, [blog?.content, toc]);
+
+  useEffect(() => {
+    if (!blog || !session?.user) return;
+
+    const checkAndSaveView = async () => {
+      const res = await fetch(
+        `/api/view-history?user=${session.user?.id}&blog=${blog._id}`
+      );
+      let data = [];
+      if (res.ok) {
+        try {
+          data = await res.json();
+        } catch {
+          data = [];
+        }
+      }
+      if (!data || data.length === 0) {
+        await fetch("/api/view-history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user: session.user?.id, blog: blog._id }),
+        });
+      }
+    };
+
+    const handleScroll = () => {
+      if (
+        !viewedRef.current &&
+        contentRef.current &&
+        window.innerHeight + window.scrollY >=
+          contentRef.current.offsetTop + contentRef.current.offsetHeight - 100
+      ) {
+        viewedRef.current = true;
+        checkAndSaveView();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [blog, session]);
+
   if (loading)
     return (
-      <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse">
+          <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse">
         <div className="w-full aspect-[8/5] h-150 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
         <div className="h-4 bg-gray-150 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
@@ -105,7 +165,7 @@ export default function BlogDetailPage({
 
   return (
     <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
             {blog.image_url ? (
@@ -152,8 +212,9 @@ export default function BlogDetailPage({
             </div>
 
             <div
+              ref={contentRef}
               className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed dark:prose-invert dark:text-gray-200"
-              dangerouslySetInnerHTML={{ __html: blog.content }}
+              dangerouslySetInnerHTML={{ __html: contentWithIds }}
             />
             <hr className="text-gray-100 mt-10" />
             <div className="max-w-6xl mx-auto mt-6 sm:mt-8 px-2 sm:px-0 md:px-2">
@@ -211,6 +272,60 @@ export default function BlogDetailPage({
         </div>
       </div>
       <Footer />
+      {/* Mobile TOC Button & Dropdown */}
+      <div className="md:hidden">
+        <div className="fixed bottom-24 right-8 z-50 flex flex-col items-end gap-2">
+          {showTocMobile && (
+            <div className="mb-2 bg-blue-50 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 rounded-xl shadow-2xl shadow-blue-300/60 dark:shadow-blue-900/60 w-64 max-h-80 overflow-y-auto p-4 transition-all duration-200">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-bold text-base dark:text-white">
+                  Table of Contents
+                </h3>
+                <button
+                  onClick={() => setShowTocMobile(false)}
+                  className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 text-xl"
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+              </div>
+              <ul className="space-y-2 text-sm">
+                {toc.length === 0 && <li className="text-gray-400">No headings</li>}
+                {toc.map((item) => (
+                  <li key={item.id} style={{ marginLeft: (item.level - 1) * 12 }}>
+                    <a
+                      href={`#${item.id}`}
+                      className="hover:text-blue-600 dark:hover:text-blue-400 transition"
+                      onClick={() => setShowTocMobile(false)}
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <button
+            onClick={() => setShowTocMobile((v) => !v)}
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-blue-600 dark:text-white p-3 rounded-full shadow-2xl hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center cursor-pointer"
+            aria-label="Open Table of Contents"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
       {showScrollTop && (
         <button
           onClick={scrollToTop}
