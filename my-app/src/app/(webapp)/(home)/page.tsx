@@ -39,7 +39,7 @@ export default function BlogPage() {
   const [searchValue, setSearchValue] = useState("");
   const { t } = useTranslation("common");
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     fetchCategories();
@@ -54,19 +54,26 @@ export default function BlogPage() {
   }, [search, category]);
 
   useEffect(() => {
+    if (status === "loading") return; 
+    console.log("Session status:", status);
+    console.log("Session data:", session);
     if (!session) {
       fetchFeaturedBlog();
     } else {
       const fetchData = async () => {
-        if (session) {
+        setLoadingFeatures(true); 
+        try {
           const res = await fetch("/api/recommend");
           const data = await res.json();
           setBlogFeatureds(data.recommendations || []);
-      }
-    };
-    fetchData();
-  }
-  }, [session]);
+        } catch (error) {
+          setBlogFeatureds([]);
+        }
+        setLoadingFeatures(false); 
+      };
+      fetchData();
+    }
+  }, [status]);
 
   useEffect(() => {
     fetchBlogs();
