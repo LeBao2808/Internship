@@ -107,9 +107,8 @@ export default function BlogDetailPage({
     if (!blog || !session?.user) return;
 
     const fetchUserIdAndSaveView = async () => {
-      let userData;
       const userRes = await fetch(`/api/user/?search=${session?.user?.email}`);
-      userData = await userRes.json();
+      const userData = await userRes.json();
       const userId = userData.users[0]?._id || session?.user?.id;
 
       const checkAndSaveView = async () => {
