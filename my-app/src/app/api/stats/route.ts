@@ -12,13 +12,25 @@ export async function GET(request: NextRequest) {
       await mongoose.connect(process.env.MONGO_URI as string);
     }
 
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("user");
 
-    const totalPosts = await Blog.countDocuments();
-    const totalComments = await Comment.countDocuments();
+    let totalPosts, totalComments;
+
+    if (userId) {
+      // Thống kê cho user cụ thể
+      totalPosts = await Blog.countDocuments({ user: userId });
+      totalComments = await Comment.countDocuments({ user: userId });
+    } else {
+      // Thống kê toàn hệ thống
+      totalPosts = await Blog.countDocuments();
+      totalComments = await Comment.countDocuments();
+    }
+
     const totalUsers = await User.countDocuments();
 
     // Tính tỉ lệ tương tác (đơn giản hóa)
-    const interactionRate = Math.round((totalComments / totalPosts) * 100) || 0;
+    const interactionRate = Math.round((totalComments / (totalPosts || 1)) * 100) || 0;
 
     return new Response(
       JSON.stringify({

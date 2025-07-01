@@ -14,16 +14,12 @@ export async function middleware(req: NextRequest) {
   console.log(isLoginPage, token, process.env.NEXTAUTH_SECRET);
 
   if (isLoginPage && token) {
-
     return NextResponse.redirect(new URL("/", req.url));
   }
   if (isAdminRoute) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-    // if (token.role !== "admin") {
-    //   return NextResponse.redirect(new URL("/UI/blog", req.url));
-    // }
   }
 
 

@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 
 export default function NavigationClient() {
-  const { t } = useTranslation("common"); // hoặc namespace bạn dùng
+  const { t } = useTranslation("common"); 
   const pathname = usePathname();
   const { data: session, status } = useSession();
 
@@ -22,13 +22,13 @@ export default function NavigationClient() {
     { label: t("Comment", "Comment"), href: "/admin/comment-management" },
   ];
   const filteredNavItems = navItems.filter((item) => {
-    if (item.label === "User") {
+    if (item.label === t("User", "User")) {
       return session?.user?.role === "admin";
     }
-    if (item.label === "Role") {
+    if (item.label === t("Role", "Role")) {
       return session?.user?.role === "admin";
     }
-    if (item.label === "Category") {
+    if (item.label === t("Category", "Category")) {
       return session?.user?.role === "admin";
     }
     return true;
@@ -132,15 +132,18 @@ export default function NavigationClient() {
         style={{ width: "auto", height: "100px", cursor: "pointer" }}
         onClick={() => router.push("/admin")}
       />
-      {filteredNavItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={"nav-link" + (pathname === item.href ? " active" : "")}
-        >
-          {item.label}
-        </Link>
-      ))}
+      {filteredNavItems.map((item) => {
+        const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`nav-link${isActive ? " active" : ""}`}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
       <div style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
         <UserButton />
       </div>

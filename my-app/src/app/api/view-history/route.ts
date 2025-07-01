@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   if (user) filter.user = user;
   if (blog) filter.blog = blog;
 
-  const histories = await ViewHistory.find(filter).populate("user").populate("blog").sort({ viewedAt: -1 });
+  const histories = await ViewHistory.find(filter).populate("user").populate({ path: "blog", populate: { path: "category", select: "name" } }).sort({ viewedAt: -1 });
   return NextResponse.json(histories);
 }
 

@@ -106,41 +106,50 @@ export default function BlogDetailPage({
   useEffect(() => {
     if (!blog || !session?.user) return;
 
-    const checkAndSaveView = async () => {
-      const res = await fetch(
-        `/api/view-history?user=${session.user?.id}&blog=${blog._id}`
-      );
-      let data = [];
-      if (res.ok) {
-        try {
-          data = await res.json();
-        } catch {
-          data = [];
+    const fetchUserIdAndSaveView = async () => {
+      let userData;
+      const userRes = await fetch(`/api/user/?search=${session?.user?.email}`);
+      userData = await userRes.json();
+      const userId = userData.users[0]?._id || session?.user?.id;
+
+      const checkAndSaveView = async () => {
+        const res = await fetch(
+          `/api/view-history?user=${userId}&blog=${blog._id}`
+        );
+        let data = [];
+        if (res.ok) {
+          try {
+            data = await res.json();
+          } catch {
+            data = [];
+          }
         }
-      }
-      if (!data || data.length === 0) {
-        await fetch("/api/view-history", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user: session.user?.id, blog: blog._id }),
-        });
-      }
+        if (!data || data.length === 0) {
+          await fetch("/api/view-history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user: userId, blog: blog._id }),
+          });
+        }
+      };
+
+      const handleScroll = () => {
+        if (
+          !viewedRef.current &&
+          contentRef.current &&
+          window.innerHeight + window.scrollY >=
+            contentRef.current.offsetTop + contentRef.current.offsetHeight - 100
+        ) {
+          viewedRef.current = true;
+          checkAndSaveView();
+        }
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
     };
 
-    const handleScroll = () => {
-      if (
-        !viewedRef.current &&
-        contentRef.current &&
-        window.innerHeight + window.scrollY >=
-          contentRef.current.offsetTop + contentRef.current.offsetHeight - 100
-      ) {
-        viewedRef.current = true;
-        checkAndSaveView();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    fetchUserIdAndSaveView();
   }, [blog, session]);
 
   if (loading)
@@ -273,59 +282,6 @@ export default function BlogDetailPage({
       </div>
       <Footer />
       {/* Mobile TOC Button & Dropdown */}
-      <div className="md:hidden">
-        <div className="fixed bottom-24 right-8 z-50 flex flex-col items-end gap-2">
-          {showTocMobile && (
-            <div className="mb-2 bg-blue-50 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 rounded-xl shadow-2xl shadow-blue-300/60 dark:shadow-blue-900/60 w-64 max-h-80 overflow-y-auto p-4 transition-all duration-200">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="font-bold text-base dark:text-white">
-                  Table of Contents
-                </h3>
-                <button
-                  onClick={() => setShowTocMobile(false)}
-                  className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 text-xl"
-                  aria-label="Close"
-                >
-                  &times;
-                </button>
-              </div>
-              <ul className="space-y-2 text-sm">
-                {toc.length === 0 && <li className="text-gray-400">No headings</li>}
-                {toc.map((item) => (
-                  <li key={item.id} style={{ marginLeft: (item.level - 1) * 12 }}>
-                    <a
-                      href={`#${item.id}`}
-                      className="hover:text-blue-600 dark:hover:text-blue-400 transition"
-                      onClick={() => setShowTocMobile(false)}
-                    >
-                      {item.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <button
-            onClick={() => setShowTocMobile((v) => !v)}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-blue-600 dark:text-white p-3 rounded-full shadow-2xl hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center cursor-pointer"
-            aria-label="Open Table of Contents"
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
       {showScrollTop && (
         <button
           onClick={scrollToTop}

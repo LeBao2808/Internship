@@ -14,26 +14,19 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-interface Blog {
-  _id: string;
-  title: string;
-  content: string;
-  image_url?: string;
-  user?: string | { _id: string; name: string };
-  createdAt?: string;
-  updatedAt?: string;
-  category?: string | { _id: string; name: string };
-  featured?: boolean;
-  slug?: string;
-}
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function AdminHomePage() {
   const [users, setUsers] = useState<any[]>([]);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [loadingUsers, setLoadingUsers] = useState(true);
   const [stats, setStats] = useState([
     {
       label: "Total Posts",
@@ -49,49 +42,105 @@ export default function AdminHomePage() {
       isPositive: false,
       icon: "💬",
     },
-    { label: "Users", value: "0", change: "+0%", isPositive: true, icon: "👥" },
     {
-      label: "Engagement Rate",
-      value: "0%",
+      label: "Blogs Viewed",
+      value: "0",
       change: "+0%",
       isPositive: true,
-      icon: "❤️",
+      icon: "👁️",
+    },
+    {
+      label: "Top Viewed Category",
+      value: "N/A",
+      change: "",
+      isPositive: true,
+      icon: "🏷️",
     },
   ]);
-
   const [popularPosts, setPopularPosts] = useState<any[]>([]);
   const [chartData, setChartData] = useState<{
     postCounts: number[];
     commentCounts: number[];
   }>({
-    postCounts: [0, 0, 0, 0, 0, 0],
-    commentCounts: [0, 0, 0, 0, 0, 0],
+    postCounts: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    commentCounts: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   });
 
+  // Thêm state cho thống kê view của user
+  const [userViewStats, setUserViewStats] = useState({
+    totalViewed: 0,
+    topCategory: "",
+  });
   useEffect(() => {
-    if (status === "loading") return; // Chờ session load xong
-
-    if (!session || session.user?.role !== "admin") {
-      router.push("/UI/blog"); // Chuyển hướng nếu không phải admin
-    }
+    if (status === "loading") return;
   }, [session, status, router]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (status === "loading" || !session?.user) return;
+
+    const fetchAllData = async () => {
       try {
-        const [statsRes, chartRes, featuredRes, usersRes] = await Promise.all([
-          fetch("/api/stats"),
-          fetch("/api/chart-stats"),
-          fetch("/api/blog/featured"),
-          fetch("/api/user"),
-        ]);
-        const [statsData, chartData, featuredData, userData] =
-          await Promise.all([
+        let statsData, chartData, featuredData, userData, histories = [];
+        let totalViewed = 0;
+        let topCategory = "N/A";
+
+        if (session?.user?.role === "admin") {
+          const [statsRes, chartRes, featuredRes, usersRes] = await Promise.all([
+            fetch("/api/stats"),
+            fetch("/api/chart-stats"),
+            fetch("/api/blog/featured"),
+            fetch("/api/user"),
+          ]);
+          [statsData, chartData, featuredData, userData] = await Promise.all([
             statsRes.json(),
             chartRes.json(),
             featuredRes.json(),
             usersRes.json(),
           ]);
+        } else {
+
+          const userRes = await fetch(`/api/user/?search=${session?.user?.email}`);
+          userData = await userRes.json();
+          const userId = userData.users[0]?._id || session?.user?.id;
+
+          const [userStatsRes, userChartRes, viewHistoryRes] = await Promise.all([
+            fetch(`/api/stats?user=${userId}`),
+            fetch(`/api/chart-stats?user=${userId}`),
+            fetch(`/api/view-history?user=${userId}`),
+          ]);
+          statsData = await userStatsRes.json();
+          chartData = await userChartRes.json();
+          featuredData = { data: [] };
+          histories = await viewHistoryRes.json();
+
+          // Xử lý thống kê view
+          totalViewed = histories.length;
+          const categoryCount: Record<string, number> = {};
+          histories.forEach((h: any) => {
+            const catName =
+              typeof h.blog === "object" &&
+              h.blog.category &&
+              typeof h.blog.category === "object"
+                ? h.blog.category.name
+                : undefined;
+            if (catName)
+              categoryCount[catName] = (categoryCount[catName] || 0) + 1;
+          });
+          let max = 0;
+          Object.entries(categoryCount).forEach(([cat, count]) => {
+            if (count > max) {
+              topCategory = cat;
+              max = count;
+            }
+          });
+        }
+
+        // Cập nhật thống kê view cho user thường
+        setUserViewStats({
+          totalViewed: session?.user?.role === "admin" ? 0 : totalViewed,
+          topCategory: session?.user?.role === "admin" ? "N/A" : topCategory || "N/A",
+        });
+
         setStats((prev) =>
           prev.map((stat) => {
             switch (stat.label) {
@@ -105,45 +154,44 @@ export default function AdminHomePage() {
                   ...stat,
                   value: statsData.totalComments?.toLocaleString() || "0",
                 };
-              case "Users":
+              case "Blogs Viewed":
                 return {
                   ...stat,
-                  value: statsData.totalUsers?.toLocaleString() || "0",
+                  value: String(
+                    session?.user?.role === "admin"
+                      ? 0
+                      : totalViewed
+                  ),
                 };
-              case "Engagement Rate":
+              case "Top Viewed Category":
                 return {
                   ...stat,
-                  value: `${statsData.interactionRate || 0}%`,
-                  change: `+${Math.floor(Math.random() * 5)}%`,
-                  isPositive: true,
+                  value:
+                    session?.user?.role === "admin"
+                      ? "N/A"
+                      : topCategory || "N/A",
                 };
               default:
                 return stat;
             }
           })
         );
+
         setChartData({
-          postCounts: chartData.postCounts || [0, 0, 0, 0, 0, 0],
-          commentCounts: chartData.commentCounts || [0, 0, 0, 0, 0, 0],
+          postCounts: chartData.postCounts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          commentCounts: chartData.commentCounts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         });
-        if (featuredData.success && Array.isArray(featuredData.data)) {
-          const processed = featuredData.data.map((blog: Blog) => ({
-            id: blog._id,
-            title: blog.title,
-            content: blog.content,
-            views: Math.floor(Math.random() * 500) + 100,
-            comments: Math.floor(Math.random() * 20) + 5,
-          }));
-          setPopularPosts(processed);
-        }
+
+        if (featuredData.data) setPopularPosts(featuredData.data);
         setUsers(userData.users || []);
       } catch (error) {
+        setUserViewStats({ totalViewed: 0, topCategory: "N/A" });
         console.error("Lỗi khi tải dữ liệu:", error);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchAllData();
+  }, [status, session]);
 
   const calculateUserStats = () => {
     const oneWeekAgo = new Date();
@@ -197,7 +245,14 @@ export default function AdminHomePage() {
           }}
         />
         <defs>
-          <linearGradient id="blue-gradient" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse">
+          <linearGradient
+            id="blue-gradient"
+            x1="0"
+            y1="0"
+            x2="160"
+            y2="160"
+            gradientUnits="userSpaceOnUse"
+          >
             <stop stopColor="#3b82f6" />
             <stop offset="1" stopColor="#60a5fa" />
           </linearGradient>
@@ -205,28 +260,51 @@ export default function AdminHomePage() {
       </svg>
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-blue-600 drop-shadow">{percent}%</span>
+        <span className="text-3xl font-bold text-blue-600 drop-shadow">
+          {percent}%
+        </span>
         <span className="text-xs text-gray-400 mt-1">New Users</span>
       </div>
       {/* Legend */}
-    
     </div>
   );
 
   const { newUserCount, oldUserCount, percent } = calculateUserStats();
 
-  // labels cho 12 tháng
-  const monthLabels = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
+  const monthLabels = [
+    "Th1",
+    "Th2",
+    "Th3",
+    "Th4",
+    "Th5",
+    "Th6",
+    "Th7",
+    "Th8",
+    "Th9",
+    "Th10",
+    "Th11",
+    "Th12",
+  ];
 
   const commentData = {
     labels: monthLabels,
     datasets: [
       {
         label: "Bình luận",
-        data: chartData.commentCounts, // phải là mảng 12 phần tử
+        data: chartData.commentCounts,
         backgroundColor: [
-          "#4ade80", "#22d3ee", "#818cf8", "#fbbf24", "#f87171", "#38bdf8",
-          "#4ade80", "#22d3ee", "#818cf8", "#fbbf24", "#f87171", "#38bdf8"
+          "#4ade80",
+          "#22d3ee",
+          "#818cf8",
+          "#fbbf24",
+          "#f87171",
+          "#38bdf8",
+          "#4ade80",
+          "#22d3ee",
+          "#818cf8",
+          "#fbbf24",
+          "#f87171",
+          "#38bdf8",
         ],
         borderRadius: 8,
       },
@@ -246,7 +324,6 @@ export default function AdminHomePage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
@@ -270,8 +347,6 @@ export default function AdminHomePage() {
                           ? "text-blue-600"
                           : stat.label.includes("Comments")
                           ? "text-green-600"
-                          : stat.label.includes("Users")
-                          ? "text-purple-600"
                           : "text-orange-600"
                       }`}
                     >
@@ -303,10 +378,20 @@ export default function AdminHomePage() {
                     datasets: [
                       {
                         label: "Bài viết",
-                        data: chartData.postCounts, // phải là mảng 12 phần tử
+                        data: chartData.postCounts, 
                         backgroundColor: [
-                          "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6",
-                          "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6", "#60a5fa", "#3b82f6"
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
+                          "#60a5fa",
+                          "#3b82f6",
                         ],
                         borderRadius: 8,
                       },
@@ -332,7 +417,6 @@ export default function AdminHomePage() {
                 <h2 className="text-lg font-semibold text-gray-800">
                   Comment Statistics
                 </h2>
-    
               </div>
               <div className="chart-container">
                 <Bar data={commentData} options={options} />
@@ -369,7 +453,7 @@ export default function AdminHomePage() {
               </h2>
               <div className="space-y-4">
                 {latestPosts.map((post, index) => (
-                  <div key={post.id} className="flex items-start">
+                  <div key={post._id} className="flex items-start">
                     <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded-full mr-3">
                       #{index + 1}
                     </span>

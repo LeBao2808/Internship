@@ -17,7 +17,7 @@ export default function SignIn() {
       if (session.user.email === "ble07983@gmail.com") {
         router.push("/admin");
       } else {
-        router.push("/ui/blog");
+        router.push("/");
       }
     }
   }, [session, router]);
