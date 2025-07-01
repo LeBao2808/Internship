@@ -3,8 +3,10 @@ import { NextRequest } from 'next/server';
 import Blog from '../models/Blog';
 import Comment from '../models/Comment';
 import mongoose from 'mongoose';
+require('../../api/models/Category');
+require('../../api/models/Comment');
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     if (mongoose.connections[0].readyState !== 1) {
       await mongoose.connect(process.env.MONGO_URI as string);

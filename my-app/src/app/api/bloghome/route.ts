@@ -4,7 +4,6 @@ import Blog from "../../api/models/Blog";
 import { z } from 'zod';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
-import mongoose from "mongoose";
 import generateSlug from "@/utils/generateSlug";
 
 const BlogSchema = z.object({

@@ -4,6 +4,7 @@ import Blog from '../../models/Blog'; // Điều chỉnh đường dẫn nếu c
 require('../../models/Blog');
 require('../../models/Category');
 require('../../models/User');
+
 export async function GET() {
   try {
     await dbConnect();
@@ -12,7 +13,8 @@ export async function GET() {
       .populate('user', 'name')
       .populate('category', 'name')
       .sort({ createdAt: -1 });
-
+      
+      console.log(featuredBlogs);
     return NextResponse.json({ success: true, data: featuredBlogs });
   } catch (error: any) {
     console.error(error);

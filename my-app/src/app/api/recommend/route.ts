@@ -25,27 +25,26 @@ export async function GET() {
     if (catId) categoryCount[catId] = (categoryCount[catId] || 0) + 1;
   });
 
-  // Sắp xếp category theo số lần xem giảm dần
   const sortedCategories = Object.entries(categoryCount)
     .sort((a, b) => b[1] - a[1])
     .map(([catId]) => catId);
 
-  // Lấy blog thuộc các category user hay xem nhất, nếu không có thì lấy blog mới nhất
   let blogs: any[] = [];
   if (sortedCategories.length > 0) {
     blogs = await Blog.find({ category: { $in: sortedCategories } })
       .limit(10)
-      .populate("category", "name");
+      .populate("category", "name")
+      .populate("user", "name");
   }
   if (blogs.length < 3) {
     const moreBlogs = await Blog.find()
       .limit(10 - blogs.length)
-      .populate("category", "name");
+      .populate("category", "name")
+      .populate("user", "name");
     const blogIds = new Set(blogs.map(b => b._id.toString()));
     blogs = blogs.concat(moreBlogs.filter(b => !blogIds.has((b as any)._id.toString())));
   }
 
-  // Tạo prompt cho Gemini
   const prompt = `
     Tôi là một hệ thống gợi ý blog. Dưới đây là danh sách các bài viết:
     ${blogs.map((b, i) => `${i + 1}. ${b.title} - ${b.category?.name || "Không có danh mục"}`).join("\n")}
@@ -75,6 +74,7 @@ export async function GET() {
   }
 
   const recommendations = indexes.map((i) => blogs[i]).filter(Boolean);
+  console.log("Recommendations:", recommendations);
 
   return NextResponse.json({ recommendations });
 }

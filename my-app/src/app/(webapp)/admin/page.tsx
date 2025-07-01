@@ -168,36 +168,6 @@ export default function AdminHomePage() {
   };
 
   const latestPosts = useMemo(() => popularPosts.slice(0, 3), [popularPosts]);
-  const renderBarChart = (data: number[], colorClass: string[]) => {
-    const maxValue = Math.max(...data);
-    const minHeightPercent = 0;
-
-    return (
-      <div className="flex items-end h-48 gap-1 mt-4">
-        {data.map((value, idx) => {
-          const barHeight =
-            maxValue === 0
-              ? minHeightPercent
-              : Math.max(minHeightPercent, (value / maxValue) * 100);
-
-          return (
-            <div
-              key={idx}
-              className="flex h-full flex-col items-center justify-end flex-1"
-            >
-              <div
-                className={`${colorClass[idx]} rounded-t-sm transition-all duration-300 hover:opacity-80`}
-                style={{ height: `${barHeight}%`, width: `20px` }}
-              />
-              <span className="text-xs text-gray-500 mt-1">
-                Month {idx + 1}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
 
   const renderDoughnutChart = (percent: number) => (
     <div className="relative w-40 h-40 mx-auto mt-4">

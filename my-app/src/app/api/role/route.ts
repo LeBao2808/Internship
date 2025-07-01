@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
     ];
   }
 
-  // Xử lý sort
   let sort: any = {};
   if (sortParam) {
     const [field, direction] = sortParam.split(":");
