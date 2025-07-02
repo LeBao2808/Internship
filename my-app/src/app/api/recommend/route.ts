@@ -45,12 +45,35 @@ export async function GET() {
     blogs = blogs.concat(moreBlogs.filter(b => !blogIds.has((b as any)._id.toString())));
   }
 
-  const prompt = `
-    Tôi là một hệ thống gợi ý blog. Dưới đây là danh sách các bài viết:
-    ${blogs.map((b, i) => `${i + 1}. ${b.title} - ${b.category?.name || "Không có danh mục"}`).join("\n")}
-    Hãy chọn ra 3 bài phù hợp nhất cho người dùng có email: ${user?.email} (dựa trên sở thích, lịch sử, ... nếu có).
-    Trả về mảng các số thứ tự bài viết phù hợp nhất.
-  `;
+  const topViewedCategory = sortedCategories.length > 0 
+    ? histories.find(h => (h.blog as any)?.category?._id?.toString() === sortedCategories[0])
+      ? ((histories.find(h => (h.blog as any)?.category?._id?.toString() === sortedCategories[0])?.blog as any)?.category?.name)
+      : "Chưa xác định"
+    : "Chưa xác định";
+
+const prompt = `
+Bạn là hệ thống gợi ý blog thông minh. Nhiệm vụ của bạn là phân tích hành vi đọc của người dùng và đề xuất các bài viết phù hợp nhất.
+
+THÔNG TIN NGƯỜI DÙNG:
+- Email: ${user?.email}
+- Lịch sử xem: Đã xem ${histories?.length || 0} bài viết
+- Category yêu thích nhất: ${topViewedCategory}
+
+DANH SÁCH BÀI VIẾT HIỆN CÓ:
+${blogs.map((b, i) => `${i + 1}. "${b.title}" - Category: ${b.category?.name || "Không phân loại"}`).join("\n")}
+
+YÊU CẦU:
+1. Ưu tiên GỢI Ý các bài viết thuộc category "${topViewedCategory}" (category người dùng xem nhiều nhất)
+2. Nếu không đủ bài trong category yêu thích, hãy chọn thêm các bài từ category tương tự hoặc phổ biến
+3. Loại trừ các bài viết người dùng đã xem (nếu có thông tin)
+4. Chọn tối đa 5-8 bài viết phù hợp nhất
+
+ĐỊNH DẠNG TRẢ VỀ:
+Chỉ trả về mảng số thứ tự của các bài viết được gợi ý, ví dụ: [1, 3, 5, 7, 9]
+
+Lưu ý: Tập trung vào sở thích đọc đã được thể hiện qua lịch sử xem của người dùng.
+`;
+
   console.log("Prompt for Gemini:", prompt);
   const geminiRes = await fetch(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBLhFqhZHJqaOcF1ogQcVLmctB9qw5shBM",

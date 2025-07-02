@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import mongoose from "mongoose";
 import Blog from "../models/Blog";
 import Comment from "../models/Comment";
+import { console } from 'inspector';
 
 export async function GET(request: Request) {
   try {
@@ -22,8 +23,7 @@ export async function GET(request: Request) {
       const monthKey = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}`;
       monthlyData[monthKey] = { posts: 0, comments: 0 };
     }
-
-    // Điều kiện lọc theo user nếu có
+    
     const postFilter: any = {};
     const commentFilter: any = {};
     if (userId) {
@@ -33,10 +33,9 @@ export async function GET(request: Request) {
     postFilter.createdAt = { $gte: new Date(now.getFullYear(), now.getMonth() - 11, 1) };
     commentFilter.createdAt = { $gte: new Date(now.getFullYear(), now.getMonth() - 11, 1) };
 
-    // Lấy danh sách bài viết và bình luận theo tháng và user
     const posts = await Blog.find(postFilter);
     const comments = await Comment.find(commentFilter);
-
+    console.log('Posts:', posts.length, 'Comments:', comments.length);
     posts.forEach(post => {
       if (post.createdAt) {
         const date = new Date(post.createdAt);
@@ -52,6 +51,8 @@ export async function GET(request: Request) {
         if (monthlyData[key]) monthlyData[key].comments += 1;
       }
     });
+
+    console.log('Monthly Data:', monthlyData);
 
     const months = Object.keys(monthlyData);
     const postCounts = months.map(m => monthlyData[m].posts);

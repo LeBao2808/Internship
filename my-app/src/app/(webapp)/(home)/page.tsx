@@ -202,7 +202,7 @@ export default function BlogPage() {
                   key={i}
                   className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800 flex flex-col min-h-[240px]"
                 >
-                  <div className="h-48 w-full bg-gray-200 rounded-lg mb-6"></div>
+                  <div className="h-55 w-full bg-gray-200 rounded-lg mb-6"></div>
                   <div className="flex items-center gap-2 mb-4">
                     <div className="h-4 w-20 bg-gray-200 rounded"></div>
                     <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
@@ -211,7 +211,6 @@ export default function BlogPage() {
                   <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
                   <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
                   <div className="h-4 w-2/3 bg-gray-200 rounded mb-6"></div>
-
                   <div className="h-10 w-28 bg-gray-200 rounded mt-auto"></div>
                 </div>
               ))}
@@ -224,14 +223,14 @@ export default function BlogPage() {
                   className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer min-h-[465px]"
                   onClick={() => router.push(`/${blog.slug}`)}
                 >
-                  <div className="relative w-full sm:aspect-[8/5] md:h-48 bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
+                  <div className="relative w-full sm:aspect-[8/5] md:h-52 bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
                     <img
                       src={
                         blog.image_url ||
                         "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
                       }
                       alt={blog.title}
-                      className="w-full h-48 sm:h-full object-cover"
+                      className="w-full h-52 sm:h-full object-cover"
                     />
                     {blog.category && (
                       <span className="absolute top-2 left-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200 shadow">

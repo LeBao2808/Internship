@@ -103,15 +103,15 @@ export default function CommentSection({ slug }: CommentSectionProps) {
       <h2 className="text-xl font-semibold mb-4 dark:text-white">💬 Comments</h2>
 
       {/* Input */}
-      <div className="flex mt-4 gap-2 items-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 px-4 py-2 rounded-xl mb-3 dark:bg-gray-800 dark:border-gray-700">
+      <div className="relative flex mt-4 gap-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 px-4 py-2 rounded-xl mb-3 dark:bg-gray-800 dark:border-gray-700">
         <textarea
-          placeholder="Nhập bình luận..."
+          placeholder="Enter comment..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           onKeyDown={(e: any) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              setComments((prev) => [
+              setComments((prev) => [ 
                 {
                   user: {
                     name: session?.user?.name || "",
@@ -138,8 +138,8 @@ export default function CommentSection({ slug }: CommentSectionProps) {
           className="flex-1 border-none outline-none bg-transparent resize-none dark:text-white"
         />
         <Send
-          className="cursor-pointer text-blue-500 hover:text-blue-700 transition"
-          size={18}
+          className="cursor-pointer text-blue-500 hover:text-blue-700 transition absolute right-3 bottom-3"
+          size={20}
           onClick={handleSubmit}
         />
       </div>

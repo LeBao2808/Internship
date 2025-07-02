@@ -249,7 +249,11 @@ export default function UserButton() {
             onClick={(e) => {
               e.preventDefault();
               fetch("/api/auth/logout", { method: "POST" }).then(() => {
-                router.push("/");
+                if (pathname === "/") {
+                  window.location.reload();
+                } else {
+                  router.push("/");
+                }
               });
             }}
             className="menu-item flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

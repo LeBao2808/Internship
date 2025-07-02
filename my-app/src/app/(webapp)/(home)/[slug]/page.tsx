@@ -26,7 +26,6 @@ export default function BlogDetailPage({
   const [authorName, setAuthorName] = useState<string>("");
   const [latestBlogs, setLatestBlogs] = useState<Blog[]>([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [showTocMobile, setShowTocMobile] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [toc, setToc] = useState<
     { id: string; text: string; level: number }[]
@@ -280,7 +279,7 @@ export default function BlogDetailPage({
         </div>
       </div>
       <Footer />
-      {/* Mobile TOC Button & Dropdown */}
+
       {showScrollTop && (
         <button
           onClick={scrollToTop}
