@@ -27,6 +27,7 @@ interface Category {
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [blogFeatureds, setBlogFeatureds] = useState<Blog[]>([]);
+  const [latestBlogs, setLatestBlogs] = useState<Blog[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(6);
@@ -48,20 +49,24 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchData = async () => {
       setPage(1);
-      await fetchBlogs();
+      if (session) {
+        await fetchSortedBlogs();
+      } else {
+        await fetchBlogs();
+      }
     };
     fetchData();
   }, [search, category]);
 
   useEffect(() => {
-    if (status === "loading") return; 
+    if (status === "loading") return;
     console.log("Session status:", status);
     console.log("Session data:", session);
     if (!session) {
       fetchFeaturedBlog();
     } else {
       const fetchData = async () => {
-        setLoadingFeatures(true); 
+        setLoadingFeatures(true);
         try {
           const res = await fetch("/api/recommend");
           const data = await res.json();
@@ -69,14 +74,42 @@ export default function BlogPage() {
         } catch (error) {
           setBlogFeatureds([]);
         }
-        setLoadingFeatures(false); 
+        setLoadingFeatures(false);
       };
       fetchData();
+      fetchSortedBlogs();
     }
   }, [status]);
 
+  const fetchSortedBlogs = async () => {
+    try {
+      const params = new URLSearchParams({
+        search,
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(category.length > 0 ? { category: category.join(",") } : {}),
+      });
+      setLoading(true);
+      const res = await fetch(
+        `/api/recommend/sort-recomend?${params.toString()}`
+      );
+      const data = await res.json();
+      setBlogs(data.blogs || []);
+      setTotal(data.total || 0);
+    } catch (error) {
+      setBlogs([]);
+      setTotal(0);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetchBlogs();
+
+    if(session) {
+      fetchSortedBlogs();
+    }else {
+      fetchBlogs();
+    }
   }, [page]);
 
   useEffect(() => {
@@ -124,6 +157,7 @@ export default function BlogPage() {
         setLoadingFeatures(true);
         const featuredList = data.data || [];
         setBlogFeatureds(featuredList);
+        setLatestBlogs(featuredList);
       } else {
         console.error("API returned error:", data.message);
       }
@@ -253,7 +287,7 @@ export default function BlogPage() {
                           >
                             <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
-                          { blog.user.name }
+                          {blog.user.name}
                         </span>
                       )}
                       {blog.createdAt && (
@@ -444,7 +478,7 @@ export default function BlogPage() {
                 className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
                 style={{ minHeight: 240 }} // giống blog card thật
               >
-                <div className="w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-65 bg-gray-200 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none animate-pulse"></div>
+                <div className="w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-60 bg-gray-200 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none animate-pulse"></div>
                 <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-4 min-h-[180px]">
                   <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
