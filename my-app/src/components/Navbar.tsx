@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import UserButton from "./UserButton";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Navbar() {
   const router = useRouter();
@@ -45,12 +46,12 @@ export default function Navbar() {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <a
+                <Link
                   href="/category"
                   className="text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 >
                   Category
-                </a>
+                </Link>
                 <a
                   href="#"
                   className="text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 hover:bg-blue-50 dark:hover:bg-blue-900/20"
