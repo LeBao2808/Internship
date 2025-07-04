@@ -4,7 +4,9 @@ import Blog from '../models/Blog';
 import Comment from '../models/Comment';
 import User from '../models/User';
 import mongoose from 'mongoose';
-
+require('../../api/models/Blog');
+require('../../api/models/Comment');
+require('../../api/models/User');
 export async function GET(request: NextRequest) {
   try {
     // Kết nối với MongoDB nếu chưa kết nối
@@ -29,7 +31,6 @@ export async function GET(request: NextRequest) {
 
     const totalUsers = await User.countDocuments();
 
-    // Tính tỉ lệ tương tác (đơn giản hóa)
     const interactionRate = Math.round((totalComments / (totalPosts || 1)) * 100) || 0;
 
     return new Response(

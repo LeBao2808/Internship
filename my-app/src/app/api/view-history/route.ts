@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import ViewHistory from "../models/ViewHistory";
+require('../../api/models/ViewHistory');
 
 export async function POST(req: Request) {
   await dbConnect();

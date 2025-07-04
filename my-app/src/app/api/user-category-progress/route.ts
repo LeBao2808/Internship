@@ -6,7 +6,10 @@ import Blog from "../models/Blog";
 import Category from "../models/Category";
 import User from "../models/User";
 import ViewHistory from "../models/ViewHistory";
-
+require('../../api/models/Blog');
+require('../../api/models/Category');
+require('../../api/models/User');
+require('../../api/models/ViewHistory');
 export async function GET() {
   await dbConnect();
   const session = await getServerSession(authOptions);

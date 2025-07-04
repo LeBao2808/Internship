@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import Blog from "../models/Blog";
 import Comment from "../models/Comment";
 import { console } from 'inspector';
+require('../../api/models/Blog');
 
 export async function GET(request: Request) {
   try {

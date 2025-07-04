@@ -61,7 +61,7 @@ export default function CategoryPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5">
+      <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white`">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
           Categories
         </h1>
