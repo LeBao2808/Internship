@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "../../../components/Footer";
-import UserButton from "../../../components/UserButton";
+import Navbar from "../../../components/Navbar";
 import "./style.css";
 import { useTranslation } from "react-i18next";
 import { useSession } from "next-auth/react";
@@ -50,7 +50,8 @@ export default function BlogPage() {
     const fetchData = async () => {
       setPage(1);
       if (session) {
-        await fetchSortedBlogs();
+        // await fetchSortedBlogs();
+        await fetchBlogs();
       } else {
         await fetchBlogs();
       }
@@ -104,10 +105,9 @@ export default function BlogPage() {
   };
 
   useEffect(() => {
-
-    if(session) {
+    if (session) {
       fetchSortedBlogs();
-    }else {
+    } else {
       fetchBlogs();
     }
   }, [page]);
@@ -206,24 +206,32 @@ export default function BlogPage() {
 
   return (
     <div
-      className={`blog-home-bg min-h-screen px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white`}
+      className={`blog-home-bg min-h-screen dark:bg-[#121618] dark:text-white`}
     >
-      <div className="flex justify-end ">
-        <div className="flex items-center rounded-lg mr-2 mt-2 p-1 absolute right-0 top-0">
-          <UserButton />
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto mt-16">
-        <div className="flex w-full justify-end"></div>
-        <div className="text-center mb-12">
-          <h1 className="title font-extrabold mb-4 text-gray-900 drop-shadow-lg leading-tight">
-            {t("learnToCode")}
-            <br />
-            {t("oneDayAtATime")}
-          </h1>
-          <p className="sub_title text-gray-600 mb-8 max-w-2xl mx-auto">
-            {t("aBlogForBeginners")}
-          </p>
+      <Navbar />
+      <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5">
+        <div className="w-full mb-12">
+          <div className="flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-[#86cfff] to-blue-600  dark:bg-gradient-to-r dark:from-[#01072c] dark:to-[#010a6b] rounded-xl p-8 md:p-12 shadow-lg">
+            <div className="flex-1 text-left md:pr-10">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg leading-tight">
+                {t("learnToCode")}
+                <br />
+                {t("oneDayAtATime")}
+              </h1>
+              <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
+                {t("aBlogForBeginners")}
+              </p>
+            
+            </div>
+            <div className="flex-1 flex justify-center mt-8 md:mt-0">
+              <img
+                src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+                alt="Banner"
+                className="rounded-xl shadow-lg max-w-full md:max-w-[420px] h-auto object-cover"
+                style={{ minWidth: 280 }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Featured Posts */}
@@ -338,7 +346,8 @@ export default function BlogPage() {
           )}
         </div>
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">{t("browseByCategory")}</h2>
+          <h2 className="text-2xl font-bold mb-6">{t("browseByCategory")}</h2>
+       
           <div className="flex flex-wrap gap-3 mb-2">
             <button
               key="all"
@@ -495,87 +504,64 @@ export default function BlogPage() {
             No blog found.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {blogs.map((blog) => (
               <div
                 key={blog._id}
                 onClick={() => router.push(`/${blog.slug}`)}
-                style={{ height: "180px" }}
-                className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
+                className="cursor-pointer group bg-white dark:bg-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
-                <div className="relative w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-60 bg-gray-100 overflow-hidden flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none">
-                  <img
-                    src={
-                      blog.image_url ||
-                      "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
-                    }
-                    alt={blog.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                  {blog.category && (
-                    <span className="absolute top-2 left-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200 shadow">
-                      {blog.category.name}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-4 min-h-[120px]">
-                  <h2 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-700 transition line-clamp-2 dark:text-white">
-                    {blog.title}
-                  </h2>
-                  <div className="flex items-center text-sm text-gray-400 mb-2 gap-4">
-                    {/* Date with icon */}
-                    {blog.createdAt && (
-                      <span className="flex items-center gap-1">
-                        <svg
-                          className="w-4 h-4 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        {new Date(blog.createdAt).toLocaleDateString()}
-                      </span>
-                    )}
-                    {/* Author with icon */}
-                    {blog.user && (
-                      <span className="flex items-center gap-1 text-gray-500">
-                        <svg
-                          className="w-4 h-4 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {typeof blog.user === "object"
-                          ? blog.user.name
-                          : blog.user}
+                {/* Mobile: Card layout, Desktop: Row layout */}
+                <div className="flex flex-col sm:flex-row sm:h-48">
+                  <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gray-100 overflow-hidden flex-shrink-0">
+                    <img
+                      src={
+                        blog.image_url ||
+                        "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
+                      }
+                      alt={blog.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {blog.category && (
+                      <span className="absolute top-2 left-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200 shadow">
+                        {blog.category.name}
                       </span>
                     )}
                   </div>
-                  <div
-                    className="text-gray-700 text-base mb-3 line-clamp-2 dark:text-gray-300 flex-1"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        blog.content && blog.content.length > 120
-                          ? blog.content.slice(0, 120) + "..."
-                          : blog.content || "",
-                    }}
-                  />
-                  <div className="mt-auto">
+                  <div className="flex-1 flex flex-col p-4">
+                    <h2 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-700 transition line-clamp-2 dark:text-white">
+                      {blog.title}
+                    </h2>
+                    <div className="flex items-center text-xs text-gray-400 mb-2 gap-3">
+                      {blog.createdAt && (
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </span>
+                      )}
+                      {blog.user && (
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {typeof blog.user === "object" ? blog.user.name : blog.user}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="text-gray-600 text-sm mb-3 line-clamp-3 dark:text-gray-300 flex-1"
+                      dangerouslySetInnerHTML={{
+                        __html: blog.content && blog.content.length > 100 ? blog.content.slice(0, 100) + "..." : blog.content || "",
+                      }}
+                    />
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/${blog.slug}`);
                       }}
-                      className="text-blue-600 hover:underline text-sm font-medium self-start"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium self-start mt-auto"
                     >
                       {t("readMore", "Đọc tiếp")} →
                     </button>

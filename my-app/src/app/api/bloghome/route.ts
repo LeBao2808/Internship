@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
 import generateSlug from "@/utils/generateSlug";
+import Category from "../models/Category";
+
 
 const BlogSchema = z.object({
   title: z.string().trim().min(5)
@@ -13,7 +15,6 @@ const BlogSchema = z.object({
 require('../../api/models/Category');
 require('../../api/models/User');
 export async function GET(req: NextRequest) {
-    const session = await getServerSession(authOptions);
   await dbConnect();
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") || "";
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   const skip = (page - 1) * limit;
   const category = searchParams.get("category");
   const sortParam = searchParams.get("sort") || ""; 
-
+ const categorySlug = searchParams.get("categorySlug");
  
   const query: any = {};
   if (search) {
@@ -38,7 +39,12 @@ export async function GET(req: NextRequest) {
     query.category = category;
   }
 }
-
+  if (categorySlug) {
+    const categoryDoc = await Category.findOne({ slug: categorySlug });
+    if (categoryDoc) {
+      query.category = categoryDoc._id;
+    }
+  }
   // Handle sort
   let sort: any = {};
   if (sortParam) {

@@ -50,7 +50,6 @@ console.log("Blog histories:", blogHistorys);
   }
 
   console.log("Blogs fetched:", blogs.length);
-  // Lấy tất cả categories theo thứ tự giảm dần
   const allTopCategories = Object.entries(categoryCount)
     .sort((a, b) => b[1] - a[1])
     .map(([catId]) => {
@@ -67,37 +66,26 @@ THÔNG TIN NGƯỜI DÙNG:
 - Categories yêu thích theo thứ tự giảm dần: ${allTopCategories.join(", ")}
 
 DANH SÁCH BÀI VIẾT HIỆN CÓ:
-${blogs.map((b, i) => `${i + 1}. "${b.title}" - Category: ${b.category?.name || "Không phân loại"}`).join("\n")}
+${blogs.map((b, i) => `${i + 1}. "${b.title}" - Category: ${b.category?.name || "Không phân loại"} - Views: ${b.views || 0} - Author: ${b.user?.name || "Không xác định"} - Content: ${(b.content || "").substring(0, 100)}...`).join("\n")}
+
+TIÊU CHÍ GỢI Ý:
+1. CATEGORY: Ưu tiên theo thứ tự sở thích ${allTopCategories.join(" > ")} 
+2. TITLE: Ưu tiên tiêu đề tương tự với các bài đã xem
+3. CONTENT: Ưu tiên nội dung liên quan đến chủ đề user quan tâm
+4. VIEWS: Ưu tiên bài viết có lượt xem cao (phổ biến)
+5. AUTHOR: Ưu tiên tác giả mà user đã từng đọc bài viết
 
 YÊU CẦU:
-1. Ưu tiên GỢI Ý các bài viết theo thứ tự sở thích: ${allTopCategories.join(" > ")} (ưu tiên các bài viết chưa xem)
-2. Nếu không đủ bài trong category yêu thích, hãy chọn thêm các bài từ category tương tự hoặc phổ biến
-3. Loại trừ các bài viết người dùng đã xem (nếu có thông tin)
-4. Chọn tối đa 5-8 bài viết phù hợp nhất
-5. Ví Dụ :
-tôi có 1 danh sách blog như sau : 
-Bài viết A - Category: HTML/CSS
-Bài viết B - Category: HTML/CSS
-Bài viết C - Category: Next.js
-Bài viết D - Category: HTML/CSS
-Bài viết E - Category: Next.js
-Bài viết F - Category: C++
-Bài viết G - Category: HTML/CSS
-Bài viết H - Category: C++
-ví dụ category tôi hay xem nhiêu nhất là html/css mà trong danh sách trên tôi đã xem 2 bài viết D và G
-tôi cũng đã đọc bài Bài viết C - Category: Next.js
-thể loại tôi hay xem sau HTML/CSS là Next.js và C++
-thì bây giờ kết quả trả ra tôi mươn theo thứ tự 
-Bài viết A - Category: HTML/CSS
-Bài viết B - Category: HTML/CSS
-Bài viết E - Category: Next.js
-Bài viết F - Category: C++
-Bài viết H - Category: C++
+1. Phân tích và chấm điểm từng bài viết dựa trên 5 tiêu chí trên
+2. Loại trừ hoàn toàn các bài viết người dùng đã xem
+3. Chọn 5-8 bài viết có điểm số cao nhất
+4. Nếu không đủ bài phù hợp, chọn thêm bài có views cao hoặc category phổ biến
+5. Nếu không có lịch sử xem, ưu tiên bài có views cao nhất
 6. Nếu như mà không có bài nào phù hợp, hãy trả về ít nhất 3 bài viết bất kỳ từ danh sách hiện có.
 ĐỊNH DẠNG TRẢ VỀ:
 Chỉ trả về mảng số thứ tự của các bài viết được gợi ý, ví dụ: [1, 3, 5, 7, 9]
 
-Lưu ý: Tập trung vào sở thích đọc đã được thể hiện qua lịch sử xem của người dùng.
+Lưu ý: Kết hợp tất cả 5 tiêu chí để đưa ra gợi ý chính xác nhất cho sở thích của người dùng.
 `;
 
   console.log("Prompt for Gemini:", prompt);
@@ -112,7 +100,6 @@ Lưu ý: Tập trung vào sở thích đọc đã được thể hiện qua lị
     }
   );
   const geminiData = await geminiRes.json();
-
   let indexes: number[] = [];
   try {
     const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";

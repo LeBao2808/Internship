@@ -12,6 +12,7 @@ import Pagination from "../../../../components/Pagination";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Category } from "@/utils/type";
 import { useTranslation } from "react-i18next"; // hoặc "next-i18next"
+import ImageUploader from "@/components/ImageUploader";
 
 const CategogySchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -26,7 +27,7 @@ export default function CategoryManagementPage() {
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [form, setForm] = useState({ name: "", description: "" });
+  const [form, setForm] = useState({ name: "", description: "", image: "" });
   const [search, setSearch] = useState("");
   const { setMessage } = useMessageStore();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -57,13 +58,13 @@ export default function CategoryManagementPage() {
 
   const handleAddClick = () => {
     setEditingCategory(null);
-    setForm({ name: "", description: "" });
+    setForm({ name: "", description: "", image: "" });
     setIsModalOpen(true);
   };
 
   const handleEditCategory = (category: Category) => {
     setEditingCategory(category);
-    setForm({ name: category.name, description: category.description });
+    setForm({ name: category.name, description: category.description, image: category.image || "" });
     setIsModalOpen(true);
   };
 
@@ -119,6 +120,7 @@ export default function CategoryManagementPage() {
     setForm({
       description: "",
       name: "",
+      image: "",
     });
   };
 
@@ -211,6 +213,13 @@ export default function CategoryManagementPage() {
               label: t("Description"),
             }),
           },
+          {
+            id: "image",
+            label: renderColumnHeader({
+              id: "image",
+              label: t("Image"),
+            }),
+          }
         ]}
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}
@@ -256,7 +265,17 @@ export default function CategoryManagementPage() {
           ]}
           onSubmit={handleSaveCategory}
           submitLabel={editingCategory ? t("Update") : t("Create")}
-        />
+        >
+            {editingCategory && (
+            <ImageUploader
+              id="user-image-upload"
+              currentImage={form.image}
+              onUploadSuccess={(imageUrl: string) => {
+                setForm({ ...form, image: imageUrl });
+              }}
+            />
+          )}
+        </AdminForm>
       </AdminModal>
     </div>
   );

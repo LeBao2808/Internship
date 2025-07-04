@@ -2,10 +2,11 @@ import {  NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import Category from "../models/Category";
 import { z } from 'zod';
+import generateSlug from "@/utils/generateSlug";
 
-const CategorySchema = z.object({
-  description: z.string().max(200).optional(),
-});
+// const CategorySchema = z.object({
+//   description: z.string().max(200).optional(),
+// });
 
 export async function GET(request: NextRequest) {
     await dbConnect();
@@ -20,6 +21,7 @@ export async function GET(request: NextRequest) {
       if (search) {
         query.$or = [
           { name: { $regex: search, $options: "i" } },
+          { slug: { $regex: search, $options: "i" } }
         ];
       }
   
@@ -48,15 +50,16 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     const body = await request.json();
     console.log(body);
-    const parsed = CategorySchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.format() },
-        { status: 400 }
-      );
-    }
+    // const parsed = CategorySchema.safeParse(body);
+    // if (!parsed.success) {
+    //   return NextResponse.json(
+    //     { error: parsed.error.format() },
+    //     { status: 400 }
+    //   );
+    // }
     try {
-      const newCategory = await Category.create(body);
+      const slug = generateSlug(body.name);
+      const newCategory = await Category.create({ ...body, slug });
       return NextResponse.json({ categories: [newCategory] }, { status: 201 });
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 400 });
@@ -67,15 +70,17 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     const body = await request.json();
     console.log(body);
-    const parsed = CategorySchema.safeParse(body);
+    // const parsed = CategorySchema.safeParse(body);
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.format() },
-        { status: 400 }
-      );
-    }
+    // if (!parsed.success) {
+    //   return NextResponse.json(
+    //     { error: parsed.error.format() },
+    //     { status: 400 }
+    //   );
+    // }
     try {
+      const slug = generateSlug(body.name);
+      body.slug = slug; 
       const updatedCategory = await Category.findByIdAndUpdate(body.id, body, { new: true });
       if (!updatedCategory) return NextResponse.json({ error: "Category not found" }, { status: 404 });
       return NextResponse.json({ categories: [updatedCategory] });

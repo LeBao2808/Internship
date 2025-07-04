@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
 import mongoose from "mongoose";
 import generateSlug from "@/utils/generateSlug";
+import Category from "../models/Category";
 
 const BlogSchema = z.object({
   title: z.string().trim().min(5)
@@ -22,8 +23,8 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = searchParams.has("limit") ? parseInt(searchParams.get("limit")!, 10) : 0;
   const skip = (page - 1) * limit;
-  const category = searchParams.get("category");
   const sortParam = searchParams.get("sort") || ""; 
+  const category = searchParams.get("category") || "";
 
  
   const query: any = {};
@@ -41,12 +42,12 @@ export async function GET(req: NextRequest) {
     query.category = category;
   }
 
+
   // Handle sort
   let sort: any = {};
   if (sortParam) {
     const [field, direction] = sortParam.split(":");
     sort[field] = direction === "desc" ? -1 : 1;
-  } else {
     sort = { createdAt: -1 }; // Default sort by latest createdAt
   }
 
