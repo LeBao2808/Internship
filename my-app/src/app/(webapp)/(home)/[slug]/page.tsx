@@ -152,7 +152,7 @@ export default function BlogDetailPage({
 
   if (loading)
     return (
-          <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse">
+          <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse" style={{ marginTop: "65px" }}>
         <div className="w-full aspect-[8/5] h-150 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
         <div className="h-4 bg-gray-150 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
@@ -172,7 +172,7 @@ export default function BlogDetailPage({
 
   return (
     <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8" style={{ marginTop: "65px" }}>
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
             {blog.image_url ? (

@@ -4,6 +4,7 @@ import React, { use, useEffect, useState } from "react";
 import { Blog, Category } from "@/utils/type";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
+import { useRouter } from "next/navigation";
 
 export default function CategoryPage({
   params,
@@ -15,6 +16,7 @@ export default function CategoryPage({
   const [searchQuery, setSearchQuery] = useState("");
   const { t } = useTranslation();
   const { slug: rawSlug } = use(params);
+  const router = useRouter();
   const slug = decodeURIComponent(rawSlug);
   useEffect(() => {
     fetchCategory();
@@ -81,6 +83,7 @@ export default function CategoryPage({
             <div
               key={blog._id}
               className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer min-h-[465px]"
+                   onClick={() => router.push(`/${blog.slug}`)}
             >
               <div className="relative w-full h-52 bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
                 <img
