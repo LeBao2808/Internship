@@ -220,111 +220,131 @@ export default function BlogPage() {
 
         {/* Featured Posts */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">{t("featuredPosts")}</h2>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">{t("featuredPosts")}</h2>
+          </div>
           {loadingFeatures ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition min-h-[465px] animate-pulse"
+                  className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[500px] animate-pulse"
+                  style={{ animationDelay: `${i * 100}ms` }}
                 >
-                  <div className="relative w-full h-52 bg-gray-200 flex items-center justify-center">
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-blue-100 rounded text-xs font-medium"></div>
+                  <div className="h-56 w-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 relative">
+                    <div className="absolute top-4 left-4 w-16 h-6 bg-white/30 rounded-full"></div>
                   </div>
-                  <div className="flex-1 flex flex-col p-6">
-                    <div className="flex items-center gap-2 mb-2 mt-0 pt-0">
-                      <div className="h-4 w-24 bg-gray-200 rounded"></div>
-                      <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
+                  <div className="flex-1 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                        <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                      </div>
+                      <div className="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
                     </div>
-                    <div className="h-6 w-3/4 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 w-2/3 bg-gray-200 rounded mb-6"></div>
-                    <div className="h-10 w-28 bg-gray-200 rounded mt-auto"></div>
+                    <div className="h-6 w-4/5 bg-gray-300 dark:bg-gray-600 rounded mb-3"></div>
+                    <div className="space-y-2 mb-6">
+                      <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    </div>
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className="h-12 w-32 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
+                      <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredPosts.map((blog) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredPosts.map((blog, index) => (
                 <div
                   key={blog._id}
-                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer min-h-[465px]"
+                  className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden flex flex-col transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl cursor-pointer min-h-[500px] group animate-in fade-in-50 slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}
                   onClick={() => router.push(`/${blog.slug}`)}
                 >
-                  <div className="relative w-full sm:aspect-[8/5] md:h-52 bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
+                  <div className="relative w-full h-56 overflow-hidden">
                     <img
                       src={
                         blog.image_url ||
                         "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
                       }
                       alt={blog.title}
-                      className="w-full h-52 sm:h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
                     {blog.category && (
-                      <span className="absolute top-2 left-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200 shadow">
+                      <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-blue-700 rounded-full text-xs font-semibold shadow-lg">
                         {blog.category.name}
                       </span>
                     )}
+                    <div className="absolute top-4 right-4 w-10 h-10 bg-yellow-400/80 backdrop-blur-md rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
                   </div>
+                  
                   <div className="flex-1 flex flex-col p-6">
-                    <div className="flex items-center gap-2 mb-2 mt-0 pt-0">
+                    <div className="flex items-center justify-between mb-4">
                       {blog.user && (
-                        <span className="text-xs text-gray-500 font-medium flex items-center gap-1">
-                          <svg
-                            className="w-5 h-5 inline-block"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {blog.user.name}
-                        </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium">{blog.user.name}</span>
+                        </div>
                       )}
                       {blog.createdAt && (
-                        <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">
-                          {/* Calendar icon */}
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          {new Date(blog.createdAt).toLocaleDateString()}
-                        </span>
+                          <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
+                        </div>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold mb-1 hover:text-blue-700 text-gray-800 dark:text-white">
+                    
+                    <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 line-clamp-2">
                       {blog.title}
                     </h3>
+                    
                     <div
-                      className="text-gray-600 dark:text-gray-300 mb-2 line-clamp-3 flex-1 items-center"
+                      className="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3 flex-1 leading-relaxed"
                       dangerouslySetInnerHTML={{
                         __html:
-                          blog.content && blog.content.length > 100
-                            ? blog.content.slice(0, 100) + "..."
+                          blog.content && blog.content.length > 120
+                            ? blog.content.slice(0, 120) + "..."
                             : blog.content || "",
                       }}
                     />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/${blog.slug}`);
-                      }}
-                      className="mt-auto px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold text-base hover:bg-blue-700 transition shadow cursor-pointer w-max"
-                    >
-                      {t("readMore", "Read More")}
-                    </button>
+                    
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/${blog.slug}`);
+                        }}
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-105"
+                      >
+                        <span>{t("readMore", "Read More")}</span>
+                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                      <div className="text-xs text-gray-400 font-medium">
+                        {Math.ceil((blog.content?.length || 0) / 200)} min read
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -332,33 +352,46 @@ export default function BlogPage() {
           )}
         </div>
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">{t("browseByCategory")}</h2>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-8 h-8 bg-gradient-to-r from-indigo-400 to-cyan-500 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">{t("browseByCategory")}</h2>
+          </div>
 
-          <div className="flex flex-wrap gap-3 mb-2">
+          <div className="flex flex-wrap gap-4">
             <button
               key="all"
-              className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${
+              className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer ${
                 category.length === 0
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "border-blue-600 text-blue-600 hover:bg-blue-50 bg-white"
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-blue-500/25"
+                  : "bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700"
               }`}
               onClick={() => {
                 setCategory([]);
                 setPage(1);
               }}
             >
-              {t("allCategory")}
+              <div className="flex items-center gap-2 cursor-pointer">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span>{t("allCategory")}</span>
+              </div>
             </button>
-            {categories.map((cat) => {
+            {categories.map((cat, index) => {
               const isSelected = category.includes(cat._id);
               return (
                 <button
                   key={cat._id}
-                  className={`px-4 py-2 border-2 rounded-lg font-medium transition cursor-pointer ${
+                  className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl animate-in fade-in-50 slide-in-from-bottom-2 cursor-pointer ${
                     isSelected
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "border-blue-600 text-blue-600 hover:bg-blue-50 bg-white"
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-blue-500/25"
+                      : "bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700"
                   }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                   onClick={() => {
                     setCategory((prev) =>
                       isSelected
@@ -368,7 +401,19 @@ export default function BlogPage() {
                     setPage(1);
                   }}
                 >
-                  {cat.name}
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      isSelected 
+                        ? "bg-white/80" 
+                        : "bg-gradient-to-r from-blue-400 to-purple-400"
+                    }`}></div>
+                    <span>{cat.name}</span>
+                    {isSelected && (
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
                 </button>
               );
             })}
@@ -376,68 +421,88 @@ export default function BlogPage() {
         </div>
 
         {/* Latest Posts */}
-        <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-4">
-            {t("latestPosts", "Bài viết mới nhất")}
-          </h2>
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {t("latestPosts", "Latest Posts")}
+            </h2>
+          </div>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition cursor-pointer"
+                  className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden flex flex-col animate-pulse"
+                  style={{ animationDelay: `${i * 100}ms` }}
                 >
-                  <div className="p-4 flex flex-col flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-12 ml-auto"></div>
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-full w-16"></div>
+                      <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded w-12 ml-auto"></div>
                     </div>
-                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-4"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mt-auto self-start"></div>
+                    <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded w-4/5 mb-3"></div>
+                    <div className="space-y-2 mb-4">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                    </div>
+                    <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-xl w-24 mt-auto"></div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {latestPosts.map((blog) => (
+              {latestPosts.map((blog, index) => (
                 <div
                   key={blog._id}
-                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+                  className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden flex flex-col transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl cursor-pointer group animate-in fade-in-50 slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}
                   onClick={() => router.push(`/${blog.slug}`)}
                 >
-                  <div className="p-4 flex flex-col flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 mb-3">
                       {blog.category && (
-                        <span className="text-xs text-blue-600 font-semibold">
+                        <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 dark:from-blue-900 dark:to-purple-900 dark:text-blue-300 rounded-full text-xs font-semibold">
                           {blog.category.name}
                         </span>
                       )}
                       {blog.createdAt && (
-                        <span className="text-xs text-gray-400 ml-auto">
+                        <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
                           {new Date(blog.createdAt).toLocaleDateString()}
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-1 text-base hover:text-blue-700">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-3 text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 line-clamp-2">
                       {blog.title}
                     </h3>
                     <div
-                      className="text-gray-600 dark:text-gray-300 text-sm mb-2 line-clamp-2"
+                      className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3 flex-1 leading-relaxed"
                       dangerouslySetInnerHTML={{
                         __html:
-                          blog.content && blog.content.length > 60
-                            ? blog.content.slice(0, 60) + "..."
+                          blog.content && blog.content.length > 80
+                            ? blog.content.slice(0, 80) + "..."
                             : blog.content || "",
                       }}
                     />
                     <button
-                      onClick={() => router.push(`/${blog.slug}`)}
-                      className="text-blue-600 hover:underline text-sm font-medium mt-auto self-start"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/${blog.slug}`);
+                      }}
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-semibold mt-auto self-start group-hover:gap-3 transition-all duration-300"
                     >
-                      {t("readMore", "Đọc tiếp")} →
+                      <span>{t("readMore", "Read More")}</span>
+                      <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -447,172 +512,187 @@ export default function BlogPage() {
         </div>
 
         {/* Search & All Posts */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-          <div className="flex px-6 py-3 rounded-xl border-2 border-blue-400 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-300 transition-all duration-200 items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="22"
-              height="22"
-              className="text-blue-500 mr-2"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              placeholder={t("searchPlaceholder")}
-              value={searchValue}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              className="w-full outline-none bg-transparent text-gray-700 text-base font-semibold font-sans placeholder:font-normal placeholder:text-gray-400"
-              style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
-            />
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent">All Articles</h2>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
+              <input
+                placeholder={t("searchPlaceholder", "Search articles, topics, authors...")}
+                value={searchValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                className="w-full pl-16 pr-6 py-4 border-2 border-gray-200 bg-white/90 backdrop-blur-sm rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 dark:bg-gray-800/90 dark:border-gray-600 dark:text-white shadow-lg hover:shadow-xl text-lg"
+              />
+            </div>
           </div>
         </div>
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="group bg-white dark:bg-gray-900 rounded-xl shadow-none hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
+                className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden animate-pulse"
+                style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="flex flex-col sm:flex-row sm:h-48">
-                  <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gray-200 animate-pulse flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none">
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-blue-100 rounded text-xs font-medium"></div>
+                <div className="flex flex-col sm:flex-row sm:h-56">
+                  <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex-shrink-0">
+                    <div className="absolute top-4 left-4 w-16 h-6 bg-white/30 rounded-full"></div>
                   </div>
-                  <div className="flex-1 flex flex-col p-4">
-                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                    <div className="flex items-center text-xs text-gray-400 mb-2 gap-3">
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-                        <div className="h-3 bg-gray-300 rounded w-16"></div>
+                  <div className="flex-1 flex flex-col p-6">
+                    <div className="h-7 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded w-4/5 mb-3"></div>
+                    <div className="flex items-center mb-3 gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                        <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-16"></div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-                        <div className="h-3 bg-gray-300 rounded w-12"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                        <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-12"></div>
                       </div>
                     </div>
-                    <div className="h-4 bg-gray-200 rounded w-full mb-2 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-5/6 mb-2 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-4/6 mb-2 animate-pulse"></div>
-                    <div className="h-8 bg-gray-200 rounded w-1/4 mt-auto animate-pulse"></div>
+                    <div className="space-y-2 mb-4 flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/6"></div>
+                    </div>
+                    <div className="h-10 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-xl w-28"></div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : blogs.length === 0 ? (
-          <div className="text-center text-gray-500 py-12 text-lg">
-            No blog found.
+          <div className="text-center py-20 animate-in fade-in-50 duration-500">
+            <div className="w-32 h-32 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center mx-auto mb-8">
+              <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-600 dark:text-gray-400 mb-3">
+              No articles found
+            </h3>
+            <p className="text-gray-500 dark:text-gray-500 text-lg">
+              Try adjusting your search terms or explore different categories
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {blogs.map((blog) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {blogs.map((blog, index) => (
               <div
                 key={blog._id}
                 onClick={() => router.push(`/${blog.slug}`)}
-                className="cursor-pointer group bg-white dark:bg-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                className="cursor-pointer group bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="flex flex-col sm:flex-row sm:h-48">
-                  <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gray-100 overflow-hidden flex-shrink-0">
+                <div className="flex flex-col sm:flex-row sm:h-56">
+                  <div className="relative w-full sm:w-2/5 h-48 sm:h-full overflow-hidden flex-shrink-0">
                     <img
                       src={
                         blog.image_url ||
                         "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
                       }
                       alt={blog.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
                     {blog.category && (
-                      <span className="absolute top-2 left-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium dark:bg-blue-900 dark:text-blue-200 shadow">
+                      <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-blue-700 rounded-full text-xs font-semibold shadow-lg">
                         {blog.category.name}
                       </span>
                     )}
                   </div>
-                  <div className="flex-1 flex flex-col p-4">
-                    <h2 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-700 transition line-clamp-2 dark:text-white">
+                  <div className="flex-1 flex flex-col p-6">
+                    <h2 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 line-clamp-2 dark:text-white">
                       {blog.title}
                     </h2>
-                    <div className="flex items-center text-xs text-gray-400 mb-2 gap-3">
+                    <div className="flex items-center text-sm text-gray-500 mb-3 gap-4">
                       {blog.createdAt && (
-                        <span className="flex items-center gap-1">
-                          <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
+                        <span className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           {new Date(blog.createdAt).toLocaleDateString()}
                         </span>
                       )}
                       {blog.user && (
-                        <span className="flex items-center gap-1">
-                          <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
+                        <span className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                             <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
-                          {typeof blog.user === "object"
-                            ? blog.user.name
-                            : blog.user}
+                          {typeof blog.user === "object" ? blog.user.name : blog.user}
                         </span>
                       )}
                     </div>
                     <div
-                      className="text-gray-600 text-sm mb-3 line-clamp-3 dark:text-gray-300 flex-1"
+                      className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 flex-1 leading-relaxed"
                       dangerouslySetInnerHTML={{
                         __html:
-                          blog.content && blog.content.length > 100
-                            ? blog.content.slice(0, 100) + "..."
+                          blog.content && blog.content.length > 120
+                            ? blog.content.slice(0, 120) + "..."
                             : blog.content || "",
                       }}
                     />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/${blog.slug}`);
-                      }}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium self-start mt-auto"
-                    >
-                      {t("readMore", "Đọc tiếp")} →
-                    </button>
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/${blog.slug}`);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-105"
+                      >
+                        <span>{t("readMore", "Read More")}</span>
+                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                      <div className="text-xs text-gray-400 font-medium">
+                        {Math.ceil((blog.content?.length || 0) / 200)} min read
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-        <div className="flex justify-center items-center gap-4 mt-10">
+        <div className="flex justify-center items-center gap-6 mt-16">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer dark:text-white dark:bg-gray-500"
+            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl font-semibold disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
           >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
             Previous
           </button>
-          <span className="text-gray-700 font-semibold cursor-pointer">
-            Page {page} / {totalPages}
-          </span>
+          <div className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold shadow-lg">
+            <span>Page {page}</span>
+            <span className="text-blue-200">of</span>
+            <span>{totalPages}</span>
+          </div>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || totalPages === 0}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-medium disabled:opacity-50 hover:bg-gray-300 transition cursor-pointer dark:text-white dark:bg-gray-500"
+            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl font-semibold disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
           >
             Next
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
       </div>
