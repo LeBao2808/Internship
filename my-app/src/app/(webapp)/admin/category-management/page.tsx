@@ -13,10 +13,12 @@ import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Category } from "@/utils/type";
 import { useTranslation } from "react-i18next"; // hoặc "next-i18next"
 import ImageUploader from "@/components/ImageUploader";
+import { useForm } from "@/hooks/useForm";
 
 const CategogySchema = z.object({
   description: z.string().min(1, "Description is required"),
   name: z.string().min(1, "Name is required"),
+  image: z.string().optional().nullable(),
 });
 
 export default function CategoryManagementPage() {
@@ -27,12 +29,19 @@ export default function CategoryManagementPage() {
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [form, setForm] = useState({ name: "", description: "", image: "" });
+  const { form, setForm, errors, setErrors, handleFormChange } = useForm(
+    CategogySchema,
+    {
+      name: "",
+      description: "",
+      image: "",
+    }
+  );
   const [search, setSearch] = useState("");
   const { setMessage } = useMessageStore();
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Category>("name");
+  const { sortBy, sortOrder, renderColumnHeader } =
+    useSortableColumns<Category>("name");
 
   useEffect(() => {
     fetchCategories(search, currentPage, pageSize);
@@ -64,7 +73,11 @@ export default function CategoryManagementPage() {
 
   const handleEditCategory = (category: Category) => {
     setEditingCategory(category);
-    setForm({ name: category.name, description: category.description, image: category.image || "" });
+    setForm({
+      name: category.name,
+      description: category.description,
+      image: category.image || "",
+    });
     setIsModalOpen(true);
   };
 
@@ -76,42 +89,6 @@ export default function CategoryManagementPage() {
     });
     setMessage(t("Delete Category Successful!"), "error");
     fetchCategories();
-  };
-
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-
-    if (name === "name") {
-      const result = CategogySchema.shape.name.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          name: t("Name is required"),
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.name;
-          return newErrors;
-        });
-      }
-    }
-    if (name === "description") {
-      const result = CategogySchema.shape.description.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          description: t("Description is required"),
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.description;
-          return newErrors;
-        });
-      }
-    }
   };
 
   const handleCloseModal = () => {
@@ -132,7 +109,9 @@ export default function CategoryManagementPage() {
       const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
         name: t(fieldErrors.name?.[0] || "Name is required"),
-        description: t(fieldErrors.description?.[0] || "Description is required"),
+        description: t(
+          fieldErrors.description?.[0] || "Description is required"
+        ),
       });
       return;
     }
@@ -204,7 +183,10 @@ export default function CategoryManagementPage() {
         columns={[
           {
             id: "name",
-            label: renderColumnHeader({ id: "name", label: t("Category Name") }),
+            label: renderColumnHeader({
+              id: "name",
+              label: t("Category Name"),
+            }),
           },
           {
             id: "description",
@@ -219,7 +201,7 @@ export default function CategoryManagementPage() {
               id: "image",
               label: t("Image"),
             }),
-          }
+          },
         ]}
         rows={Array.isArray(categories) ? categories : []}
         onEdit={handleEditCategory}
@@ -266,7 +248,7 @@ export default function CategoryManagementPage() {
           onSubmit={handleSaveCategory}
           submitLabel={editingCategory ? t("Update") : t("Create")}
         >
-            {editingCategory && (
+          {editingCategory && (
             <ImageUploader
               id="user-image-upload"
               currentImage={form.image}

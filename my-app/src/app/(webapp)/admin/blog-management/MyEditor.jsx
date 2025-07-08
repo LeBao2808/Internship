@@ -50,10 +50,10 @@ const Editor = ({
             uploadUrl: '/api/upload',
           },
         }}
-        onChange={(_event, editor) => {
-          const data = editor.getData();
-          onChange(data);
-        }}
+        // onChange={(_event, editor) => {
+        //   const data = editor.getData();
+        //   onChange(data);
+        // }}
         onBlur={(_event, editor) => {
           const data = editor.getData();
           onChange(data);

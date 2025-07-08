@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       commentCount,
     ] = await Promise.all([
       Blog.countDocuments({ isDelete: false }),
-      Category.countDocuments({ isDelete: false }),
+      Category.countDocuments(),
       User.countDocuments({ isDelete: false }),
       Blog.aggregate([
         { $match: { isDelete: false } },

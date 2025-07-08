@@ -15,11 +15,13 @@ import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { User } from "@/utils/type";
 import ImageUploader from "../../../../components/ImageUploader";
 import { useTranslation } from "react-i18next";
+import { useForm } from "@/hooks/useForm";
 
 const UserSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
   name: z.string().min(1, "Name is required"),
   role: z.string().min(1, "Role is required"),
+  image: z.string().optional().nullable(),
 });
 
 export default function UserManagementPage() {
@@ -28,20 +30,16 @@ export default function UserManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    role: "",
-    image: "",
-  });
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 10;
-
+  const { form, setForm, errors, setErrors, handleFormChange } = useForm(
+    UserSchema,
+    { name: "", email: "", role: "", image: "" }
+  );
   const { setMessage } = useMessageStore();
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
   const { sortBy, sortOrder, renderColumnHeader } =
@@ -119,41 +117,7 @@ export default function UserManagementPage() {
     fetchUsers();
   };
 
-  const handleFormChange = (e: React.ChangeEvent<any>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
 
-    if (name === "name") {
-      const result = UserSchema.shape.name.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          name: result.error.errors[0]?.message || "Invalid title",
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.name;
-          return newErrors;
-        });
-      }
-    }
-    if (name === "email") {
-      const result = UserSchema.shape.email.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          email: result.error.errors[0]?.message || "Invalid email",
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.email;
-          return newErrors;
-        });
-      }
-    }
-  };
 
   const handleCloseModal = () => {
     setErrors({});
@@ -330,7 +294,7 @@ export default function UserManagementPage() {
                   onChange={(e: any) => {
                     setForm({ ...form, role: e.target.value });
                     if (e.target.value) {
-                      setErrors((prev) => {
+                      setErrors((prev:any) => {
                         const newErrors = { ...prev };
                         delete newErrors.role;
                         return newErrors;

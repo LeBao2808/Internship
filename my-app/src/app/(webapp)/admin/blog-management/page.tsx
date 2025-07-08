@@ -14,13 +14,15 @@ import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Blog } from "@/utils/type";
 import ImageUploader from "../../../../components/ImageUploader";
 import { useTranslation } from "next-i18next";
+import { useForm } from "@/hooks/useForm"; // Đường dẫn tùy dự án
 const Editor = dynamic(() => import("./MyEditor"), { ssr: false });
 
 const BlogSchema = z.object({
   title: z.string().trim().min(5, "Title must be at least 5 characters"),
   content: z.string().min(1, "Content is required"),
   category: z.string().min(1, "Category is required"),
-  image_url: z.string().optional(),
+  image_url: z.string().optional().nullable(),
+  user: z.string().optional(), // Có thể để trống nếu không cần thiết
 });
 export default function BlogManagementPage() {
   const { t } = useTranslation();
@@ -28,13 +30,16 @@ export default function BlogManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const [detailBlog, setDetailBlog] = useState<Blog | null>(null);
-  const [form, setForm] = useState({
-    title: "",
-    content: "",
-    user: "",
-    image_url: "",
-    category: "",
-  });
+  const { form, setForm, errors, setErrors, handleFormChange } = useForm(
+    BlogSchema,
+    {
+      title: "",
+      content: "",
+      user: "",
+      image_url: "",
+      category: "",
+    }
+  );
 
   const [search, setSearch] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -45,7 +50,6 @@ export default function BlogManagementPage() {
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const { setMessage } = useMessageStore();
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   const { sortBy, sortOrder, renderColumnHeader } =
@@ -147,32 +151,6 @@ export default function BlogManagementPage() {
     }
   };
 
-  const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-
-    if (name === "title") {
-      const result = BlogSchema.shape.title.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          title: result.error.errors[0]?.message || "Invalid title",
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.title;
-          return newErrors;
-        });
-      }
-    }
-  };
-
-  console.log("form.user", form.user);
-  console.log("form", form.category);
-
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = BlogSchema.safeParse(form);
@@ -268,12 +246,12 @@ export default function BlogManagementPage() {
           // console.log("data", data);
           console.log("editingBlog", data.length);
           if (data && data.length === 0) {
-            setErrors((prev) => ({
+            setErrors((prev: any) => ({
               ...prev,
               content: "Content is required",
             }));
           } else {
-            setErrors((prev) => {
+            setErrors((prev: any) => {
               const newErrors = { ...prev };
               delete newErrors.content;
               return newErrors;
@@ -313,7 +291,7 @@ export default function BlogManagementPage() {
           }}
         />
         <div className="btn-add ">
-          <button onClick={handleAddClick}>{t("Add Blog")}</button>
+          <button className="cursor-pointer" onClick={handleAddClick}>{t("Add Blog")}</button>
         </div>
       </div>
       <AdminTable
@@ -328,7 +306,10 @@ export default function BlogManagementPage() {
           },
           {
             id: "nameuser",
-            label: renderColumnHeader({ id: "nameuser", label: t("Name Author") }),
+            label: renderColumnHeader({
+              id: "nameuser",
+              label: t("Name Author"),
+            }),
           },
           {
             id: "content",
@@ -358,7 +339,6 @@ export default function BlogManagementPage() {
         onDelete={handleDeleteBlog}
         onViewDetail={handleViewDetail}
         loading={loading}
-        // onUpload={handleUploadImage}
       />
 
       <Pagination
@@ -406,7 +386,7 @@ export default function BlogManagementPage() {
                   onChange={(e: any) => {
                     setForm({ ...form, category: e.target.value });
                     if (e.target.value) {
-                      setErrors((prev) => {
+                      setErrors((prev: any) => {
                         const newErrors = { ...prev };
                         delete newErrors.category;
                         return newErrors;

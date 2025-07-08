@@ -13,11 +13,6 @@ import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Comment } from "@/utils/type";
 import { useTranslation } from "react-i18next"; // Thêm dòng này
 
-const CommentSchema = z.object({
-  content: z.string().min(1, "Description is required"),
-  name: z.string().min(1, "Name is required"),
-});
-
 export default function CommentManagementPage() {
   const { t } = useTranslation(); // Thêm dòng này
   const [comments, setComments] = useState<Comment[]>([]);
@@ -77,41 +72,6 @@ export default function CommentManagementPage() {
     fetchComments();
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-
-    if (name === "content") {
-      const result = CommentSchema.shape.content.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          content: t(result.error.errors[0]?.message || "Invalid content"),
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.content;
-          return newErrors;
-        });
-      }
-    }
-    if (name === "user") {
-      const isValid = /^[a-f\d]{24}$/i.test(value);
-      if (!isValid) {
-        setErrors((prev) => ({
-          ...prev,
-          user: t("Invalid user ID"),
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.user;
-          return newErrors;
-        });
-      }
-    }
-  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -242,7 +202,7 @@ export default function CommentManagementPage() {
               name: "content",
               label: t("Content"),
               value: form.content,
-              onChange: handleFormChange,
+              // onChange: handleFormChange,
               error: !!errors.content,
               helperText: errors.content,
             },
@@ -250,7 +210,7 @@ export default function CommentManagementPage() {
               name: "user",
               label: t("User ID"),
               value: form.user,
-              onChange: handleFormChange,
+              // onChange: handleFormChange,
               error: !!errors.user,
               helperText: errors.user,
               display: true,
@@ -259,7 +219,7 @@ export default function CommentManagementPage() {
               name: "blog",
               label: t("Blog ID"),
               value: form.blog,
-              onChange: handleFormChange,
+              // onChange: handleFormChange,
               error: !!errors.blog,
               helperText: errors.blog,
               display: true,

@@ -8,14 +8,13 @@ const expressApp = express();
 const httpServer = createServer(expressApp);
 const io = new Server(httpServer,{
   cors: {
-    origin: "*", // Cho phép mọi domain kết nối
-    methods: ["GET", "POST"], // Các phương thức HTTP được cho phép
-    credentials: true, // Nếu bạn dùng cookie/token xác thực
+    origin: "*", 
+    methods: ["GET", "POST"], 
+    credentials: true, 
   },
 });
 
-// Lắng nghe kết nối socket
-io.on("connection", (socket) => {
+  io.on("connection", (socket) => {
   console.log("Client connected");
 
   socket.on("clientMessage", (msg) => {

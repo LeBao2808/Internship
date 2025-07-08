@@ -6,6 +6,7 @@ import Navbar from "../../../components/Navbar";
 import "./style.css";
 import { useTranslation } from "react-i18next";
 import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 interface Blog {
   _id: string;
@@ -40,47 +41,39 @@ export default function BlogPage() {
   const [searchValue, setSearchValue] = useState("");
   const { t } = useTranslation("common");
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const { data: session, status } = useSession();
-
+  // const { data: session, status } = useSession();
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
+    fetchBlogs();
+  }, [page]);
+
+  useEffect(() => {
     const fetchData = async () => {
       setPage(1);
-      if (session) {
-        // await fetchSortedBlogs();
-        await fetchBlogs();
-      } else {
-        await fetchBlogs();
-      }
+      await fetchBlogs();
     };
     fetchData();
   }, [search, category]);
 
   useEffect(() => {
-    if (status === "loading") return;
-    console.log("Session status:", status);
-    console.log("Session data:", session);
-    if (!session) {
-      fetchFeaturedBlog();
-    } else {
-      const fetchData = async () => {
-        setLoadingFeatures(true);
-        try {
-          const res = await fetch("/api/recommend");
-          const data = await res.json();
-          setBlogFeatureds(data.recommendations || []);
-        } catch (error) {
-          setBlogFeatureds([]);
-        }
-        setLoadingFeatures(false);
-      };
-      fetchData();
-      fetchSortedBlogs();
-    }
-  }, [status]);
+    setLoadingFeatures(true);
+    getSession().then((session) => {
+      console.log("Session data:", session);
+      if (!session) {
+        fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
+      } else {
+        fetch("/api/recommend")
+          .then((res) => res.json())
+          .then((data) => setBlogFeatureds(data.recommendations || []))
+          .catch(() => setBlogFeatureds([]))
+          .finally(() => setLoadingFeatures(false));
+        fetchSortedBlogs();
+      }
+    });
+  }, []);
 
   const fetchSortedBlogs = async () => {
     try {
@@ -103,14 +96,6 @@ export default function BlogPage() {
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (session) {
-      fetchSortedBlogs();
-    } else {
-      fetchBlogs();
-    }
-  }, [page]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -243,28 +228,18 @@ export default function BlogPage() {
                   key={i}
                   className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition min-h-[465px] animate-pulse"
                 >
-                  {/* Image placeholder */}
                   <div className="relative w-full h-52 bg-gray-200 flex items-center justify-center">
                     <div className="absolute top-2 left-2 px-2 py-1 bg-blue-100 rounded text-xs font-medium"></div>
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1 flex flex-col p-6">
-                    {/* Author and date */}
                     <div className="flex items-center gap-2 mb-2 mt-0 pt-0">
                       <div className="h-4 w-24 bg-gray-200 rounded"></div>
                       <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
                     </div>
-
-                    {/* Title */}
                     <div className="h-6 w-3/4 bg-gray-200 rounded mb-4"></div>
-
-                    {/* Excerpt */}
                     <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
                     <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
                     <div className="h-4 w-2/3 bg-gray-200 rounded mb-6"></div>
-
-                    {/* Button placeholder */}
                     <div className="h-10 w-28 bg-gray-200 rounded mt-auto"></div>
                   </div>
                 </div>
@@ -293,12 +268,10 @@ export default function BlogPage() {
                       </span>
                     )}
                   </div>
-                  {/* Content */}
                   <div className="flex-1 flex flex-col p-6">
                     <div className="flex items-center gap-2 mb-2 mt-0 pt-0">
                       {blog.user && (
                         <span className="text-xs text-gray-500 font-medium flex items-center gap-1">
-                          {/* User icon */}
                           <svg
                             className="w-5 h-5 inline-block"
                             fill="none"
@@ -507,18 +480,11 @@ export default function BlogPage() {
                 className="group bg-white dark:bg-gray-900 rounded-xl shadow-none hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
               >
                 <div className="flex flex-col sm:flex-row sm:h-48">
-                  {/* Image placeholder */}
                   <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gray-200 animate-pulse flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none">
-                    {/* Category placeholder */}
                     <div className="absolute top-2 left-2 px-2 py-1 bg-blue-100 rounded text-xs font-medium"></div>
                   </div>
-
-                  {/* Content placeholder */}
                   <div className="flex-1 flex flex-col p-4">
-                    {/* Title */}
                     <div className="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-
-                    {/* Meta info */}
                     <div className="flex items-center text-xs text-gray-400 mb-2 gap-3">
                       <div className="flex items-center gap-1">
                         <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
@@ -529,13 +495,9 @@ export default function BlogPage() {
                         <div className="h-3 bg-gray-300 rounded w-12"></div>
                       </div>
                     </div>
-
-                    {/* Excerpt */}
                     <div className="h-4 bg-gray-200 rounded w-full mb-2 animate-pulse"></div>
                     <div className="h-4 bg-gray-200 rounded w-5/6 mb-2 animate-pulse"></div>
                     <div className="h-4 bg-gray-200 rounded w-4/6 mb-2 animate-pulse"></div>
-
-                    {/* Button placeholder */}
                     <div className="h-8 bg-gray-200 rounded w-1/4 mt-auto animate-pulse"></div>
                   </div>
                 </div>
@@ -554,7 +516,6 @@ export default function BlogPage() {
                 onClick={() => router.push(`/${blog.slug}`)}
                 className="cursor-pointer group bg-white dark:bg-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
-                {/* Mobile: Card layout, Desktop: Row layout */}
                 <div className="flex flex-col sm:flex-row sm:h-48">
                   <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gray-100 overflow-hidden flex-shrink-0">
                     <img

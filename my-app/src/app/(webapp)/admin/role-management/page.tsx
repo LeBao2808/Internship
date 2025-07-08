@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import { useSortableColumns } from "../../../../hooks/useSortableColumns";
 import { Role } from "@/utils/type";
 import { useTranslation } from "react-i18next"; // Thêm dòng này
+import { useForm } from "@/hooks/useForm";
 
 const RoleSchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -25,12 +26,12 @@ export default function RoleManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [isModalDelete, setIsModalDelete] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
-  const [form, setForm] = useState({ name: "", description: "" });
+  const { form, setForm, errors, setErrors, handleFormChange } = useForm<
+    Role
+  >(RoleSchema, { name: "", description: "" });
   const [search, setSearch] = useState("");
   const { setMessage } = useMessageStore();
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   const { sortBy, sortOrder, renderColumnHeader } = useSortableColumns<Role>("name");
@@ -79,46 +80,9 @@ export default function RoleManagementPage() {
     fetchRoles();
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-
-    if (name === "name") {
-      const result = RoleSchema.shape.name.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          name: t(result.error.errors[0]?.message || "Name is required"),
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.name;
-          return newErrors;
-        });
-      }
-    }
-
-    if (name === "description") {
-      const result = RoleSchema.shape.description.safeParse(value);
-      if (!result.success) {
-        setErrors((prev) => ({
-          ...prev,
-          description: t(result.error.errors[0]?.message || "Description is required"),
-        }));
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.description;
-          return newErrors;
-        });
-      }
-    }
-  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIsModalDelete(false);
     setErrors({});
     setForm({
       description: "",
