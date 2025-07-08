@@ -1,4 +1,5 @@
 "use client"
+import BlogChatbot from "@/components/BlogChatBot";
 import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({
@@ -17,6 +18,7 @@ export default function RootLayout({
       <main className="dark:bg-[#121618]">
         <SessionProvider>{children}</SessionProvider>
       </main>
+      <BlogChatbot/>
     </div>
   );
 }

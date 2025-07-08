@@ -61,7 +61,7 @@ export default function CategoryPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white`">
+      <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white min-h-195">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
           Categories
         </h1>
@@ -81,8 +81,17 @@ export default function CategoryPage() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-gray-200 rounded-xl h-48 animate-pulse"
-              ></div>
+                className="bg-white dark:bg-gray-900 rounded-xl shadow-lg animate-pulse overflow-hidden h-48 flex flex-col"
+              >
+                <div className="h-full bg-gray-200 dark:bg-gray-700 rounded-xl relative">
+                  <div className="absolute top-3 left-3">
+                    <div className="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+                  </div>
+                  <div className="absolute top-3 right-3">
+                    <div className="h-5 w-10 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
@@ -124,6 +133,7 @@ export default function CategoryPage() {
           </div>
         )}
       </div>
+      <Footer />
     </>
   );
 }

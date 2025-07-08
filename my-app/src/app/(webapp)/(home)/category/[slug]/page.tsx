@@ -5,6 +5,7 @@ import { Blog, Category } from "@/utils/type";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer";
 
 export default function CategoryPage({
   params,
@@ -40,7 +41,8 @@ export default function CategoryPage({
   if (!blogs) return <div className="text-center">{t("categoryNotFound")}</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 dark:bg-[#121618] dark:text-white`">
+    <>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 dark:bg-[#121618] dark:text-white min-h-195">
       <Navbar />
       <div className="mt-10">
          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
@@ -78,7 +80,7 @@ export default function CategoryPage({
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
           {blogs.map((blog) => (
             <div
               key={blog._id}
@@ -157,5 +159,7 @@ export default function CategoryPage({
       )}
       </div>
     </div>
+          <Footer/>
+          </>
   );
 }

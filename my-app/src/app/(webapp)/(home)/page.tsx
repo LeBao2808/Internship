@@ -221,7 +221,6 @@ export default function BlogPage() {
               <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
                 {t("aBlogForBeginners")}
               </p>
-            
             </div>
             <div className="flex-1 flex justify-center mt-8 md:mt-0">
               <img
@@ -242,18 +241,32 @@ export default function BlogPage() {
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800 flex flex-col min-h-[240px]"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition min-h-[465px] animate-pulse"
                 >
-                  <div className="h-55 w-full bg-gray-200 rounded-lg mb-6"></div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
-                    <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
+                  {/* Image placeholder */}
+                  <div className="relative w-full h-52 bg-gray-200 flex items-center justify-center">
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-blue-100 rounded text-xs font-medium"></div>
                   </div>
-                  <div className="h-6 w-3/4 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 w-2/3 bg-gray-200 rounded mb-6"></div>
-                  <div className="h-10 w-28 bg-gray-200 rounded mt-auto"></div>
+
+                  {/* Content */}
+                  <div className="flex-1 flex flex-col p-6">
+                    {/* Author and date */}
+                    <div className="flex items-center gap-2 mb-2 mt-0 pt-0">
+                      <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                      <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
+                    </div>
+
+                    {/* Title */}
+                    <div className="h-6 w-3/4 bg-gray-200 rounded mb-4"></div>
+
+                    {/* Excerpt */}
+                    <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 w-2/3 bg-gray-200 rounded mb-6"></div>
+
+                    {/* Button placeholder */}
+                    <div className="h-10 w-28 bg-gray-200 rounded mt-auto"></div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -347,7 +360,7 @@ export default function BlogPage() {
         </div>
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">{t("browseByCategory")}</h2>
-       
+
           <div className="flex flex-wrap gap-3 mb-2">
             <button
               key="all"
@@ -399,11 +412,18 @@ export default function BlogPage() {
               {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white p-6 rounded-2xl shadow-lg animate-pulse dark:bg-gray-900 dark:border-gray-800"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col transition cursor-pointer"
                 >
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-2 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-2 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="p-4 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-12 ml-auto"></div>
+                    </div>
+                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-4"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mt-auto self-start"></div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -480,21 +500,44 @@ export default function BlogPage() {
           </div>
         </div>
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="cursor-pointer group flex flex-col sm:flex-row bg-white dark:bg-gray-900 rounded-xl shadow-none hover:bg-blue-50 dark:hover:bg-gray-800 transition min-h-[240px]"
-                style={{ minHeight: 240 }} // giống blog card thật
+                className="group bg-white dark:bg-gray-900 rounded-xl shadow-none hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
               >
-                <div className="w-full sm:w-2/5 aspect-[8/5] sm:aspect-auto sm:h-60 bg-gray-200 rounded-t-xl sm:rounded-l-xl sm:rounded-bl-xl sm:rounded-tr-none sm:rounded-b-none animate-pulse"></div>
-                <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-4 min-h-[180px]">
-                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/4 mt-auto"></div>
+                <div className="flex flex-col sm:flex-row sm:h-48">
+                  {/* Image placeholder */}
+                  <div className="relative w-full sm:w-2/5 h-48 sm:h-full bg-gray-200 animate-pulse flex-shrink-0 rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none">
+                    {/* Category placeholder */}
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-blue-100 rounded text-xs font-medium"></div>
+                  </div>
+
+                  {/* Content placeholder */}
+                  <div className="flex-1 flex flex-col p-4">
+                    {/* Title */}
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+
+                    {/* Meta info */}
+                    <div className="flex items-center text-xs text-gray-400 mb-2 gap-3">
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                        <div className="h-3 bg-gray-300 rounded w-16"></div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                        <div className="h-3 bg-gray-300 rounded w-12"></div>
+                      </div>
+                    </div>
+
+                    {/* Excerpt */}
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6 mb-2 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded w-4/6 mb-2 animate-pulse"></div>
+
+                    {/* Button placeholder */}
+                    <div className="h-8 bg-gray-200 rounded w-1/4 mt-auto animate-pulse"></div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -535,25 +578,46 @@ export default function BlogPage() {
                     <div className="flex items-center text-xs text-gray-400 mb-2 gap-3">
                       {blog.createdAt && (
                         <span className="flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
                           </svg>
                           {new Date(blog.createdAt).toLocaleDateString()}
                         </span>
                       )}
                       {blog.user && (
                         <span className="flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                          >
                             <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
-                          {typeof blog.user === "object" ? blog.user.name : blog.user}
+                          {typeof blog.user === "object"
+                            ? blog.user.name
+                            : blog.user}
                         </span>
                       )}
                     </div>
                     <div
                       className="text-gray-600 text-sm mb-3 line-clamp-3 dark:text-gray-300 flex-1"
                       dangerouslySetInnerHTML={{
-                        __html: blog.content && blog.content.length > 100 ? blog.content.slice(0, 100) + "..." : blog.content || "",
+                        __html:
+                          blog.content && blog.content.length > 100
+                            ? blog.content.slice(0, 100) + "..."
+                            : blog.content || "",
                       }}
                     />
                     <button
@@ -596,7 +660,7 @@ export default function BlogPage() {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white p-3 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-200 flex items-center justify-center cursor-pointer"
+          className="fixed bottom-24 right-7 z-50 bg-blue-600 text-white p-3 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-200 flex items-center justify-center cursor-pointer"
           aria-label="Scroll to top"
         >
           <svg

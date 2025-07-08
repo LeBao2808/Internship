@@ -519,53 +519,54 @@ const postData = getBarChartData(
 </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-semibold text-gray-800">
-                User Distribution
-              </h2>
-              <DoughnutChart percent={percent} />
-              <div className="flex justify-center mt-4 space-x-4 text-sm">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>
-                  <span>
-                    New ({newUserCount} account{newUserCount !== 1 ? "s" : ""})
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-3 h-3 rounded-full bg-blue-200 mr-1"></span>
-                  <span>
-                    Old ({oldUserCount} account{oldUserCount !== 1 ? "s" : ""})
-                  </span>
-                </div>
-              </div>
-            </div>
-
-
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                Popular Posts
-              </h2>
-              <div className="space-y-4">
-                {latestPosts.map((post, index) => (
-                  <div key={post._id} className="flex items-start">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded-full mr-3">
-                      #{index + 1}
+          {session?.user?.role === "admin" && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  User Distribution
+                </h2>
+                <DoughnutChart percent={percent} />
+                <div className="flex justify-center mt-4 space-x-4 text-sm">
+                  <div className="flex items-center">
+                    <span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>
+                    <span>
+                      New ({newUserCount} account{newUserCount !== 1 ? "s" : ""})
                     </span>
-                    <div>
-                      <h3 className="font-medium text-gray-800">
-                        {post.title}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {post.views?.toLocaleString() ?? 0} views •{" "}
-                        {post.comments ?? 0} comments
-                      </p>
-                    </div>
                   </div>
-                ))}
+                  <div className="flex items-center">
+                    <span className="w-3 h-3 rounded-full bg-blue-200 mr-1"></span>
+                    <span>
+                      Old ({oldUserCount} account{oldUserCount !== 1 ? "s" : ""})
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                  Popular Posts
+                </h2>
+                <div className="space-y-4">
+                  {latestPosts.map((post, index) => (
+                    <div key={post._id} className="flex items-start">
+                      <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded-full mr-3">
+                        #{index + 1}
+                      </span>
+                      <div>
+                        <h3 className="font-medium text-gray-800">
+                          {post.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {post.views?.toLocaleString() ?? 0} views •{" "}
+                          {post.comments ?? 0} comments
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
 
