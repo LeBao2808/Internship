@@ -17,7 +17,12 @@ const UserSchema = z.object({
     })
     .optional(),
 });
-require('../../api/models');
+require('../../api/models/Blog');
+require('../../api/models/User');
+require('../../api/models/Role');
+require('../../api/models/ViewHistory');
+require('../../api/models/Category'); // Nếu cần sử dụng ViewHistory
+ 
 export async function GET(request: NextRequest) {
     // const session = await getServerSession(authOptions);
   // if (!session || session.user?.role !== "admin") {

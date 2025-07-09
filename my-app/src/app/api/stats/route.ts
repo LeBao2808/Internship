@@ -4,7 +4,10 @@ import Blog from '../models/Blog';
 import Comment from '../models/Comment';
 import User from '../models/User';
 import mongoose from 'mongoose';
-require('../../api/models');
+require('../../api/models/Blog');
+require('../../api/models/Comment');
+require('../../api/models/User');
+require('../../api/models/Category'); 
 export async function GET(request: NextRequest) {
   try {
     // Kết nối với MongoDB nếu chưa kết nối
