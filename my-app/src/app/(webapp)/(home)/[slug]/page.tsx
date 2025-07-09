@@ -61,7 +61,7 @@ export default function BlogDetailPage({
       if (!blog?.category) return;
       try {
         const res = await fetch(
-          `/api/blog?category=${encodeURIComponent(blog.category)}&limit=5`
+          `/api/bloghome?category=${encodeURIComponent(blog.category)}&limit=5`
         );
         const data = await res.json();
         if (Array.isArray(data.blogs)) {
@@ -170,9 +170,12 @@ export default function BlogDetailPage({
     );
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
-  return (
+   return (
     <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8" style={{ marginTop: "65px" }}>
+      <div
+        className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8"
+        style={{ marginTop: "65px" }}
+      >
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-12">
             {blog.image_url ? (
@@ -187,11 +190,11 @@ export default function BlogDetailPage({
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-gray-900 dark:text-white leading-tight">
               {blog.title}
             </h1>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 text-gray-500 text-xs sm:text-sm gap-2 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center mb-8 text-gray-600 dark:text-gray-400 text-sm gap-3 sm:gap-6">
               {blog.user && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full">
                   <svg
-                    className="w-4 h-4 inline-block"
+                    className="w-5 h-5 text-blue-600 dark:text-blue-400"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -199,13 +202,13 @@ export default function BlogDetailPage({
                   >
                     <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  {authorName || blog.user}
+                  <span className="font-medium">{authorName || blog.user}</span>
                 </span>
               )}
               {blog.createdAt && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-full">
                   <svg
-                    className="w-4 h-4 inline-block"
+                    className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -213,7 +216,9 @@ export default function BlogDetailPage({
                   >
                     <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  {new Date(blog.createdAt).toLocaleString()}
+                  <span className="font-medium">
+                    {new Date(blog.createdAt).toLocaleString()}
+                  </span>
                 </span>
               )}
             </div>
@@ -223,48 +228,41 @@ export default function BlogDetailPage({
               className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed dark:prose-invert dark:text-gray-200"
               dangerouslySetInnerHTML={{ __html: contentWithIds }}
             />
-            <hr className="text-gray-100 mt-10" />
-            <div className="max-w-6xl mx-auto mt-6 sm:mt-8 px-2 sm:px-0 md:px-2">
-              <h2 className="text-xl sm:text-xl font-semibold mb-3 sm:mb-4 dark:text-white">
+         <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent mt-12 mb-8"></div>
+            <div className="max-w-6xl mx-auto mt-8 px-2 sm:px-0 md:px-2">
+              <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-blue-600 dark:from-gray-200 dark:to-blue-400 bg-clip-text text-transparent">
                 Related articles
               </h2>
-              <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-2">
+              <div className="flex overflow-x-auto gap-4 sm:gap-6 pb-4">
                 {latestBlogs.length > 0 ? (
                   latestBlogs.map((item) => (
                     <a
                       key={item.slug}
                       href={`/${item.slug}`}
-                      className="group min-w-[200px] sm:min-w-[250px] max-w-xs bg-white rounded-xl shadow-2xl p-3 sm:p-4 flex-shrink-0 transition h-auto aspect-[8/5] w-36 sm:w-40 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700"
+                      className="group min-w-[220px] sm:min-w-[280px] max-w-sm bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl p-4 sm:p-5 flex-shrink-0 transition-all duration-500 hover:scale-105 border border-white/20 dark:border-gray-700/30 hover:border-blue-200 dark:hover:border-blue-600/50"
                     >
                       {item.image_url ? (
-                        <img
-                          src={item.image_url}
-                          alt={item.title}
-                          className="w-full h-24 sm:h-32 object-cover rounded mb-2"
-                        />
-                      ) : (
-                        <svg
-                          className="h-auto aspect-[8/5] w-full text-blue-400 opacity-40"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 6v6l4 2"
+                        <div className="relative overflow-hidden rounded-xl mb-3">
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="w-full h-32 sm:h-40 object-cover transition-transform duration-500 group-hover:scale-110"
                           />
-                        </svg>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                      ) : (
+                        <div className="w-full h-32 sm:h-40 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl mb-3 flex items-center justify-center">
+                          <svg className="w-12 h-12 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                          </svg>
+                        </div>
                       )}
-                      <div className="font-semibold text-gray-900 line-clamp-2 dark:text-white group-hover:text-blue-700 transition">
+                      <h3 className="font-bold text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                         {item.title}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {item.createdAt
-                          ? new Date(item.createdAt).toLocaleDateString()
-                          : ""}
-                      </div>
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
+                      </p>
                     </a>
                   ))
                 ) : (
@@ -294,7 +292,11 @@ export default function BlogDetailPage({
             stroke="currentColor"
             strokeWidth={2}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 15l7-7 7 7"
+            />
           </svg>
         </button>
       )}

@@ -15,18 +15,20 @@ export async function GET() {
   }
   const user = await User.findOne({ email: session.user.email });
 
-  const histories = await ViewHistory.find({ user: user?._id })
-    .populate({ path: "blog", populate: { path: "category", select: "name" } });
+  const histories = await ViewHistory.find({ user: user?._id }).populate({
+    path: "blog",
+    populate: { path: "category", select: "name" },
+  });
 
-    console.log("User's view histories:", histories);
-const blogHistorys = histories.map(h => ({
-  name: (h.blog as any)?.title?.toString() || null,
-  category: (h.blog as any)?.category?.name?.toString() || null
-}));
+  console.log("User's view histories:", histories);
+  const blogHistorys = histories.map((h) => ({
+    name: (h.blog as any)?.title?.toString() || null,
+    category: (h.blog as any)?.category?.name?.toString() || null,
+  }));
 
-console.log("Blog histories:", blogHistorys);
+  console.log("Blog histories:", blogHistorys);
   const categoryCount: Record<string, number> = {};
-  histories.forEach(h => {
+  histories.forEach((h) => {
     const catId = (h.blog as any)?.category?._id?.toString();
     if (catId) categoryCount[catId] = (categoryCount[catId] || 0) + 1;
   });
@@ -41,49 +43,64 @@ console.log("Blog histories:", blogHistorys);
       .populate("category", "name")
       .populate("user", "name");
   }
+
   if (blogs.length < 1000000000) {
     const moreBlogs = await Blog.find()
       .populate("category", "name")
       .populate("user", "name");
-    const blogIds = new Set(blogs.map(b => b._id.toString()));
-    blogs = blogs.concat(moreBlogs.filter(b => !blogIds.has((b as any)._id.toString())));
+    const blogIds = new Set(blogs.map((b) => b._id.toString()));
+    blogs = blogs.concat(
+      moreBlogs.filter((b) => !blogIds.has((b as any)._id.toString()))
+    );
   }
 
   console.log("Blogs fetched:", blogs.length);
   const allTopCategories = Object.entries(categoryCount)
     .sort((a, b) => b[1] - a[1])
     .map(([catId]) => {
-      const categoryName = histories.find(h => (h.blog as any)?.category?._id?.toString() === catId);
-      return `${(categoryName?.blog as any)?.category?.name || "Không xác định"} `;
+      const categoryName = histories.find(
+        (h) => (h.blog as any)?.category?._id?.toString() === catId
+      );
+      return `${
+        (categoryName?.blog as any)?.category?.name || "Không xác định"
+      } `;
     });
+  console.log("All top categories:", allTopCategories);
 
-const prompt = `
+  const prompt = `
 Bạn là hệ thống gợi ý blog thông minh. Nhiệm vụ của bạn là phân tích hành vi đọc của người dùng và đề xuất các bài viết phù hợp nhất.
 
 THÔNG TIN NGƯỜI DÙNG:
 - Email: ${user?.email}
-- Lịch sử xem: Đã xem ${blogHistorys.map(h => `"${h.name}" - Category: ${h.category || "Không phân loại"}`).join(", ") || "Không có lịch sử xem"}
+- Lịch sử xem: Đã xem ${
+    blogHistorys
+      .map((h) => `"${h.name}" - Category: ${h.category || "Không phân loại"}`)
+      .join(", ") || "Không có lịch sử xem"
+  }
 - Categories yêu thích theo thứ tự giảm dần: ${allTopCategories.join(", ")}
 
 DANH SÁCH BÀI VIẾT HIỆN CÓ:
-${blogs.map((b, i) => `${i + 1}. "${b.title}" - Category: ${b.category?.name || "Không phân loại"} - Views: ${b.views || 0} - Author: ${b.user?.name || "Không xác định"} - Content: ${(b.content || "").substring(0, 100)}...`).join("\n")}
+${blogs
+  .map(
+    (b, i) =>
+      `${i + 1}. "${b.title}" - Category: ${
+        b.category?.name || "Không phân loại"
+      }  - Author: ${b.user?.name || "Không xác định"} - Content: ${(
+        b.content || ""
+      ).substring(0, 100)}...`
+  )
+  .join("\n")}
 
 TIÊU CHÍ GỢI Ý:
 1. CATEGORY: Ưu tiên theo thứ tự sở thích ${allTopCategories.join(" > ")} 
 2. TITLE: Ưu tiên tiêu đề tương tự với các bài đã xem
-3. CONTENT: Ưu tiên nội dung liên quan đến chủ đề user quan tâm
-4. VIEWS: Ưu tiên bài viết có lượt xem cao (phổ biến)
-5. AUTHOR: Ưu tiên tác giả mà user đã từng đọc bài viết
-
 YÊU CẦU:
 1. Phân tích và chấm điểm từng bài viết dựa trên 5 tiêu chí trên
 2. Loại trừ hoàn toàn các bài viết người dùng đã xem
-3. Chọn 5-8 bài viết có điểm số cao nhất
-4. Nếu không đủ bài phù hợp, chọn thêm bài có views cao hoặc category phổ biến
-5. Nếu không có lịch sử xem, ưu tiên bài có views cao nhất
-6. Nếu như mà không có bài nào phù hợp, hãy trả về ít nhất 3 bài viết bất kỳ từ danh sách hiện có.
+3. Nếu không đủ bài phù hợp, chọn thêm bài có views cao hoặc category phổ biến
+4. Nếu như mà không có bài nào phù hợp, hãy trả về ít nhất 3 bài viết bất kỳ từ danh sách hiện có.
 ĐỊNH DẠNG TRẢ VỀ:
-Chỉ trả về mảng số thứ tự của các bài viết được gợi ý, ví dụ: [1, 3, 5, 7, 9]
+Chỉ trả về mảng số thứ tự của các bài viết được gợi ý, ví dụ: [1, 2, 3, 4, 5]
 
 Lưu ý: Kết hợp tất cả 5 tiêu chí để đưa ra gợi ý chính xác nhất cho sở thích của người dùng.
 `;
@@ -104,7 +121,9 @@ Lưu ý: Kết hợp tất cả 5 tiêu chí để đưa ra gợi ý chính xác
   try {
     const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
     indexes = JSON.parse(text.match(/\[.*\]/)?.[0] || "[]");
-    indexes = indexes.map(i => i - 1).filter(i => i >= 0 && i < blogs.length);
+    indexes = indexes
+      .map((i) => i - 1)
+      .filter((i) => i >= 0 && i < blogs.length);
   } catch {
     indexes = [0, 1, 2];
   }

@@ -65,7 +65,7 @@ export default function BlogChatbot() {
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen && (
         <div className="mb-18 w-96 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden backdrop-blur-sm animate-in slide-in-from-bottom-5 duration-300">
-          <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white p-4">
+          <div className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white p-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <BsRobot className="w-6 h-6 animate-pulse" />
@@ -165,7 +165,7 @@ export default function BlogChatbot() {
           e.preventDefault();
           setIsOpen(!isOpen);
         }}
-        className="w-14 h-14 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 flex items-center justify-center transition-all duration-300 border-4 border-white dark:border-gray-800 cursor-pointer animate-pulse hover:animate-none  overflow-hidden group absolute bottom-1.5 right-2  translate-x-1/2 mr-[20px]"
+        className="w-14 h-14 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 flex items-center justify-center transition-all duration-300 border-4 border-white dark:border-gray-800 cursor-pointer animate-pulse hover:animate-none  overflow-hidden group absolute bottom-1.5 right-2  translate-x-1/2 mr-[20px]"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <BsRobot className="w-8 h-8 relative z-10 group-hover:animate-bounce" />

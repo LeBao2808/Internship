@@ -62,9 +62,9 @@ export default function CategoryPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-8xl mx-auto pt-20 px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white min-h-195">
+      <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5 dark:bg-[#121618] dark:text-white min-h-195">
         <div className=" mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent mb-4">
             Explore Categories
           </h1>
           <div className="max-w-lg mx-auto relative animate-in fade-in-50 duration-700 delay-300">
@@ -81,7 +81,7 @@ export default function CategoryPage() {
           </div>
         </div>
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
@@ -104,7 +104,7 @@ export default function CategoryPage() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
             {filteredCategories.map((category, index) => (
               <div
                 key={category._id}
@@ -112,7 +112,7 @@ export default function CategoryPage() {
                 className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer group overflow-hidden h-64 animate-in fade-in-50 slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-blue-300 dark:from-blue-900 dark:to-blue-700">
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-400">
                   {category.image ? (
                     <img
                       src={category.image}
@@ -120,14 +120,13 @@ export default function CategoryPage() {
                       className="w-full h-full object-cover transition-all duration-500 group-hover:opacity-100 group-hover:mix-blend-normal opacity-70 mix-blend-overlay"
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-200 to-blue-500 dark:from-blue-900 dark:to-blue-700 opacity-80">
+                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-200 to-blue-500 ">
                       <span className="text-6xl font-extrabold text-white drop-shadow-lg">
                         {category.name.charAt(0)}
                       </span>
                     </div>
                   )}
                   {/* Overlay chỉ hiện khi chưa hover */}
-                
                 </div>
 
                 <div className="absolute top-4 left-4 z-10">
@@ -152,7 +151,9 @@ export default function CategoryPage() {
                   <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-1000 ease-out"
-                      style={{ width: `${progress[String(category._id)] ?? 0}%` }}
+                      style={{
+                        width: `${progress[String(category._id)] ?? 0}%`,
+                      }}
                     ></div>
                   </div>
                 </div>

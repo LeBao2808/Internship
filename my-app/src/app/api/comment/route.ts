@@ -5,27 +5,25 @@ import User from "@/app/api/models/User"; // nếu cần `populate`
 import { z } from "zod";
 import { getToken } from "next-auth/jwt";
 import { getServerSession } from "next-auth/next";
-
-
-require('../../api/models/User');
-
-require('../../api/models/Blog');
 // Define Comment validation schema
 const CommentSchema = z.object({
   content: z.string().min(1, "Content is required"),
   user: z.string().regex(/^[a-f\d]{24}$/i, "Invalid user ID"),
 });
-
 import Blog from "@/app/api/models/Blog";
 import { NextApiRequest, NextApiResponse } from "next";
 import { authOptions } from "@/resources/lib/auth.config";
 import mongoose from "mongoose";
+require("../../api/models/User");
+
+require("../../api/models/Blog");
 
 export async function GET(request: NextRequest) {
-      const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);
+    const isComment = searchParams.get("isComment") === "true";
     const search = searchParams.get("search") || "";
     const sortParam = searchParams.get("sort") || "";
     const page = parseInt(searchParams.get("page") || "1", 10);
@@ -35,13 +33,12 @@ export async function GET(request: NextRequest) {
     const query: any = {};
 
     if (search) {
-      // Tìm các blog có title khớp
-   const matchingBlogs = await Blog.find({
-  $or: [
-    { title: { $regex: search, $options: "i" } },
-    { slug: { $regex: search, $options: "i" } },
-  ],
-}).select("_id");
+      const matchingBlogs = await Blog.find({
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { slug: { $regex: search, $options: "i" } },
+        ],
+      }).select("_id");
 
       const blogIds = matchingBlogs.map((b) => b._id);
 
@@ -51,12 +48,13 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-      console.log("session.user.id",session?.user?.id)
-       const dbUser = await User.findOne({ email: session?.user?.email  }).exec();
-    if (dbUser &&  session?.user?.role != "admin" ) {
-      query.user = dbUser.id;
+    console.log("session.user.id", session?.user?.id);
+    const dbUser = await User.findOne({ email: session?.user?.email }).exec();
+    if (!isComment) {
+      if (dbUser && session?.user?.role != "admin") {
+        query.user = dbUser.id;
+      }
     }
-
     let sort: any = {};
     if (sortParam) {
       const [field, direction] = sortParam.split(":");
@@ -74,7 +72,7 @@ export async function GET(request: NextRequest) {
         .populate("blog", "title"),
       Comment.countDocuments(query),
     ]);
-console.log(comments);
+    console.log(comments);
     // const comments = await Comment.find(query)
     //   .skip(skip)
     //   .limit(limit)
@@ -83,7 +81,6 @@ console.log(comments);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
 
 export async function POST(request: NextRequest) {
   try {
@@ -98,7 +95,10 @@ export async function POST(request: NextRequest) {
     const { content, slug } = await request.json();
 
     if (!content || !slug) {
-      return NextResponse.json({ error: "Missing required data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required data" },
+        { status: 400 }
+      );
     }
 
     const decodedSlug = decodeURIComponent(slug);
@@ -108,10 +108,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
-    const userInDB = await User.findOne({ email: session.user.email, name: session.user.name });
+    const userInDB = await User.findOne({
+      email: session.user.email,
+      name: session.user.name,
+    });
 
     if (!userInDB) {
-      return NextResponse.json({ error: "User not found in database" }, { status: 404 });
+      return NextResponse.json(
+        { error: "User not found in database" },
+        { status: 404 }
+      );
     }
 
     const newComment = await Comment.create({
@@ -139,10 +145,7 @@ export async function PUT(request: Request) {
   const parsed = CommentSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.format() },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: parsed.error.format() }, { status: 400 });
   }
 
   try {

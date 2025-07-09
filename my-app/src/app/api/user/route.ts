@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../api/models/User";
-import Role from "../../api/models/Role";
 import { z } from 'zod';
-import Email from "next-auth/providers/email";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
 const UserSchema = z.object({
@@ -19,7 +17,7 @@ const UserSchema = z.object({
     })
     .optional(),
 });
-require('../../api/models/Role');
+require('../../api/models/Blog');
  
 export async function GET(request: NextRequest) {
     // const session = await getServerSession(authOptions);

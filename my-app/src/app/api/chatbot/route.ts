@@ -49,10 +49,10 @@ export async function POST(req: Request) {
 
     const systemContext = `
 Hệ thống blog hiện tại có:
-- ${blogCount} bài viết
-- ${categoryCount} danh mục
-- ${userCount} người dùng
-- ${commentCount} bình luận
+- Tổng số bài viết ${blogCount} bài viết
+- Tổng số danh mục ${categoryCount} danh mục
+- Tổng số người dùng ${userCount} người dùng
+- Tổng số bình luận ${commentCount} bình luận
 - Danh sách bài viết gần đây:
 ${recentBlogs
   .map(
@@ -66,7 +66,7 @@ Các danh mục: ${categories.map((c) => c.name).join(", ")}
     `;
 
     const prompt = `
-Bạn là trợ lý AI của blog, hãy trả lời ngắn gọn, dễ hiểu cho người dùng bằng tiếng Việt.
+Bạn là trợ lý AI của blog, hãy trả lời ngắn gọn, đúng ý, dễ hiểu cho người dùng bằng tiếng Việt.
 ${systemContext}
 ${context ? `Thông tin bổ sung: ${context}` : ""}
 Câu hỏi: ${question}

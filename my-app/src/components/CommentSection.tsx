@@ -40,7 +40,7 @@ export default function CommentSection({ slug }: CommentSectionProps) {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/comment?search=${encodeURIComponent(slug)}`
+    `/api/comment?search=${encodeURIComponent(slug)}&isComment=true`
       );
       const data = await res.json();
       if (res.ok && Array.isArray(data.comments)) {
