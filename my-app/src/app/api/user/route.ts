@@ -1,3 +1,8 @@
+require('../../api/models/Blog');
+require('../../api/models/User');
+require('../../api/models/Role');
+require('../../api/models/ViewHistory');
+require('../../api/models/Category'); 
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../api/models/User";
@@ -17,11 +22,7 @@ const UserSchema = z.object({
     })
     .optional(),
 });
-require('../../api/models/Blog');
-require('../../api/models/User');
-require('../../api/models/Role');
-require('../../api/models/ViewHistory');
-require('../../api/models/Category'); // Nếu cần sử dụng ViewHistory
+// Nếu cần sử dụng ViewHistory
  
 export async function GET(request: NextRequest) {
     // const session = await getServerSession(authOptions);
