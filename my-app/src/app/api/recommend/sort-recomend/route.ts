@@ -5,6 +5,11 @@ import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../models/Blog";
 import User from "../../models/User";
 import ViewHistory from "../../models/ViewHistory";
+require("../../models/Blog");
+require("../../models/User");
+require("../../models/Role");
+require("../../models/ViewHistory");
+require("../../models/Category"); 
 
 export async function GET(req: Request) {
   await dbConnect();

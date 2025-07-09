@@ -3,8 +3,7 @@ import { NextRequest } from 'next/server';
 import mongoose from "mongoose";
 import Blog from "../models/Blog";
 import Comment from "../models/Comment";
-require('../../api/models/Blog');
-require('../../api/models/Comment');
+require('../../api/models');
 export async function GET(request: Request) {
   try {
     if (mongoose.connections[0].readyState !== 1) {
