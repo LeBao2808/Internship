@@ -64,11 +64,10 @@ export default function BlogPage() {
         fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       } else {
         fetch("/api/recommend")
-          .then((res) => res.json())
+          .then((res) => res.json()) 
           .then((data) => setBlogFeatureds(data.recommendations || []))
           .catch(() => setBlogFeatureds([]))
           .finally(() => setLoadingFeatures(false));
-
         // fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       }
     });
