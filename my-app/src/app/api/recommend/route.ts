@@ -5,7 +5,6 @@ import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
 import User from "../models/User";
 import ViewHistory from "../models/ViewHistory";
-import { redis } from "@/utils/cache";
 import {
   getCachedRecommendation,
   setCachedRecommendation,

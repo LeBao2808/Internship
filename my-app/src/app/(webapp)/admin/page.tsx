@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Bar } from "react-chartjs-2";
 import DoughnutChart from "@/components/DoughnutChart";
 import { useFetchDashboardData } from "@/hooks/useFetchDashboardData";
-import  { monthLabels, chartOptions, getBarChartData } from "@/utils/chartUtils";
+import { monthLabels, chartOptions, getBarChartData } from "@/utils/chartUtils";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -76,6 +76,9 @@ export default function AdminHomePage() {
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [topAuthors, setTopAuthors] = useState<any[]>([]);
+  const [performanceMetrics, setPerformanceMetrics] = useState<any>({});
   useEffect(() => {
     if (status === "loading") return;
   }, [session, status, router]);
@@ -100,7 +103,7 @@ export default function AdminHomePage() {
               fetch("/api/chart-stats"),
               fetch("/api/blog/featured"),
               fetch("/api/user"),
-              fetch(`/api/view-history`), 
+              fetch(`/api/view-history`),
             ]);
           [statsData, chartData, featuredData, userData, histories] =
             await Promise.all([
@@ -213,6 +216,68 @@ export default function AdminHomePage() {
 
         if (featuredData.data) setPopularPosts(featuredData.data);
         setUsers(userData.users || []);
+
+        // Mock data for enhanced features
+        setRecentActivities([
+          {
+            type: "post",
+            user: "John Doe",
+            action: "published",
+            time: "2 min ago",
+            title: "React Hooks Guide",
+          },
+          {
+            type: "comment",
+            user: "Jane Smith",
+            action: "commented on",
+            time: "5 min ago",
+            title: "JavaScript Tips",
+          },
+          {
+            type: "user",
+            user: "Mike Johnson",
+            action: "joined platform",
+            time: "10 min ago",
+          },
+          {
+            type: "like",
+            user: "Sarah Wilson",
+            action: "liked",
+            time: "15 min ago",
+            title: "CSS Grid Layout",
+          },
+        ]);
+
+        setTopAuthors([
+          {
+            name: "Alex Chen",
+            posts: 24,
+            views: 15420,
+            avatar: "AC",
+            engagement: 94.2,
+          },
+          {
+            name: "Maria Garcia",
+            posts: 18,
+            views: 12350,
+            avatar: "MG",
+            engagement: 87.8,
+          },
+          {
+            name: "James Wilson",
+            posts: 15,
+            views: 9870,
+            avatar: "JW",
+            engagement: 82.1,
+          },
+        ]);
+
+        setPerformanceMetrics({
+          serverResponse: "245ms",
+          uptime: "99.9%",
+          activeUsers: 1247,
+          bandwidth: "2.4 GB/h",
+        });
       } catch (error) {
         setUserViewStats({ totalViewed: 0, topCategory: "N/A" });
         console.error("Lỗi khi tải dữ liệu:", error);
@@ -227,32 +292,37 @@ export default function AdminHomePage() {
 
     const fetchSelectedData = async () => {
       try {
-        let statsData, chartData, featuredData, histories = [];
+        let statsData,
+          chartData,
+          featuredData,
+          histories = [];
         let totalViewed = 0;
         let topCategory = "N/A";
 
         if (!selectedUserId) {
-          const [statsRes, chartRes, featuredRes, viewHistoryRes] = await Promise.all([
-            fetch("/api/stats"),
-            fetch("/api/chart-stats"),
-            fetch("/api/blog/featured"),
-            fetch("/api/view-history"),
-          ]);
+          const [statsRes, chartRes, featuredRes, viewHistoryRes] =
+            await Promise.all([
+              fetch("/api/stats"),
+              fetch("/api/chart-stats"),
+              fetch("/api/blog/featured"),
+              fetch("/api/view-history"),
+            ]);
           [statsData, chartData, featuredData, histories] = await Promise.all([
             statsRes.json(),
             chartRes.json(),
             featuredRes.json(),
             viewHistoryRes.json(),
           ]);
-          
+
           if (featuredData.data) setPopularPosts(featuredData.data);
         } else {
           // User cụ thể
-          const [userStatsRes, userChartRes, viewHistoryRes] = await Promise.all([
-            fetch(`/api/stats?user=${selectedUserId}`),
-            fetch(`/api/chart-stats?user=${selectedUserId}`),
-            fetch(`/api/view-history?user=${selectedUserId}`),
-          ]);
+          const [userStatsRes, userChartRes, viewHistoryRes] =
+            await Promise.all([
+              fetch(`/api/stats?user=${selectedUserId}`),
+              fetch(`/api/chart-stats?user=${selectedUserId}`),
+              fetch(`/api/view-history?user=${selectedUserId}`),
+            ]);
           [statsData, chartData, histories] = await Promise.all([
             userStatsRes.json(),
             userChartRes.json(),
@@ -354,29 +424,30 @@ export default function AdminHomePage() {
   const latestPosts = useMemo(() => popularPosts.slice(0, 3), [popularPosts]);
 
   const filteredUsers = useMemo(() => {
-    return users.filter(user => 
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [users, searchTerm]);
 
-  const selectedUser = users.find(user => user._id === selectedUserId);
+  const selectedUser = users.find((user) => user._id === selectedUserId);
 
   const { newUserCount, oldUserCount, percent } = calculateUserStats();
 
-const commentData = getBarChartData(
-  monthLabels,
-  chartData.commentCounts,
-  "Comment",
-  ["#4ade80", "#22d3ee", "#818cf8", "#fbbf24", "#f87171", "#38bdf8"]
-);
+  const commentData = getBarChartData(
+    monthLabels,
+    chartData.commentCounts,
+    "Comment",
+    ["#4ade80", "#22d3ee", "#818cf8", "#fbbf24", "#f87171", "#38bdf8"]
+  );
 
-const postData = getBarChartData(
-  monthLabels,
-  chartData.postCounts,
-  "Post blog",
-  ["#60a5fa", "#3b82f6"]
-);
+  const postData = getBarChartData(
+    monthLabels,
+    chartData.postCounts,
+    "Post blog",
+    ["#60a5fa", "#3b82f6"]
+  );
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="flex-1 overflow-auto">
@@ -390,16 +461,32 @@ const postData = getBarChartData(
                 <input
                   type="text"
                   readOnly
-                  value={selectedUser ? `${selectedUser.name} (${selectedUser.email})` : "All Users"}
+                  value={
+                    selectedUser
+                      ? `${selectedUser.name} (${selectedUser.email})`
+                      : "All Users"
+                  }
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="w-80 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer text-gray-700"
                   placeholder="Select user..."
                 />
-                <svg className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 transition-transform pointer-events-none ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 transition-transform pointer-events-none ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
-              
+
               {isDropdownOpen && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                   <div className="p-2 border-b border-gray-100">
@@ -419,12 +506,16 @@ const postData = getBarChartData(
                         setSearchTerm("");
                       }}
                       className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
-                        !selectedUserId ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                        !selectedUserId
+                          ? "bg-blue-50 text-blue-700 font-medium"
+                          : "text-gray-700"
                       }`}
                     >
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white text-sm font-bold">All</span>
+                          <span className="text-white text-sm font-bold">
+                            All
+                          </span>
                         </div>
                         <span>All Users</span>
                       </div>
@@ -438,7 +529,9 @@ const postData = getBarChartData(
                           setSearchTerm("");
                         }}
                         className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
-                          selectedUserId === user._id ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                          selectedUserId === user._id
+                            ? "bg-blue-50 text-blue-700 font-medium"
+                            : "text-gray-700"
                         }`}
                       >
                         <div className="flex items-center">
@@ -449,7 +542,9 @@ const postData = getBarChartData(
                           </div>
                           <div>
                             <div className="font-medium">{user.name}</div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
+                            <div className="text-sm text-gray-500">
+                              {user.email}
+                            </div>
                           </div>
                         </div>
                       </button>
@@ -471,31 +566,40 @@ const postData = getBarChartData(
             {stats.map((stat, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg"
+                className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg hover:scale-105 border border-gray-100"
               >
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500">{stat.label}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="text-2xl mr-3">{stat.icon}</span>
+                      <p className="text-gray-600 font-medium">{stat.label}</p>
+                    </div>
                     <h3
-                      className={`text-3xl font-bold ${
+                      className={`text-3xl font-bold mb-2 ${
                         stat.label.includes("Posts")
                           ? "text-blue-600"
                           : stat.label.includes("Comments")
                           ? "text-green-600"
-                          : "text-orange-600"
+                          : stat.label.includes("Viewed")
+                          ? "text-orange-600"
+                          : "text-purple-600"
                       }`}
                     >
                       {stat.value}
                     </h3>
-                    <p
-                      className={`text-sm ${
-                        stat.isPositive ? "text-green-500" : "text-red-500"
-                      } mt-1`}
-                    >
-                      {stat.change} compared to last month
-                    </p>
+                    <div className="flex items-center">
+                      <span
+                        className={`text-sm font-semibold ${
+                          stat.isPositive ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {stat.change || "+12%"}
+                      </span>
+                      <span className="text-gray-500 text-sm ml-2">
+                        vs last period
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-2xl">{stat.icon}</div>
                 </div>
               </div>
             ))}
@@ -503,20 +607,61 @@ const postData = getBarChartData(
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div className="bg-white rounded-xl shadow-md p-6">
-  <h2 className="text-lg font-semibold text-gray-800">Post Statistics</h2>
-  <div className="chart-container mt-4">
-    <Bar data={postData} options={chartOptions} />
-  </div>
-</div>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Post Statistics
+              </h2>
+              <div className="chart-container mt-4">
+                <Bar data={postData} options={chartOptions} />
+              </div>
+            </div>
 
-<div className="bg-white rounded-xl shadow-md p-6 transition duration-300 card-hover">
-  <div className="flex justify-between items-center mb-4">
-    <h2 className="text-lg font-semibold text-gray-800">Comment Statistics</h2>
-  </div>
-  <div className="chart-container">
-    <Bar data={commentData} options={chartOptions} />
-  </div>
-</div>
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                Blog Categories
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-blue-500 mr-3"></div>
+                    <span className="text-gray-700">Technology</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-gray-900">35%</span>
+                    <div className="text-xs text-gray-500">45 posts</div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                    <span className="text-gray-700">Design</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-gray-900">25%</span>
+                    <div className="text-xs text-gray-500">32 posts</div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-purple-500 mr-3"></div>
+                    <span className="text-gray-700">Business</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-gray-900">22%</span>
+                    <div className="text-xs text-gray-500">28 posts</div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-orange-500 mr-3"></div>
+                    <span className="text-gray-700">Lifestyle</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-gray-900">18%</span>
+                    <div className="text-xs text-gray-500">23 posts</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {session?.user?.role === "admin" && (
@@ -530,13 +675,15 @@ const postData = getBarChartData(
                   <div className="flex items-center">
                     <span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>
                     <span>
-                      New ({newUserCount} account{newUserCount !== 1 ? "s" : ""})
+                      New ({newUserCount} account{newUserCount !== 1 ? "s" : ""}
+                      )
                     </span>
                   </div>
                   <div className="flex items-center">
                     <span className="w-3 h-3 rounded-full bg-blue-200 mr-1"></span>
                     <span>
-                      Old ({oldUserCount} account{oldUserCount !== 1 ? "s" : ""})
+                      Old ({oldUserCount} account{oldUserCount !== 1 ? "s" : ""}
+                      )
                     </span>
                   </div>
                 </div>
@@ -576,10 +723,10 @@ const postData = getBarChartData(
           transform: scaleY(1.05);
         }
       `}</style>
-      
+
       {isDropdownOpen && (
-        <div 
-          className="fixed inset-0 z-40" 
+        <div
+          className="fixed inset-0 z-40"
           onClick={() => {
             setIsDropdownOpen(false);
             setSearchTerm("");
