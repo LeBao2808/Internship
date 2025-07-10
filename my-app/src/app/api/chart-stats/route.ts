@@ -1,12 +1,10 @@
 // /app/api/admin/chart-stats/route.ts
-require('../../api/models/Blog');
-require('../../api/models/Comment');
-require('../../api/models/User');
-require('../../api/models/Category'); 
 import { NextRequest } from 'next/server';
 import mongoose from "mongoose";
 import Blog from "../models/Blog";
 import Comment from "../models/Comment";
+import "../models/User";
+import "../models/Category";
 
 
 export async function GET(request: Request) {

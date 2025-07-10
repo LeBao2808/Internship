@@ -1,11 +1,10 @@
-require('../../api/models/Blog');
-require('../../api/models/User');
-require('../../api/models/Role');
-require('../../api/models/ViewHistory');
-require('../../api/models/Category'); 
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb";
 import User from "../../api/models/User";
+import "../../api/models/Blog";
+import "../../api/models/Role";
+import "../../api/models/ViewHistory";
+import "../../api/models/Category";
 import { z } from 'zod';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
