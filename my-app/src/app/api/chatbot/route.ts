@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   try {
     // Try to get cached system context
-    let systemData = await getCachedChatBot();
+    const systemData = await getCachedChatBot();
     let blogCount, categoryCount, userCount, recentBlogs, categories, commentCount;
       const session = await getServerSession(authOptions);
     if (!systemData) {
