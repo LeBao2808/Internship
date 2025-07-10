@@ -6,6 +6,10 @@ import Blog from "../../api/models/Blog";
 import User from "../models/User";
 import ViewHistory from "../models/ViewHistory";
 import { redis } from "@/utils/cache";
+import {
+  getCachedRecommendation,
+  setCachedRecommendation,
+} from "@/utils/cache";
 
 export async function GET() {
   await dbConnect();
@@ -16,13 +20,14 @@ export async function GET() {
   }
 
   const userId = session.user.email;
-    const cacheKey = `recommendations:${userId}`;
 
   // Kiểm tra cache trước
-  const cached = await redis.get(cacheKey);
-  if (typeof cached === "string" && cached.length > 0) {
+  const cached = await getCachedRecommendation(userId);
+  console.log("Cache:", cached);
+
+  if (cached) {
     console.log("Cache hit for user:", userId);
-    return NextResponse.json({ recommendations: JSON.parse(cached) });
+    return NextResponse.json({ recommendations: cached });
   }
 
   const user = await User.findOne({ email: session.user.email });
@@ -142,6 +147,7 @@ Lưu ý: Kết hợp tất cả 5 tiêu chí để đưa ra gợi ý chính xác
 
   const recommendations = indexes.map((i) => blogs[i]).filter(Boolean);
   console.log("Recommendations:", recommendations);
+  await setCachedRecommendation(userId, recommendations);
 
   return NextResponse.json({ recommendations });
 }

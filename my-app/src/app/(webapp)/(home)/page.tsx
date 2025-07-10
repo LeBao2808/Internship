@@ -69,6 +69,7 @@ export default function BlogPage() {
           .catch(() => setBlogFeatureds([]))
           .finally(() => setLoadingFeatures(false));
         // fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
+        
       }
     });
   }, []);
