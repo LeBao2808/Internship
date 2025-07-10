@@ -5,6 +5,7 @@ import dbConnect from "@/resources/lib/mongodb";
 import Blog from "../../api/models/Blog";
 import User from "../models/User";
 import ViewHistory from "../models/ViewHistory";
+import { redis } from "@/utils/cache";
 
 export async function GET() {
   await dbConnect();
@@ -13,6 +14,17 @@ export async function GET() {
   if (!session || !session.user?.email) {
     return NextResponse.json({ recommendations: [] });
   }
+
+  const userId = session.user.email;
+    const cacheKey = `recommendations:${userId}`;
+
+  // Kiểm tra cache trước
+  const cached = await redis.get(cacheKey);
+  if (typeof cached === "string" && cached.length > 0) {
+    console.log("Cache hit for user:", userId);
+    return NextResponse.json({ recommendations: JSON.parse(cached) });
+  }
+
   const user = await User.findOne({ email: session.user.email });
 
   const histories = await ViewHistory.find({ user: user?._id }).populate({

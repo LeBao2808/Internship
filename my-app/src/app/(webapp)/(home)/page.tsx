@@ -68,6 +68,8 @@ export default function BlogPage() {
           .then((data) => setBlogFeatureds(data.recommendations || []))
           .catch(() => setBlogFeatureds([]))
           .finally(() => setLoadingFeatures(false));
+
+        // fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       }
     });
   }, []);
@@ -227,7 +229,7 @@ export default function BlogPage() {
               </svg>
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent dark:from-cyan-200 dark:via-cyan-100  dark:to-cyan-50">
-              {t("featuredPosts")}
+              {t("recommendPosts", "Recommended Posts")}
             </h2>
           </div>
           {loadingFeatures ? (
@@ -499,11 +501,7 @@ export default function BlogPage() {
                 strokeWidth={2}
                 viewBox="0 0 24 24"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent dark:from-cyan-200 dark:via-cyan-100  dark:to-cyan-50">

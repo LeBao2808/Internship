@@ -12,6 +12,7 @@ import {
   FiCalendar,
   FiArrowRight,
   FiBookOpen,
+  FiEye,
 } from "react-icons/fi";
 
 export default function CategoryPage({
@@ -22,6 +23,7 @@ export default function CategoryPage({
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewedBlogs, setViewedBlogs] = useState<string[]>([]);
   const { t } = useTranslation();
   const { slug: rawSlug } = use(params);
   const router = useRouter();
@@ -39,7 +41,20 @@ export default function CategoryPage({
       if (params.length > 0) url += "?" + params.join("&");
       const res = await fetch(url);
       const data = await res.json();
-      setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
+      const blogList = Array.isArray(data.blogs) ? data.blogs : [];
+      setBlogs(blogList);
+
+      // Fetch view status
+      if (blogList.length > 0) {
+        const blogIds = blogList.map((b: any) => b._id).filter(Boolean);
+        const viewRes = await fetch('/api/view-history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ blogIds })
+        });
+        const viewData = await viewRes.json();
+        setViewedBlogs(viewData.viewed || []);
+      }
     } finally {
       setLoading(false);
     }
@@ -121,7 +136,7 @@ export default function CategoryPage({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogs.map((blog, index) => (
+              {blogs.map((blog: any, index: number) => (
                 <div
                   key={blog._id}
                   className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden flex flex-col transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl  min-h-[500px] group animate-in fade-in-50 slide-in-from-bottom-4"
@@ -142,6 +157,12 @@ export default function CategoryPage({
                       <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-blue-700 rounded-full text-xs font-semibold shadow-lg">
                         {blog.category.name}
                       </span>
+                    )}
+                    {viewedBlogs.includes(blog._id) && (
+                      <div className="absolute top-4 right-4 flex items-center gap-1 px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white rounded-full text-xs font-semibold shadow-lg">
+                        <FiEye className="w-3 h-3" />
+                        <span>Viewed</span>
+                      </div>
                     )}
                     <div className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <FiArrowRight className="w-5 h-5 text-white" />
