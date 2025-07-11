@@ -76,9 +76,8 @@ export default function AdminHomePage() {
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
-  const [topAuthors, setTopAuthors] = useState<any[]>([]);
-  const [performanceMetrics, setPerformanceMetrics] = useState<any>({});
+  const [categoryStats, setCategoryStats] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     if (status === "loading") return;
   }, [session, status, router]);
@@ -87,6 +86,7 @@ export default function AdminHomePage() {
     if (status === "loading" || !session?.user) return;
 
     const fetchAllData = async () => {
+      setIsLoading(true);
       try {
         let statsData,
           chartData,
@@ -97,14 +97,21 @@ export default function AdminHomePage() {
         let topCategory = "N/A";
 
         if (session?.user?.role === "admin") {
-          const [statsRes, chartRes, featuredRes, usersRes, viewHistoryRes] =
-            await Promise.all([
-              fetch("/api/stats"),
-              fetch("/api/chart-stats"),
-              fetch("/api/blog/featured"),
-              fetch("/api/user"),
-              fetch(`/api/view-history`),
-            ]);
+          const [
+            statsRes,
+            chartRes,
+            featuredRes,
+            usersRes,
+            viewHistoryRes,
+            categoryRes,
+          ] = await Promise.all([
+            fetch("/api/stats"),
+            fetch("/api/chart-stats"),
+            fetch("/api/blog/featured"),
+            fetch("/api/user"),
+            fetch(`/api/view-history`),
+            fetch("/api/category-stats"),
+          ]);
           [statsData, chartData, featuredData, userData, histories] =
             await Promise.all([
               statsRes.json(),
@@ -113,6 +120,8 @@ export default function AdminHomePage() {
               usersRes.json(),
               viewHistoryRes.json(),
             ]);
+          const categoryData = await categoryRes.json();
+          setCategoryStats(categoryData.stats || []);
 
           totalViewed = histories.length;
           const categoryCount: Record<string, number> = {};
@@ -140,16 +149,19 @@ export default function AdminHomePage() {
           userData = await userRes.json();
           const userId = userData.users[0]?._id || session?.user?.id;
 
-          const [userStatsRes, userChartRes, viewHistoryRes] =
+          const [userStatsRes, userChartRes, viewHistoryRes, categoryRes] =
             await Promise.all([
               fetch(`/api/stats?user=${userId}`),
               fetch(`/api/chart-stats?user=${userId}`),
               fetch(`/api/view-history?user=${userId}`),
+              fetch(`/api/category-stats?user=${userId}`),
             ]);
           statsData = await userStatsRes.json();
           chartData = await userChartRes.json();
           featuredData = { data: [] };
           histories = await viewHistoryRes.json();
+          const categoryData = await categoryRes.json();
+          setCategoryStats(categoryData.stats || []);
           totalViewed = histories.length;
           const categoryCount: Record<string, number> = {};
           histories.forEach((h: any) => {
@@ -218,69 +230,11 @@ export default function AdminHomePage() {
         setUsers(userData.users || []);
 
         // Mock data for enhanced features
-        setRecentActivities([
-          {
-            type: "post",
-            user: "John Doe",
-            action: "published",
-            time: "2 min ago",
-            title: "React Hooks Guide",
-          },
-          {
-            type: "comment",
-            user: "Jane Smith",
-            action: "commented on",
-            time: "5 min ago",
-            title: "JavaScript Tips",
-          },
-          {
-            type: "user",
-            user: "Mike Johnson",
-            action: "joined platform",
-            time: "10 min ago",
-          },
-          {
-            type: "like",
-            user: "Sarah Wilson",
-            action: "liked",
-            time: "15 min ago",
-            title: "CSS Grid Layout",
-          },
-        ]);
-
-        setTopAuthors([
-          {
-            name: "Alex Chen",
-            posts: 24,
-            views: 15420,
-            avatar: "AC",
-            engagement: 94.2,
-          },
-          {
-            name: "Maria Garcia",
-            posts: 18,
-            views: 12350,
-            avatar: "MG",
-            engagement: 87.8,
-          },
-          {
-            name: "James Wilson",
-            posts: 15,
-            views: 9870,
-            avatar: "JW",
-            engagement: 82.1,
-          },
-        ]);
-
-        setPerformanceMetrics({
-          serverResponse: "245ms",
-          uptime: "99.9%",
-          activeUsers: 1247,
-          bandwidth: "2.4 GB/h",
-        });
+        setIsLoading(false);
       } catch (error) {
         setUserViewStats({ totalViewed: 0, topCategory: "N/A" });
         console.error("Lỗi khi tải dữ liệu:", error);
+        setIsLoading(false);
       }
     };
 
@@ -300,12 +254,13 @@ export default function AdminHomePage() {
         let topCategory = "N/A";
 
         if (!selectedUserId) {
-          const [statsRes, chartRes, featuredRes, viewHistoryRes] =
+          const [statsRes, chartRes, featuredRes, viewHistoryRes, categoryRes] =
             await Promise.all([
               fetch("/api/stats"),
               fetch("/api/chart-stats"),
               fetch("/api/blog/featured"),
               fetch("/api/view-history"),
+              fetch("/api/category-stats"),
             ]);
           [statsData, chartData, featuredData, histories] = await Promise.all([
             statsRes.json(),
@@ -313,21 +268,26 @@ export default function AdminHomePage() {
             featuredRes.json(),
             viewHistoryRes.json(),
           ]);
+          const categoryData = await categoryRes.json();
+          setCategoryStats(categoryData.stats || []);
 
           if (featuredData.data) setPopularPosts(featuredData.data);
         } else {
           // User cụ thể
-          const [userStatsRes, userChartRes, viewHistoryRes] =
+          const [userStatsRes, userChartRes, viewHistoryRes, categoryRes] =
             await Promise.all([
               fetch(`/api/stats?user=${selectedUserId}`),
               fetch(`/api/chart-stats?user=${selectedUserId}`),
               fetch(`/api/view-history?user=${selectedUserId}`),
+              fetch(`/api/category-stats?user=${selectedUserId}`),
             ]);
           [statsData, chartData, histories] = await Promise.all([
             userStatsRes.json(),
             userChartRes.json(),
             viewHistoryRes.json(),
           ]);
+          const categoryData = await categoryRes.json();
+          setCategoryStats(categoryData.stats || []);
         }
         totalViewed = histories.length;
         const categoryCount: Record<string, number> = {};
@@ -563,46 +523,59 @@ export default function AdminHomePage() {
 
         <main className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, idx) => (
-              <div
-                key={idx}
-                className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg hover:scale-105 border border-gray-100"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <span className="text-2xl mr-3">{stat.icon}</span>
-                      <p className="text-gray-600 font-medium">{stat.label}</p>
-                    </div>
-                    <h3
-                      className={`text-3xl font-bold mb-2 ${
-                        stat.label.includes("Posts")
-                          ? "text-blue-600"
-                          : stat.label.includes("Comments")
-                          ? "text-green-600"
-                          : stat.label.includes("Viewed")
-                          ? "text-orange-600"
-                          : "text-purple-600"
-                      }`}
-                    >
-                      {stat.value}
-                    </h3>
-                    <div className="flex items-center">
-                      <span
-                        className={`text-sm font-semibold ${
-                          stat.isPositive ? "text-green-600" : "text-red-600"
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="bg-white rounded-xl shadow-md p-6 animate-pulse">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full mr-3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  </div>
+                  <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-20"></div>
+                </div>
+              ))
+            ) : (
+              stats.map((stat, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg hover:scale-105 border border-gray-100"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center mb-2">
+                        <span className="text-2xl mr-3">{stat.icon}</span>
+                        <p className="text-gray-600 font-medium">{stat.label}</p>
+                      </div>
+                      <h3
+                        className={`text-3xl font-bold mb-2 ${
+                          stat.label.includes("Posts")
+                            ? "text-blue-600"
+                            : stat.label.includes("Comments")
+                            ? "text-green-600"
+                            : stat.label.includes("Viewed")
+                            ? "text-orange-600"
+                            : "text-purple-600"
                         }`}
                       >
-                        {stat.change || "+12%"}
-                      </span>
-                      <span className="text-gray-500 text-sm ml-2">
-                        vs last period
-                      </span>
+                        {stat.value}
+                      </h3>
+                      <div className="flex items-center">
+                        <span
+                          className={`text-sm font-semibold ${
+                            stat.isPositive ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {stat.change || "+12%"}
+                        </span>
+                        <span className="text-gray-500 text-sm ml-2">
+                          vs last period
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -616,50 +589,83 @@ export default function AdminHomePage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                Blog Categories
+              <h2 className="text-lg font-semibold text-gray-800 mb-6">
+                {session?.user?.role == "admin"
+                  ? "Blog Categories"
+                  : "Processed Categories"}
               </h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-blue-500 mr-3"></div>
-                    <span className="text-gray-700">Technology</span>
+              <div className=" max-h-96 overflow-y-auto space-y-3">
+                {isLoading ? (
+                  Array.from({ length: 4 }).map((_, idx) => (
+                    <div key={idx} className="p-3 bg-gray-50 rounded-lg animate-pulse">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <div className="w-4 h-4 bg-gray-200 rounded-full mr-3"></div>
+                          <div className="h-4 bg-gray-200 rounded w-20"></div>
+                        </div>
+                        <div className="h-5 bg-gray-200 rounded w-10"></div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="w-full bg-gray-200 rounded-full h-2 mr-3"></div>
+                        <div className="h-3 bg-gray-200 rounded w-12"></div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  categoryStats.map((cat, idx) => (
+                  <div
+                    key={cat.name}
+                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <div
+                          className={`w-4 h-4 rounded-full mr-3 shadow-sm`}
+                          style={{
+                            backgroundColor:
+                              cat.color ||
+                              [
+                                "#3b82f6",
+                                "#22c55e",
+                                "#a855f7",
+                                "#f59e42",
+                                "#eab308",
+                              ][idx % 5],
+                          }}
+                        ></div>
+                        <span className="text-gray-800 font-medium">
+                          {cat.name}
+                        </span>
+                      </div>
+                      <span className="text-lg font-bold text-gray-900">
+                        {cat.percent}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2 mr-3">
+                        <div
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${cat.percent}%`,
+                            backgroundColor:
+                              cat.color ||
+                              [
+                                "#3b82f6",
+                                "#22c55e",
+                                "#a855f7",
+                                "#f59e42",
+                                "#eab308",
+                              ][idx % 5],
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-gray-600 font-medium whitespace-nowrap">
+                        {cat.postCount} posts
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <span className="font-semibold text-gray-900">35%</span>
-                    <div className="text-xs text-gray-500">45 posts</div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
-                    <span className="text-gray-700">Design</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-semibold text-gray-900">25%</span>
-                    <div className="text-xs text-gray-500">32 posts</div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-purple-500 mr-3"></div>
-                    <span className="text-gray-700">Business</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-semibold text-gray-900">22%</span>
-                    <div className="text-xs text-gray-500">28 posts</div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-orange-500 mr-3"></div>
-                    <span className="text-gray-700">Lifestyle</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-semibold text-gray-900">18%</span>
-                    <div className="text-xs text-gray-500">23 posts</div>
-                  </div>
-                </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
