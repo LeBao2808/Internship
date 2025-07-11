@@ -34,14 +34,14 @@ export default function Navbar() {
                 src="/logoadmin.png"
                 alt="Logo"
                 className="cursor-pointer block dark:hidden transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-2xl relative z-10"
-                style={{ width: "auto", height: "60px" }}
+                style={{ width: "80px", height: "80px" }}
                 onClick={() => router.push("/")}
               />
               <img
                 src="/logo.png"
                 alt="Logo"
                 className="cursor-pointer hidden dark:block transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-2xl relative z-10"
-                style={{ width: "60px", height: "70px" }}
+                style={{ width: "80px", height: "80px" }}
                 onClick={() => router.push("/")}
               />
             </div>

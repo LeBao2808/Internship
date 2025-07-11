@@ -9,6 +9,7 @@ import {
   getCachedRecommendation,
   setCachedRecommendation,
 } from "@/utils/cache";
+import { ragService } from "@/utils/ragService";
 
 export async function GET() {
   await dbConnect();
@@ -20,14 +21,15 @@ export async function GET() {
 
   const userId = session.user.email;
 
-  // Kiểm tra cache trước
-  const cached = await getCachedRecommendation(userId);
-  console.log("Cache:", cached);
 
-  if (cached) {
-    console.log("Cache hit for user:", userId);
-    return NextResponse.json({ recommendations: cached });
-  }
+  const cached = await getCachedRecommendation(userId);
+  // console.log("Cache:", cached);
+
+  // if (cached) {
+  //   console.log("Cache hit for user:", userId);
+  //   console.log("Cached recommendations:", cached);
+  //   return NextResponse.json({ recommendations: cached });
+  // }
 
   const user = await User.findOne({ email: session.user.email });
 
@@ -36,115 +38,33 @@ export async function GET() {
     populate: { path: "category", select: "name" },
   });
 
-  console.log("User's view histories:", histories);
-  const blogHistorys = histories.map((h) => ({
-    name: (h.blog as any)?.title?.toString() || null,
-    category: (h.blog as any)?.category?.name?.toString() || null,
-  }));
+  // Khởi tạo vector store nếu chưa có
+  await ragService.initializeIfNeeded();
 
-  console.log("Blog histories:", blogHistorys);
-  const categoryCount: Record<string, number> = {};
-  histories.forEach((h) => {
-    const catId = (h.blog as any)?.category?._id?.toString();
-    if (catId) categoryCount[catId] = (categoryCount[catId] || 0) + 1;
-  });
+  // Build user profile từ lịch sử
+  const userProfile = ragService.buildUserProfile(histories);
 
-  const sortedCategories = Object.entries(categoryCount)
-    .sort((a, b) => b[1] - a[1])
-    .map(([catId]) => catId);
+  // Lấy danh sách blog đã xem để loại trừ
+  const viewedBlogIds = histories.map(h => (h.blog as any)?._id?.toString()).filter(Boolean);
 
-  let blogs: any[] = [];
-  if (sortedCategories.length > 0) {
-    blogs = await Blog.find({ category: { $in: sortedCategories } })
-      .populate("category", "name")
-      .populate("user", "name");
+  // Sử dụng RAG để tìm recommendations
+  const recommendedBlogIds = await ragService.getRecommendations(userProfile, viewedBlogIds, 5);
+
+  // Lấy blog data từ database dựa trên recommendations
+  const recommendations = await Blog.find({ _id: { $in: recommendedBlogIds } })
+    .populate("category", "name")
+    .populate("user", "name");
+
+  // Fallback nếu không đủ recommendations
+  if (recommendations.length < 3) {
+    const fallbackBlogs = await Blog.find({ 
+      _id: { $nin: [...viewedBlogIds, ...recommendedBlogIds] } 
+    })
+    .populate("category", "name")
+    .populate("user", "name")
+    .limit(5 - recommendations.length);
+    recommendations.push(...fallbackBlogs);
   }
-
-  if (blogs.length < 1000000000) {
-    const moreBlogs = await Blog.find()
-      .populate("category", "name")
-      .populate("user", "name");
-    const blogIds = new Set(blogs.map((b) => b._id.toString()));
-    blogs = blogs.concat(
-      moreBlogs.filter((b) => !blogIds.has((b as any)._id.toString()))
-    );
-  }
-
-  console.log("Blogs fetched:", blogs.length);
-  const allTopCategories = Object.entries(categoryCount)
-    .sort((a, b) => b[1] - a[1])
-    .map(([catId]) => {
-      const categoryName = histories.find(
-        (h) => (h.blog as any)?.category?._id?.toString() === catId
-      );
-      return `${
-        (categoryName?.blog as any)?.category?.name || "Không xác định"
-      } `;
-    });
-  console.log("All top categories:", allTopCategories);
-
-  const prompt = `
-Bạn là hệ thống gợi ý blog thông minh. Nhiệm vụ của bạn là phân tích hành vi đọc của người dùng và đề xuất các bài viết phù hợp nhất.
-
-THÔNG TIN NGƯỜI DÙNG:
-- Email: ${user?.email}
-- Lịch sử xem: Đã xem ${
-    blogHistorys
-      .map((h) => `"${h.name}" - Category: ${h.category || "Không phân loại"}`)
-      .join(", ") || "Không có lịch sử xem"
-  }
-- Categories yêu thích theo thứ tự giảm dần: ${allTopCategories.join(", ")}
-
-DANH SÁCH BÀI VIẾT HIỆN CÓ:
-${blogs
-  .map(
-    (b, i) =>
-      `${i + 1}. "${b.title}" - Category: ${
-        b.category?.name || "Không phân loại"
-      }  - Author: ${b.user?.name || "Không xác định"} - Content: ${(
-        b.content || ""
-      ).substring(0, 100)}...`
-  )
-  .join("\n")}
-
-TIÊU CHÍ GỢI Ý:
-1. CATEGORY: Ưu tiên theo thứ tự sở thích ${allTopCategories.join(" > ")} 
-2. TITLE: Ưu tiên tiêu đề tương tự với các bài đã xem
-YÊU CẦU:
-1. Phân tích và chấm điểm từng bài viết dựa trên 5 tiêu chí trên
-2. Loại trừ hoàn toàn các bài viết người dùng đã xem
-3. Nếu không đủ bài phù hợp, chọn thêm bài có views cao hoặc category phổ biến
-4. Nếu như mà không có bài nào phù hợp, hãy trả về ít nhất 3 bài viết bất kỳ từ danh sách hiện có.
-ĐỊNH DẠNG TRẢ VỀ:
-Chỉ trả về mảng số thứ tự của các bài viết được gợi ý, ví dụ: [1, 2, 3, 4, 5]
-
-Lưu ý: Kết hợp tất cả 5 tiêu chí để đưa ra gợi ý chính xác nhất cho sở thích của người dùng.
-`;
-
-  console.log("Prompt for Gemini:", prompt);
-  const geminiRes = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBLhFqhZHJqaOcF1ogQcVLmctB9qw5shBM",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-      }),
-    }
-  );
-  const geminiData = await geminiRes.json();
-  let indexes: number[] = [];
-  try {
-    const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    indexes = JSON.parse(text.match(/\[.*\]/)?.[0] || "[]");
-    indexes = indexes
-      .map((i) => i - 1)
-      .filter((i) => i >= 0 && i < blogs.length);
-  } catch {
-    indexes = [0, 1, 2];
-  }
-
-  const recommendations = indexes.map((i) => blogs[i]).filter(Boolean);
   console.log("Recommendations:", recommendations);
   await setCachedRecommendation(userId, recommendations);
 

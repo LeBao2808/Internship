@@ -69,7 +69,7 @@ export default function CategoryPage({
         <div className="mt-10">
           <div className="text-center mb-12">
             <div className="flex gap-3 mb-4">
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent animate-in fade-in-50 duration-700">
+              <h1 className="text-5xl font-bold capitalize bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent animate-in fade-in-50 duration-700">
                 {slug}
               </h1>
             </div>
