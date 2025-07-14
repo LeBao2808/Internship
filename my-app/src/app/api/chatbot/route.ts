@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/resources/lib/mongodb"
 import { getCachedChatBot, setCachedChatBot } from "@/utils/cache";
+import { ragService } from "@/utils/ragService";
 import Blog from "@/app/api/models/Blog";
 import Category from "@/app/api/models/Category";
 import User from "@/app/api/models/User";
@@ -14,64 +15,45 @@ export async function POST(req: Request) {
 
   try {
     // Try to get cached system context
+    const session = await getServerSession(authOptions);
     const systemData = await getCachedChatBot();
-    let blogCount, categoryCount, userCount, recentBlogs, categories, commentCount;
-      const session = await getServerSession(authOptions);
+    let blogCount, categoryCount, userCount, categories, commentCount;
+    
     if (!systemData) {
       await dbConnect();
-
-      // Get system information
       [
         blogCount,
         categoryCount,
         userCount,
-        recentBlogs,
         categories,
         commentCount,
       ] = await Promise.all([
         Blog.countDocuments({ isDelete: false }),
         Category.countDocuments(),
         User.countDocuments({ isDelete: false }),
-        Blog.aggregate([
-          { $match: { isDelete: false } },
-          { $lookup: { from: "categories", localField: "category", foreignField: "_id", as: "category" } },
-          { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
-          { $lookup: { from: "comments", localField: "_id", foreignField: "blog", as: "commentsList" } },
-          { $addFields: { 
-            comments: { $size: "$commentsList" },
-            category: { $arrayElemAt: ["$category", 0] },
-            user: { $arrayElemAt: ["$user", 0] }
-          }},
-          { $project: { title: 1, slug: 1, comments: 1, "category.name": 1, "user.name": 1, createdAt: 1 } },
-          { $sort: { createdAt: -1 } },
-          { $limit: 15 }
-        ]),
         Category.find().select("name description").lean(),
         Comment.countDocuments({ isDelete: false }),
       ]);
-      
-      const contextData = {
-        blogCount,
-        categoryCount,
-        userCount,
-        recentBlogs,
-        categories,
-        commentCount
-      };
-      
+      const contextData = { blogCount, categoryCount, userCount, categories, commentCount };
       await setCachedChatBot(contextData);
     } else {
-      console.log("Using cached system context");
       if (typeof systemData === 'string') {
-        ({ blogCount, categoryCount, userCount, recentBlogs, categories, commentCount } = JSON.parse(systemData));
+        ({ blogCount, categoryCount, userCount, categories, commentCount } = JSON.parse(systemData));
       } else {
-        ({ blogCount, categoryCount, userCount, recentBlogs, categories, commentCount } = systemData as any);
+        ({ blogCount, categoryCount, userCount, categories, commentCount } = systemData as any);
       }
     }
-
-    // Ensure arrays are defined
-    recentBlogs = recentBlogs || [];
     categories = categories || [];
+    // Khởi tạo RAG nếu cần
+    await ragService.initializeIfNeeded();
+    // Tìm blog liên quan đến câu hỏi
+    const relatedBlogIds = await ragService.findRelatedBlogs(question, categoryCount);
+
+    const relatedBlogs = relatedBlogIds.length > 0
+      ? await Blog.find({ _id: { $in: relatedBlogIds } })
+          .populate('category', 'name')
+          .populate('user', 'name')
+      : [];
 
     const systemContext = `
 Hệ thống blog hiện tại có:
@@ -81,19 +63,16 @@ Hệ thống blog hiện tại có:
 - Tổng số bình luận ${commentCount} bình luận
 - Người tạo ra trang web này là Bảo Lê
 - Người dùng hiện tại: ${session?.user?.name || 'Khách'}
-- Danh sách bài viết gần đây:
-${recentBlogs.length > 0 ? recentBlogs
-  .map(
-    (blog: any) =>
-      `  - ${blog.title} (Tác giả: ${blog.user?.name || 'Không rõ'}, Danh mục: ${blog.category?.name || 'Chưa phân loại'}, Bình luận: ${blog.comments || 0})`
-  )
-  .join("\n") : 'Chưa có bài viết nào'}
 
+Bài viết liên quan đến câu hỏi:
+${relatedBlogs.length > 0 ? relatedBlogs
+  .map((blog: any) => `  - ${blog.title} (${blog.category?.name || 'Chưa phân loại'})`)  
+  .join("\n") : 'Không tìm thấy bài viết liên quan'}
 
 Các danh mục: ${categories.length > 0 ? categories.map((c: any) => c.name).join(", ") : 'Chưa có danh mục nào'}
     `;
 
-       const prompt = `Bạn là trợ lý AI của trang web BlogDev, hãy trả lời ngắn gọn, theo câu hỏi của người dùng nhưng mà phải dễ thương :), dễ hiểu cho người dùng bằng tiếng Việt${systemContext}
+       const prompt = `Bạn là trợ lý AI của trang web BlogDev, hãy trả lời ngắn gọn, theo câu hỏi của người dùng nhưng mà phải lịch sự dễ thương, dễ hiểu cho người dùng bằng tiếng Việt${systemContext}
 ${context ? `Thông tin bổ sung: ${context}` : ""}
 Câu hỏi: ${question}
 Trả lời:
@@ -115,8 +94,8 @@ console.log("Prompt:", prompt);
       "Xin lỗi, tôi chưa có câu trả lời cho câu hỏi này.";
 
     // Convert blog titles to clickable links
-    if (recentBlogs && recentBlogs.length > 0) {
-      recentBlogs.forEach((blog: any) => {
+    if (relatedBlogs && relatedBlogs.length > 0) {
+      relatedBlogs.forEach((blog: any) => {
         const titleRegex = new RegExp(blog.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
         answer = answer.replace(titleRegex, `[${blog.title}](/${blog.slug})`);
       });

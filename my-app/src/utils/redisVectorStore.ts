@@ -67,6 +67,8 @@ class RedisVectorStore {
     const queryEmbedding = await this.generateEmbedding(queryText);
     const keys = await this.redis.keys(`${this.VECTOR_KEY}*`);
     const similarities: Array<{ doc: CategoryVector; score: number }> = [];
+    console.log("keys:", keys);
+    console.log("similarities:", similarities);
 
     for (const key of keys) {
       const docStr = await this.redis.get(key);
@@ -75,6 +77,7 @@ class RedisVectorStore {
         if (doc.embedding) {
           const score = this.cosineSimilarity(queryEmbedding, doc.embedding);
           similarities.push({ doc, score });
+          console.log("similarities:", similarities);
         }
       }
     }
@@ -86,6 +89,7 @@ class RedisVectorStore {
   }
 
   async setInitialized(status: boolean) {
+    console.log('ThisInnit key:', this.INIT_KEY);
     await this.redis.set(this.INIT_KEY, status ? "1" : "0");
   }
 

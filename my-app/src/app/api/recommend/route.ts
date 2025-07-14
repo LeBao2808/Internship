@@ -25,11 +25,11 @@ export async function GET() {
   const cached = await getCachedRecommendation(userId);
   // console.log("Cache:", cached);
 
-  // if (cached) {
-  //   console.log("Cache hit for user:", userId);
-  //   console.log("Cached recommendations:", cached);
-  //   return NextResponse.json({ recommendations: cached });
-  // }
+  if (cached) {
+    console.log("Cache hit for user:", userId);
+    console.log("Cached recommendations:", cached);
+    return NextResponse.json({ recommendations: cached });
+  }
 
   const user = await User.findOne({ email: session.user.email });
 

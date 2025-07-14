@@ -17,6 +17,11 @@ export class RAGService {
     }
   }
 
+  async forceReindex() {
+    await this.indexCategories();
+    console.log('Category vectors re-indexed');
+  }
+
   async indexCategories() {
     const dbConnect = (await import('@/resources/lib/mongodb')).default;
     const Blog = (await import('@/app/api/models/Blog')).default;
@@ -39,7 +44,8 @@ export class RAGService {
           blogIds: blogs.map(blog => (blog._id as any).toString())
         }
       };
-      
+      console.log(`Indexing category: ${category.name} with ${blogs.length} blogs`);
+      console.log('Category vector:', categoryVector);
       await vectorStore.addCategoryVector(categoryVector);
     }
   }
@@ -72,9 +78,10 @@ export class RAGService {
 
   async getRecommendations(userProfile: UserProfile, excludeIds: string[], topK: number = 5): Promise<string[]> {
     const query = `${userProfile.preferences} ${userProfile.viewedCategories.join(' ')}`;
-    
+    console.log('Querying for similar categories:', query);
     const similarCategories = await vectorStore.findSimilarCategories(query, 3);
-    
+    console.log('Found similar categories:', similarCategories);
+  
     const recommendedBlogIds: string[] = [];
     for (const categoryVector of similarCategories) {
       const availableBlogIds = categoryVector.metadata.blogIds
@@ -84,6 +91,17 @@ export class RAGService {
     }
     
     return recommendedBlogIds.slice(0, topK);
+  }
+
+  async findRelatedBlogs(question: string, categoriesCount: number): Promise<string[]> {
+    const similarCategories = await vectorStore.findSimilarCategories(question, categoriesCount);
+    
+    const relatedBlogIds: string[] = [];
+    for (const categoryVector of similarCategories) {
+      relatedBlogIds.push(...categoryVector.metadata.blogIds);
+    }
+    
+    return relatedBlogIds;
   }
 
   buildUserProfile(histories: any[]): UserProfile {
