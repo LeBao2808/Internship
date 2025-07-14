@@ -69,8 +69,8 @@ export default function Navbar() {
                     Category
                   </span>
                 </Link>
-                <a
-                  href="#"
+                <Link
+                  href="/saves"
                   className="relative overflow-hidden group px-8 py-4 text-gray-800 dark:text-gray-200 font-semibold text-lg transition-all duration-500 hover:text-white dark:hover:text-white rounded-2xl"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-2xl"></span>
@@ -91,7 +91,7 @@ export default function Navbar() {
                     </svg>
                     Saves
                   </span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

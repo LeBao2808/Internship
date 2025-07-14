@@ -2,7 +2,6 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 import { IBaseTimestamps } from "./BaseTimestamps";
 import { baseTimestamps } from "./BaseTimestamps";
 import slugify from "slugify";
-import { boolean } from "zod";
 
 export interface IBlog extends Document, IBaseTimestamps {
   title: string;
