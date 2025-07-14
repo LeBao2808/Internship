@@ -1,3 +1,6 @@
+import { IBlog } from "@/app/api/models/Blog";
+import { IUser } from "@/app/api/models/User";
+
 export interface Comment {
   _id?: number;
   content: string;
@@ -43,4 +46,10 @@ export interface Role {
   _id?: string;
   name: string;
   description: string;
+}
+
+export interface SaveBlog {
+  _id?: string;
+  user: User
+  blog: Blog
 }

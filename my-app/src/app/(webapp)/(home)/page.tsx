@@ -6,6 +6,7 @@ import Navbar from "../../../components/Navbar";
 import "./style.css";
 import { useTranslation } from "react-i18next";
 import { getSession } from "next-auth/react";
+import { FiBookmark, FiEye } from "react-icons/fi";
 
 interface Blog {
   _id: string;
@@ -40,6 +41,8 @@ export default function BlogPage() {
   const [searchValue, setSearchValue] = useState("");
   const { t } = useTranslation("common");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [savedBlogs, setSavedBlogs] = useState<string[]>([]);
+  const [viewedBlogs, setViewedBlogs] = useState<string[]>([]);
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -64,36 +67,50 @@ export default function BlogPage() {
         fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       } else {
         fetch("/api/recommend")
-          .then((res) => res.json()) 
+          .then((res) => res.json())
           .then((data) => setBlogFeatureds(data.recommendations || []))
           .catch(() => setBlogFeatureds([]))
           .finally(() => setLoadingFeatures(false));
-        // fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
-        
       }
+
+      // Fetch saved blogs and viewed status
+      fetchSavedAndViewedBlogs();
     });
   }, []);
-  const fetchSortedBlogs = async () => {
+
+  const fetchSavedAndViewedBlogs = async () => {
     try {
-      const params = new URLSearchParams({
-        search,
-        page: page.toString(),
-        limit: limit.toString(),
-        ...(category.length > 0 ? { category: category.join(",") } : {}),
-      });
-      setLoading(true);
-      const res = await fetch(
-        `/api/recommend/sort-recomend?${params.toString()}`
-      );
-      const data = await res.json();
-      setBlogs(data.blogs || []);
-      setTotal(data.total || 0);
+      const saveRes = await fetch("/api/saveblog");
+      const saveData = await saveRes.json();
+      setSavedBlogs(saveData.savedBlogs?.map((s: any) => s.blog._id) || []);
     } catch (error) {
-      setBlogs([]);
-      setTotal(0);
+      setSavedBlogs([]);
     }
-    setLoading(false);
   };
+
+  const handleSaveBlog = async (blogId: string) => {
+    console.log("Toggling save for blog:", blogId);
+    try {
+      if (savedBlogs.includes(blogId)) {
+        await fetch("/api/saveblog", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blogId }),
+        });
+        setSavedBlogs((prev) => prev.filter((id) => id !== blogId));
+      } else {
+        await fetch("/api/saveblog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blogId }),
+        });
+        setSavedBlogs((prev) => [...prev, blogId]);
+      }
+    } catch (error) {
+      console.error("Error saving blog:", error);
+    }
+  };
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -289,17 +306,33 @@ export default function BlogPage() {
                         {blog.category.name}
                       </span>
                     )}
-                    <div className="absolute top-4 right-4 w-10 h-10 bg-yellow-400/80 backdrop-blur-md rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveBlog(blog._id);
+                        }}
+                        className={`p-3 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
+                          savedBlogs.includes(blog._id)
+                            ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
+                            : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
+                        }`}
                       >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                        <FiBookmark
+                          className={`w-5 h-5 transition-all duration-300 ${
+                            savedBlogs.includes(blog._id) ? "fill-current" : ""
+                          }`}
+                        />
+                      </button>
                     </div>
-                  </div>
 
+                    {viewedBlogs.includes(blog._id) && (
+                      <div className="absolute bottom-4 right-4 flex items-center gap-1 px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white rounded-full text-xs font-semibold shadow-lg">
+                        <FiEye className="w-3 h-3" />
+                        <span>Viewed</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 flex flex-col p-6">
                     <div className="flex items-center justify-between mb-4">
                       {blog.user && (
@@ -501,7 +534,11 @@ export default function BlogPage() {
                 strokeWidth={2}
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent dark:from-cyan-200 dark:via-cyan-100  dark:to-cyan-50">
@@ -740,6 +777,23 @@ export default function BlogPage() {
                         {blog.category.name}
                       </span>
                     )}
+                          <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveBlog(blog._id);
+                        }}
+                        className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
+                          savedBlogs.includes(blog._id)
+                            ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
+                            : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
+                        }`}
+                      >
+                        <FiBookmark
+                          className={`w-5 h-5 transition-all duration-300 ${
+                            savedBlogs.includes(blog._id) ? "fill-current" : ""
+                          }`}
+                        />
+                      </button>
                   </div>
                   <div className="flex-1 flex flex-col p-6">
                     <h2 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 line-clamp-2 dark:text-white">

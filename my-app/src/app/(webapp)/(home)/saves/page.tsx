@@ -12,9 +12,10 @@ import {
   FiBookmark,
   FiTrash2,
 } from "react-icons/fi";
+import { SaveBlog } from "@/utils/type";
 
 export default function SavedBlogsPage() {
-  const [savedBlogs, setSavedBlogs] = useState<any[]>([]);
+  const [savedBlogs, setSavedBlogs] = useState<SaveBlog[]>([]);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
   const router = useRouter();

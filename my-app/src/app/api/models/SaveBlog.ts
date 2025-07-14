@@ -22,7 +22,10 @@ SaveBlogSchema.pre("save", async function (next) {
   if (!this.slug && this.user) {
     const User = mongoose.models.User || mongoose.model("User", new Schema({}));
     const user = await User.findById(this.user);
-    this.slug = slugify(`${user?.name || 'user'}-blogsave`, { lower: true, strict: true });
+    const blog = await mongoose.models.Blog.findById(this.blog);
+    
+
+    this.slug = slugify(`${(user?.name || 'user')}, ${(blog?.title || 'blog')}-blogsave`, { lower: true, strict: true });
   }
   next();
 });
