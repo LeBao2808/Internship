@@ -76,7 +76,7 @@ export class RAGService {
     await vectorStore.addCategoryVector(categoryVector);
   }
 
-  async getRecommendations(userProfile: UserProfile, excludeIds: string[], topK: number = 5): Promise<string[]> {
+  async getRecommendations(userProfile: UserProfile, excludeIds: string[], topK: number = 3): Promise<string[]> {
     const query = `${userProfile.preferences} ${userProfile.viewedCategories.join(' ')}`;
     console.log('Querying for similar categories:', query);
     const similarCategories = await vectorStore.findSimilarCategories(query, 3);

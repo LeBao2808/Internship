@@ -71,6 +71,7 @@ export default function BlogPage() {
           .then((data) => setBlogFeatureds(data.recommendations || []))
           .catch(() => setBlogFeatureds([]))
           .finally(() => setLoadingFeatures(false));
+        // fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       }
 
       // Fetch saved blogs and viewed status
@@ -110,7 +111,6 @@ export default function BlogPage() {
       console.error("Error saving blog:", error);
     }
   };
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -777,23 +777,23 @@ export default function BlogPage() {
                         {blog.category.name}
                       </span>
                     )}
-                          <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSaveBlog(blog._id);
-                        }}
-                        className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
-                          savedBlogs.includes(blog._id)
-                            ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
-                            : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSaveBlog(blog._id);
+                      }}
+                      className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
+                        savedBlogs.includes(blog._id)
+                          ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
+                          : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
+                      }`}
+                    >
+                      <FiBookmark
+                        className={`w-5 h-5 transition-all duration-300 ${
+                          savedBlogs.includes(blog._id) ? "fill-current" : ""
                         }`}
-                      >
-                        <FiBookmark
-                          className={`w-5 h-5 transition-all duration-300 ${
-                            savedBlogs.includes(blog._id) ? "fill-current" : ""
-                          }`}
-                        />
-                      </button>
+                      />
+                    </button>
                   </div>
                   <div className="flex-1 flex flex-col p-6">
                     <h2 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 line-clamp-2 dark:text-white">
