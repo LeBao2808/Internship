@@ -50,6 +50,49 @@ export class ChatbotService {
       : [];
   }
 
+  async getBlogByTitle(title: string) {
+    await dbConnect();
+    return await Blog.findOne({ 
+      title: { $regex: title, $options: 'i' },
+      isDelete: false 
+    })
+    .populate('category', 'name')
+    .populate('user', 'name');
+  }
+
+  async checkForBlogSummary(question: string) {
+    const summaryKeywords = ['tóm tắt', 'tổng hợp', 'nội dung', 'bài viết', 'summary', 'summarize', 'content', 'article'];
+    const hasSummaryRequest = summaryKeywords.some(keyword => 
+      question.toLowerCase().includes(keyword)
+    );
+    
+    if (hasSummaryRequest) {
+      // Extract potential blog title from question
+       const cleanTitle = question
+        .replace(/^(tóm tắt|nội dung|summary|summarize)\s+(cho\s+tôi\s+|for\s+me\s+|the\s+)?(bài viết\s+|bài\s+|article\s+)?/i, '')
+        .replace(/\?$/, '')
+        .trim();
+      
+      console.log('Extracted title:', cleanTitle);
+      if (cleanTitle) {
+        const blog = await this.getBlogByTitle(cleanTitle);
+        console.log('Found blog:', blog ? blog.title : 'Not found');
+        if (blog) {
+          const summary = blog.content.length > 300 
+            ? blog.content.substring(0, 300) + '...'
+            : blog.content;
+          return {
+            isSummaryRequest: true,
+            blog,
+            summary: `**Tóm tắt bài viết "${blog.title}":**\n\n${summary}\n\n[Đọc toàn bộ bài viết](/${blog.slug})`
+          };
+        }
+      }
+    }
+    console.log("No summary request detected");
+    return { isSummaryRequest: false };
+  }
+
   buildSystemContext(systemData: SystemData, relatedBlogs: any[], session: any) {
     return `
 Hệ thống blog hiện tại có:

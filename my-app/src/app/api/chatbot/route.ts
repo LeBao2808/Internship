@@ -11,6 +11,14 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     
+    // Check if this is a blog summary request
+    const summaryCheck = await chatbotService.checkForBlogSummary(question);
+    if (summaryCheck.isSummaryRequest && summaryCheck.blog) {
+      const answer = await chatbotService.callGemini(summaryCheck.summary);
+      return NextResponse.json({ answer });
+    }
+
+    
     // Get system data (cached)
     const systemData = await chatbotService.getSystemData();
     
@@ -28,7 +36,7 @@ export async function POST(req: Request) {
     
     // Convert to clickable links
     answer = chatbotService.convertToClickableLinks(answer, relatedBlogs);
-
+    console.log("summaryCheck:", summaryCheck);
     return NextResponse.json({ answer });
   } catch (error) {
     console.error("Chatbot error:", error);
