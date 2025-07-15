@@ -42,7 +42,7 @@ export class ChatbotService {
 
   async getRelatedBlogs(question: string) {
     await ragService.initializeIfNeeded();
-    const relatedBlogIds = await ragService.findRelatedBlogs(question, 8);
+    const relatedBlogIds = await ragService.findRelatedBlogs(question, 3);
     return relatedBlogIds.length > 0
       ? await Blog.find({ _id: { $in: relatedBlogIds } })
           .populate('category', 'name')
@@ -53,13 +53,14 @@ export class ChatbotService {
   buildSystemContext(systemData: SystemData, relatedBlogs: any[], session: any) {
     return `
 Hệ thống blog hiện tại có:
+- Tổng số bài viết ${systemData.blogCount} bài viết
 - Tổng số danh mục ${systemData.categoryCount} danh mục
 - Tổng số người dùng ${systemData.userCount} người dùng
 - Tổng số bình luận ${systemData.commentCount} bình luận
 - Người tạo ra trang web này là Bảo Lê
 - Người dùng hiện tại: ${session?.user?.name || 'Khách'}
 
-Tất cả bài viết trong hệ thống:
+Bài viết có liên quan:
 ${relatedBlogs.length > 0 ? relatedBlogs
   .map((blog: any) => `  - ${blog.title} -  (${blog.category?.name || 'Chưa phân loại'})`)  
   .join("\n") : 'Không tìm thấy bài viết trong hệ thống'}
