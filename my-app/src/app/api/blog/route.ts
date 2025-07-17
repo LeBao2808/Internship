@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import generateSlug from "@/utils/generateSlug";
 import Category from "../models/Category";
 import { ragService } from "@/utils/ragService";
+import { redisVectorStore } from "@/utils/redisVectorStore";
 
 const BlogSchema = z.object({
   title: z.string().trim().min(5).optional(),
@@ -159,11 +160,12 @@ export async function DELETE(req: NextRequest) {
   console.log(body);
   try {
     const blog = await Blog.findById(body.id);
-    if (!blog) return NextResponse.json({ error: "Blog not found" }, { status: 404 });
-    
+    if (!blog)
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+
     const categoryId = blog.category.toString();
     await Blog.findByIdAndDelete(body.id);
-    await ragService.updateCategoryVector(categoryId);
+    await redisVectorStore.removeCategoryVector(categoryId, body.id);
 
     return NextResponse.json({ message: "Blog deleted" }, { status: 200 });
   } catch (error: any) {

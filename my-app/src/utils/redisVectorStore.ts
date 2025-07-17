@@ -129,8 +129,8 @@ class RedisVectorStore {
     return result === 1 || result === "1";
   }
 
-  async removeCategoryVector(categoryId: string) {
-    await this.redis.del(`${this.VECTOR_KEY}${categoryId}`);
+  async removeCategoryVector(categoryId: string , blogId:string) {
+    await this.redis.del(`${this.VECTOR_KEY}${categoryId}_${blogId}`);
   }
 
   async addDocumentVector(doc: any) {
@@ -188,7 +188,6 @@ class RedisVectorStore {
       exactMatchBonus: number;
     }> = [];
 
-    // Lowercase query for exact match checking
     const queryLower = queryText.toLowerCase();
     const queryWords = queryLower.split(/\W+/).filter((w) => w.length > 2);
 
@@ -212,7 +211,6 @@ class RedisVectorStore {
               doc.embedding
             );
 
-            // Calculate exact match bonus
             let exactMatchBonus = 0;
             const contentLower = doc.content.toLowerCase();
 

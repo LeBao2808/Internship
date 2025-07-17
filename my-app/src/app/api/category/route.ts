@@ -93,9 +93,6 @@ export async function PUT(request: Request) {
         { error: "Category not found" },
         { status: 404 }
       );
-    if (updatedCategory._id) {
-      await ragService.updateCategoryVector(updatedCategory._id.toString());
-    }
     return NextResponse.json({ categories: [updatedCategory] });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -114,7 +111,6 @@ export async function DELETE(request: Request) {
     });
     await Category.findByIdAndDelete(body.id);
     const categoryId = body.id.toString();
-    await ragService.updateCategoryVector(categoryId);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

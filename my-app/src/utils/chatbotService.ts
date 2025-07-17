@@ -17,7 +17,9 @@ export class ChatbotService {
     const cached = await getCachedChatBot();
     if (cached) {
       console.log("Using cached system data");
-      return typeof cached === "string" ? JSON.parse(cached) : (cached as SystemData);
+      return typeof cached === "string"
+        ? JSON.parse(cached)
+        : (cached as SystemData);
     }
     await dbConnect();
     const categories = await Category.find().select("name description").lean();
@@ -25,9 +27,9 @@ export class ChatbotService {
     await setCachedChatBot(data);
     return data;
   }
-  async getRelatedBlogs(question: string) {
+  async getRelatedBlogs(question: string, topK: number = 3) {
     await ragService.initializeIfNeeded();
-    const relatedBlogIds = await ragService.findRelatedBlogs(question);
+    const relatedBlogIds = await ragService.findRelatedBlogs(question, topK);
     return relatedBlogIds.length > 0
       ? await Blog.find({ _id: { $in: relatedBlogIds } })
           .populate("category", "name")
@@ -53,24 +55,50 @@ export class ChatbotService {
       "summary",
       "summarize",
       "content",
+      "tóm"
     ];
     const hasSummaryRequest = summaryKeywords.some((keyword) =>
       question.toLowerCase().includes(keyword)
     );
     if (hasSummaryRequest) {
-      // Use embedding search to find most relevant blog
-      const relatedBlogs = await this.getRelatedBlogs(question);
-      console.log("Related blogs for summary:", relatedBlogs);
+      // Extract potential title from question
+      const titlePattern = /tóm tắt|nội dung|summary|summarize|content|bài viết|bài|article|tóm/gi;
+      const cleanQuestion = question.replace(titlePattern, '').trim();
+      console.log('Extracted potential title:', cleanQuestion);
       
+      // Try to find exact title match first
+      await dbConnect();
+      const exactMatch = await Blog.findOne({
+        title: { $regex: cleanQuestion, $options: 'i' },
+        isDelete: false
+      }).populate('category', 'name').populate('user', 'name');
+      
+      if (exactMatch) {
+        console.log('Found exact title match:', exactMatch.title);
+        const summary = exactMatch.content.length > 300
+          ? exactMatch.content.substring(0, 300) + '...'
+          : exactMatch.content;
+        return {
+          isSummaryRequest: true,
+          blog: exactMatch,
+          summary: `**Tóm tắt bài viết "${exactMatch.title}":**\n\n${summary}\n\n[Đọc toàn bộ bài viết](/${exactMatch.slug})`,
+        };
+      }
+      
+      // Fallback to embedding search
+      const relatedBlogs = await this.getRelatedBlogs(question, 1);
+      console.log("Related blogs for summary:", relatedBlogs);
+
       if (relatedBlogs.length > 0) {
         const blog = relatedBlogs[0]; // Take the most relevant one
-        const summary = blog.content.length > 300 
-          ? blog.content.substring(0, 300) + '...'
-          : blog.content;
+        const summary =
+          blog.content.length > 300
+            ? blog.content.substring(0, 300) + "..."
+            : blog.content;
         return {
           isSummaryRequest: true,
           blog,
-          summary: `**Tóm tắt bài viết "${blog.title}":**\n\n${summary}\n\n[Đọc toàn bộ bài viết](/${blog.slug})`
+          summary: `**Tóm tắt bài viết "${blog.title}":**\n\n${summary}\n\n[Đọc toàn bộ bài viết](/${blog.slug})`,
         };
       }
     }
