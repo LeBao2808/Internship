@@ -9,6 +9,7 @@ interface CategoryVector {
     categoryId: string;
     blogCount: number;
     blogIds: string[];
+    blogTitle?: string;
   };
   embedding?: number[];
 }
@@ -18,6 +19,11 @@ class RedisVectorStore {
   private readonly VECTOR_KEY = "category_vectors:";
   private readonly INIT_KEY = "vector_store_initialized";
 
+  // Add method to expose Redis client for operations like keys and multi-delete
+  getRedisClient(): Redis {
+    return this.redis;
+  }
+
   constructor() {
     this.redis = new Redis({
       url: process.env.UPSTASH_REDIS_URL!,
@@ -25,32 +31,43 @@ class RedisVectorStore {
     });
   }
 
+  // Helper function for fallback embedding
+  hashCode(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+  }
+
   async addCategoryVector(doc: CategoryVector) {
     const embedding = await this.generateEmbedding(doc.content);
+
     doc.embedding = embedding;
     await this.redis.set(`${this.VECTOR_KEY}${doc.id}`, JSON.stringify(doc));
   }
 
   async generateEmbedding(text: string): Promise<number[]> {
-    try {
-      const response = await fetch("https://api.openai.com/v1/embeddings", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          input: text,
-          model: "text-embedding-3-small",
-        }),
-      });
-
-      const data = await response.json();
-      return data.data[0].embedding;
-    } catch (error) {
-      const hash = createHash("md5").update(text).digest("hex");
-      return Array.from(hash).map((char) => char.charCodeAt(0) / 255);
-    }
+    console.log('Using local embedding generator');
+    const words = text
+      .toLowerCase()
+      .split(/\W+/)
+      .filter((w) => w.length > 0);
+    const wordFreq: Record<string, number> = {};
+    words.forEach((word) => {
+      wordFreq[word] = (wordFreq[word] || 0) + 1;
+    });
+    const vector = new Array(1536).fill(0);
+    Object.entries(wordFreq).forEach(([word, freq], i) => {
+      const position = Math.abs(this.hashCode(word)) % 1536;
+      vector[position] = (freq as number) / words.length;
+    });
+    const magnitude = Math.sqrt(
+      vector.reduce((sum, val) => sum + val * val, 0)
+    );
+    return vector.map((val) => val / (magnitude || 1));
   }
 
   cosineSimilarity(a: number[], b: number[]): number {
@@ -62,7 +79,7 @@ class RedisVectorStore {
 
   async findSimilarCategories(
     queryText: string,
-    topK: number = 3
+    topK: number = 10
   ): Promise<CategoryVector[]> {
     const queryEmbedding = await this.generateEmbedding(queryText);
     const keys = await this.redis.keys(`${this.VECTOR_KEY}*`);
@@ -71,10 +88,25 @@ class RedisVectorStore {
     for (const key of keys) {
       const docStr = await this.redis.get(key);
       if (docStr) {
-        const doc: CategoryVector = docStr as CategoryVector;
-        if (doc.embedding) {
-          const score = this.cosineSimilarity(queryEmbedding, doc.embedding);
-          similarities.push({ doc, score });
+        let doc: CategoryVector;
+        try {
+          // Handle different data types from Redis
+          if (typeof docStr === 'string') {
+            doc = JSON.parse(docStr);
+          } else if (typeof docStr === 'object') {
+            doc = docStr as unknown as CategoryVector;
+          } else {
+            console.error('Unexpected data type from Redis:', typeof docStr);
+            continue;
+          }
+          
+          if (doc.embedding) {
+            const score = this.cosineSimilarity(queryEmbedding, doc.embedding);
+            similarities.push({ doc, score });
+          }
+        } catch (error) {
+          console.error('Error parsing vector data:', error);
+          continue;
         }
       }
     }
@@ -86,19 +118,144 @@ class RedisVectorStore {
   }
 
   async setInitialized(status: boolean) {
-    console.log('ThisInnit key:', this.INIT_KEY);
+    console.log("ThisInnit key:", this.INIT_KEY);
     await this.redis.set(this.INIT_KEY, status ? "1" : "0");
   }
 
   async getInitialized(): Promise<boolean> {
     const result = await this.redis.get(this.INIT_KEY);
-    console.log('index initialized:', result);
-    
+    console.log("index initialized:", result);
+
     return result === 1 || result === "1";
   }
 
   async removeCategoryVector(categoryId: string) {
     await this.redis.del(`${this.VECTOR_KEY}${categoryId}`);
+  }
+
+  async addDocumentVector(doc: any) {
+    // Split document into chunks for better search
+    const chunks = this.splitIntoChunks(doc.content, 500);
+    for (let i = 0; i < chunks.length; i++) {
+      const chunkDoc = {
+        ...doc,
+        id: `${doc.id}_chunk_${i}`,
+        content: chunks[i],
+        embedding: await this.generateEmbedding(chunks[i]),
+        metadata: {
+          ...doc.metadata,
+          chunkIndex: i,
+          originalDocId: doc.id,
+        },
+      };
+      await this.redis.set(
+        `document_vectors:${chunkDoc.id}`,
+        JSON.stringify(chunkDoc)
+      );
+    }
+  }
+
+  splitIntoChunks(text: string, chunkSize: number): string[] {
+    const sentences = text.split(/[.!?]+/);
+    const chunks = [];
+    let currentChunk = "";
+
+    for (const sentence of sentences) {
+      if ((currentChunk + sentence).length > chunkSize && currentChunk) {
+        chunks.push(currentChunk.trim());
+        currentChunk = sentence;
+      } else {
+        currentChunk += sentence + ".";
+      }
+    }
+    if (currentChunk) chunks.push(currentChunk.trim());
+    return chunks;
+  }
+
+  async removeDocumentVector(docId: string) {
+    await this.redis.del(`document_vectors:${docId}`);
+  }
+
+  async findSimilarDocuments(
+    queryText: string,
+    topK: number = 3
+  ): Promise<any[]> {
+    const queryEmbedding = await this.generateEmbedding(queryText);
+    const keys = await this.redis.keys("document_vectors:*");
+    const similarities: Array<{
+      doc: any;
+      score: number;
+      exactMatchBonus: number;
+    }> = [];
+
+    // Lowercase query for exact match checking
+    const queryLower = queryText.toLowerCase();
+    const queryWords = queryLower.split(/\W+/).filter((w) => w.length > 2);
+
+    for (const key of keys) {
+      const docStr = await this.redis.get(key);
+      if (docStr) {
+        try {
+          let doc: any;
+          if (typeof docStr === "string") {
+            doc = JSON.parse(docStr);
+          } else if (typeof docStr === "object") {
+            doc = docStr;
+          } else {
+            continue;
+          }
+
+          if (doc.embedding) {
+            // Calculate embedding similarity
+            const embeddingScore = this.cosineSimilarity(
+              queryEmbedding,
+              doc.embedding
+            );
+
+            // Calculate exact match bonus
+            let exactMatchBonus = 0;
+            const contentLower = doc.content.toLowerCase();
+
+            // Check for exact phrase match
+            if (contentLower.includes(queryLower)) {
+              exactMatchBonus += 0.3; // Big bonus for exact phrase
+            }
+
+            // Check for individual keywords
+            const matchedWords = queryWords.filter((word) =>
+              contentLower.includes(word)
+            );
+            exactMatchBonus += (matchedWords.length / queryWords.length) * 0.2;
+
+            // Combined score with both semantic and exact matching
+            const finalScore = embeddingScore + exactMatchBonus;
+
+            similarities.push({
+              doc,
+              score: finalScore,
+              exactMatchBonus,
+            });
+          }
+        } catch (error) {
+          console.error("Error parsing document data:", error);
+          continue;
+        }
+      }
+    }
+
+    console.log(
+      "Similarities found:",
+      similarities.map((s) => ({
+        content: s.doc.content.substring(0, 50) + "...",
+        score: s.score,
+        exactMatchBonus: s.exactMatchBonus,
+      }))
+    );
+
+    return similarities
+      .sort((a, b) => b.score - a.score)
+      .slice(0, topK)
+      .map((item) => item.doc);
   }
 }
 

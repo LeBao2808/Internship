@@ -48,14 +48,17 @@ export default function BlogChatbot() {
     } catch (error) {
       setChatHistory((prev) => [
         ...prev,
-        { type: "assistant", content: "Xin lỗi, có lỗi xảy ra. Vui lòng thử lại." },
+        {
+          type: "assistant",
+          content: "Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.",
+        },
       ]);
     }
     setLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleAsk();
     }
@@ -79,9 +82,12 @@ export default function BlogChatbot() {
               </button>
             </div>
           </div>
-          
+
           <div className="flex flex-col h-96">
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+            <div
+              className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
+              style={{ display: "flex", flexDirection: "column" }}
+            >
               {chatHistory.length === 0 ? (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                   <BsRobot className="w-12 h-12 mx-auto mb-3 text-blue-500" />
@@ -91,7 +97,9 @@ export default function BlogChatbot() {
                 chatHistory.map((msg, index) => (
                   <div
                     key={index}
-                    className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"} animate-in fade-in-50 duration-300`}
+                    className={`flex ${
+                      msg.type === "user" ? "justify-end" : "justify-start"
+                    } animate-in fade-in-50 duration-300`}
                   >
                     <div
                       className={`max-w-[80%] p-3 rounded-2xl ${
@@ -103,7 +111,9 @@ export default function BlogChatbot() {
                       {msg.type === "assistant" && (
                         <div className="flex items-center gap-2 mb-1">
                           <BsRobot className="w-4 h-4 text-blue-500" />
-                          <span className="text-xs font-medium text-blue-500">Assistant</span>
+                          <span className="text-xs font-medium text-blue-500">
+                            Assistant
+                          </span>
                         </div>
                       )}
                       <div
@@ -126,8 +136,14 @@ export default function BlogChatbot() {
                       <BsRobot className="w-4 h-4 text-blue-500 animate-spin" />
                       <div className="flex gap-1">
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div
+                          className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -135,7 +151,7 @@ export default function BlogChatbot() {
               )}
               <div ref={messagesEndRef} />
             </div>
-            
+
             <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
               <div className="flex gap-2">
                 <textarea

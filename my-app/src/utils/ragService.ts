@@ -1,3 +1,4 @@
+
 import { redisVectorStore as vectorStore, CategoryVector } from './redisVectorStore';
 
 
@@ -29,24 +30,27 @@ export class RAGService {
     
     await dbConnect();
     const categories = await Category.find();
-    
+  
     for (const category of categories) {
-      const blogs = await Blog.find({ category: category._id });
-      const content = blogs.map(blog => `${blog.title} ${blog.content}`).join(' ');
-      
-      const categoryVector: CategoryVector = {
-        id: (category._id as any).toString(),
-        content,
-        metadata: {
-          categoryName: category.name,
-          categoryId: (category._id as any).toString(),
-          blogCount: blogs.length,
-          blogIds: blogs.map(blog => (blog._id as any).toString())
-        }
-      };
-      console.log(`Indexing category: ${category.name} with ${blogs.length} blogs`);
-      console.log('Category vector:', categoryVector);
-      await vectorStore.addCategoryVector(categoryVector);
+      const blogs = await Blog.find({ category: category._id }).populate('user', 'name');
+
+      // Create separate vector for each blog
+      for (const blog of blogs) {
+        const content = `Category: ${category.name}. Author: ${(blog.user as any)?.name || 'Unknown'}. Title: ${blog.title} ${blog.content}`;
+        
+        const categoryVector: CategoryVector = {
+          id: `${category._id}_${blog._id}`,
+          content,
+          metadata: {
+            categoryName: category.name,
+            categoryId: (category._id as any).toString(),
+            blogCount: 1,
+            blogIds: [(blog._id as any).toString()],
+            blogTitle: blog.title
+          }
+        };
+        await vectorStore.addCategoryVector(categoryVector);
+      }
     }
   }
 
@@ -93,8 +97,8 @@ export class RAGService {
     return recommendedBlogIds.slice(0, topK);
   }
 
-  async findRelatedBlogs(question: string, categoriesCount: number): Promise<string[]> {
-    const similarCategories = await vectorStore.findSimilarCategories(question, categoriesCount);
+  async findRelatedBlogs(question: string ): Promise<string[]> {
+    const similarCategories = await vectorStore.findSimilarCategories(question);
     
     const relatedBlogIds: string[] = [];
     for (const categoryVector of similarCategories) {

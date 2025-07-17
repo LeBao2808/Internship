@@ -20,6 +20,7 @@ export default function NavigationClient() {
     { label: t("Blog", "Blog"), href: "/admin/blog-management" },
     { label: t("Category", "Category"), href: "/admin/category-management" },
     { label: t("Comment", "Comment"), href: "/admin/comment-management" },
+    { label: t("Document", "Document"), href: "/admin/document-management" },
   ];
   const filteredNavItems = navItems.filter((item) => {
     if (item.label === t("User", "User")) {
@@ -29,6 +30,9 @@ export default function NavigationClient() {
       return session?.user?.role === "admin";
     }
     if (item.label === t("Category", "Category")) {
+      return session?.user?.role === "admin";
+    }
+    if (item.label === t("Document", "Document")) {
       return session?.user?.role === "admin";
     }
     return true;

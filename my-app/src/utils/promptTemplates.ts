@@ -15,7 +15,6 @@ Hãy tóm tắt nội dung sau đây thành 2-3 câu ngắn gọn, dễ hiểu b
 
 ${content}
   `,
-
   CATEGORY_EXPLANATION: (categoryName: string, relatedBlogs: string[]) => `
 Hãy giải thích về danh mục "${categoryName}" và liệt kê các bài viết liên quan:
 ${relatedBlogs.map(blog => `- ${blog}`).join('\n')}
@@ -29,7 +28,7 @@ Hệ thống blog hiện tại có:
 - Tổng số danh mục: ${categoryCount} danh mục  
 - Tổng số người dùng: ${userCount} người dùng
 - Tổng số bình luận: ${commentCount} bình luận
-- Người tạo ra trang web này là Bảo Lê
+
   `,
 
   USER_CONTEXT: (userName: string, relatedBlogs: any[]) => `

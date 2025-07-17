@@ -9,113 +9,109 @@ import { getCachedChatBot, setCachedChatBot } from "./cache";
 import { ragService } from "./ragService";
 
 interface SystemData {
-  blogCount: number;
-  categoryCount: number;
-  userCount: number;
   categories: any[];
-  commentCount: number;
 }
 
 export class ChatbotService {
   async getSystemData(): Promise<SystemData> {
     const cached = await getCachedChatBot();
-
-    
     if (cached) {
       console.log("Using cached system data");
-      return typeof cached === 'string' ? JSON.parse(cached) : cached as SystemData;
+      return typeof cached === "string" ? JSON.parse(cached) : (cached as SystemData);
     }
-
     await dbConnect();
-    const [blogCount, categoryCount, userCount, categories, commentCount] = await Promise.all([
-      Blog.countDocuments({ isDelete: false }),
-      Category.countDocuments(),
-      User.countDocuments({ isDelete: false }),
-      Category.find().select("name description").lean(),
-      Comment.countDocuments({ isDelete: false }),
-    ]);
-
-    const data = { blogCount, categoryCount, userCount, categories, commentCount };
+    const categories = await Category.find().select("name description").lean();
+    const data = { categories };
     await setCachedChatBot(data);
     return data;
   }
-
   async getRelatedBlogs(question: string) {
     await ragService.initializeIfNeeded();
-    const relatedBlogIds = await ragService.findRelatedBlogs(question, 3);
+    const relatedBlogIds = await ragService.findRelatedBlogs(question);
     return relatedBlogIds.length > 0
       ? await Blog.find({ _id: { $in: relatedBlogIds } })
-          .populate('category', 'name')
-          .populate('user', 'name')
+          .populate("category", "name")
+          .populate("user", "name")
       : [];
   }
 
   async getBlogByTitle(title: string) {
     await dbConnect();
-    return await Blog.findOne({ 
-      title: { $regex: title, $options: 'i' },
-      isDelete: false 
+    return await Blog.findOne({
+      title: { $regex: title, $options: "i" },
+      isDelete: false,
     })
-    .populate('category', 'name')
-    .populate('user', 'name');
+      .populate("category", "name")
+      .populate("user", "name");
   }
 
   async checkForBlogSummary(question: string) {
-    const summaryKeywords = ['tóm tắt', 'tổng hợp', 'nội dung', 'bài viết', 'summary', 'summarize', 'content', 'article'];
-    const hasSummaryRequest = summaryKeywords.some(keyword => 
+    const summaryKeywords = [
+      "tóm tắt",
+      "tổng hợp",
+      "nội dung",
+      "summary",
+      "summarize",
+      "content",
+    ];
+    const hasSummaryRequest = summaryKeywords.some((keyword) =>
       question.toLowerCase().includes(keyword)
     );
-    
     if (hasSummaryRequest) {
-      // Extract potential blog title from question
-       const cleanTitle = question
-        .replace(/^(tóm tắt|nội dung|summary|summarize)\s+(cho\s+tôi\s+|for\s+me\s+|the\s+)?(bài viết\s+|bài\s+|article\s+)?/i, '')
-        .replace(/\?$/, '')
-        .trim();
+      // Use embedding search to find most relevant blog
+      const relatedBlogs = await this.getRelatedBlogs(question);
+      console.log("Related blogs for summary:", relatedBlogs);
       
-      console.log('Extracted title:', cleanTitle);
-      if (cleanTitle) {
-        const blog = await this.getBlogByTitle(cleanTitle);
-        console.log('Found blog:', blog ? blog.title : 'Not found');
-        if (blog) {
-          const summary = blog.content.length > 300 
-            ? blog.content.substring(0, 300) + '...'
-            : blog.content;
-          return {
-            isSummaryRequest: true,
-            blog,
-            summary: `**Tóm tắt bài viết "${blog.title}":**\n\n${summary}\n\n[Đọc toàn bộ bài viết](/${blog.slug})`
-          };
-        }
+      if (relatedBlogs.length > 0) {
+        const blog = relatedBlogs[0]; // Take the most relevant one
+        const summary = blog.content.length > 300 
+          ? blog.content.substring(0, 300) + '...'
+          : blog.content;
+        return {
+          isSummaryRequest: true,
+          blog,
+          summary: `**Tóm tắt bài viết "${blog.title}":**\n\n${summary}\n\n[Đọc toàn bộ bài viết](/${blog.slug})`
+        };
       }
     }
     console.log("No summary request detected");
     return { isSummaryRequest: false };
   }
 
-  buildSystemContext(systemData: SystemData, relatedBlogs: any[], session: any) {
+  buildSystemContext(
+    systemData: SystemData,
+    relatedBlogs: any[],
+    session: any
+  ) {
     return `
-Hệ thống blog hiện tại có:
-- Tổng số bài viết ${systemData.blogCount} bài viết
-- Tổng số danh mục ${systemData.categoryCount} danh mục
-- Tổng số người dùng ${systemData.userCount} người dùng
-- Tổng số bình luận ${systemData.commentCount} bình luận
-- Người tạo ra trang web này là Bảo Lê
-- Người dùng hiện tại: ${session?.user?.name || 'Khách'}
+- Người dùng hiện tại: ${session?.user?.name || "Khách"}
 
 Bài viết có liên quan:
-${relatedBlogs.length > 0 ? relatedBlogs
-  .map((blog: any) => `  - ${blog.title} -  (${blog.category?.name || 'Chưa phân loại'})`)  
-  .join("\n") : 'Không tìm thấy bài viết trong hệ thống'}
+${
+  relatedBlogs.length > 0
+    ? relatedBlogs
+        .map(
+          (blog: any) =>
+            `  - ${blog.title} -  (${
+              blog.category?.name || "Chưa phân loại"
+            }) - (Tác giả ${blog.user?.name || "Chưa xác định"})`
+        )
+        .join("\n")
+    : "Không tìm thấy bài viết trong hệ thống"
+}
 
-Các danh mục: ${systemData.categories.length > 0 ? systemData.categories.map((c: any) => c.name).join(", ") : 'Chưa có danh mục nào'}
+Các danh mục: ${
+      systemData.categories.length > 0
+        ? systemData.categories.map((c: any) => c.name).join(", ")
+        : "Chưa có danh mục nào"
+    }
     `;
   }
 
   async callGemini(prompt: string): Promise<string> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-    
+
     try {
       const response = await fetch(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBLhFqhZHJqaOcF1ogQcVLmctB9qw5shBM",
@@ -125,26 +121,28 @@ Các danh mục: ${systemData.categories.length > 0 ? systemData.categories.map(
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              maxOutputTokens: 500,    // Giới hạn độ dài
-              temperature: 0.7,        // Giảm creativity = nhanh hơn
-            }
+              maxOutputTokens: 500, // Giới hạn độ dài
+              temperature: 0.7, // Giảm creativity = nhanh hơn
+            },
           }),
-          signal: controller.signal
+          signal: controller.signal,
         }
       );
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      
+
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 
-             "Xin lỗi, tôi chưa có câu trả lời cho câu hỏi này.";
+      return (
+        data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+        "Xin lỗi, tôi chưa có câu trả lời cho câu hỏi này."
+      );
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error === 'AbortError') {
+      if (error === "AbortError") {
         return "Phản hồi quá chậm, vui lòng thử lại.";
       }
       throw error;
@@ -153,12 +151,15 @@ Các danh mục: ${systemData.categories.length > 0 ? systemData.categories.map(
 
   convertToClickableLinks(answer: string, relatedBlogs: any[]): string {
     if (!relatedBlogs?.length) return answer;
-    
+
     relatedBlogs.forEach((blog: any) => {
-      const titleRegex = new RegExp(blog.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      const titleRegex = new RegExp(
+        blog.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        "gi"
+      );
       answer = answer.replace(titleRegex, `[${blog.title}](/${blog.slug})`);
     });
-    
+
     return answer;
   }
 }
