@@ -13,11 +13,11 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     
     // Check if this is a blog summary request
-    // const summaryCheck = await chatbotService.checkForBlogSummary(question);
-    // if (summaryCheck.isSummaryRequest && summaryCheck.blog) {
-    //   const answer = await chatbotService.callGemini(summaryCheck.summary);
-    //   return NextResponse.json({ answer });
-    // }
+    const summaryCheck = await chatbotService.checkForBlogSummary(question);
+    if (summaryCheck.isSummaryRequest && summaryCheck.blog) {
+      const answer = await chatbotService.callGemini(summaryCheck.summary);
+      return NextResponse.json({ answer });
+    }
 
     
     // Get system data (cached)
