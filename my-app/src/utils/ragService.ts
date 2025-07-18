@@ -38,7 +38,6 @@ export class RAGService {
         "name"
       );
 
-      // Create separate vector for each blog
       for (const blog of blogs) {
         const content = `Category: ${category.name}. Author: ${
           (blog.user as any)?.name || "Unknown"

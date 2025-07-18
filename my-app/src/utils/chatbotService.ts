@@ -149,8 +149,8 @@ Các danh mục: ${
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              maxOutputTokens: 500, // Giới hạn độ dài
-              temperature: 0.7, // Giảm creativity = nhanh hơn
+              maxOutputTokens: 500, 
+              temperature: 0.7, 
             },
           }),
           signal: controller.signal,

@@ -50,25 +50,57 @@ class RedisVectorStore {
   }
 
   async generateEmbedding(text: string): Promise<number[]> {
-    console.log('Using local embedding generator');
-    const words = text
-      .toLowerCase()
-      .split(/\W+/)
-      .filter((w) => w.length > 0);
-    const wordFreq: Record<string, number> = {};
-    words.forEach((word) => {
-      wordFreq[word] = (wordFreq[word] || 0) + 1;
-    });
-    const vector = new Array(1536).fill(0);
-    Object.entries(wordFreq).forEach(([word, freq], i) => {
-      const position = Math.abs(this.hashCode(word)) % 1536;
-      vector[position] = (freq as number) / words.length;
-    });
-    const magnitude = Math.sqrt(
-      vector.reduce((sum, val) => sum + val * val, 0)
-    );
-    return vector.map((val) => val / (magnitude || 1));
+    try {
+      console.log("Using Xenova Transformers for embedding");
+
+      // Import dynamically to avoid server-side issues
+      const { pipeline } = await import("@xenova/transformers");
+
+      // Load the embedding model
+      const embedder = await pipeline(
+        "feature-extraction",
+        "Xenova/all-MiniLM-L6-v2"
+      );
+
+      // Generate embedding
+      const result = await embedder(text, { pooling: "mean", normalize: true });
+
+      // Convert to array
+      const embedding = Array.from(result.data);
+      console.log(
+        "Successfully generated embedding with shape:",
+        embedding.length
+      );
+      return embedding;
+    } catch (error) {
+      console.error(
+        "Error with Hugging Face embedding, using fallback:",
+        error
+      );
+
+      // Fallback method
+      const words = text
+        .toLowerCase()
+        .split(/\W+/)
+        .filter((w) => w.length > 0);
+      const wordFreq: Record<string, number> = {};
+      words.forEach((word) => {
+        wordFreq[word] = (wordFreq[word] || 0) + 1;
+      });
+
+      const vector = new Array(1536).fill(0);
+      Object.entries(wordFreq).forEach(([word, freq]) => {
+        const position = Math.abs(this.hashCode(word)) % 1536;
+        vector[position] = (freq as number) / words.length;
+      });
+
+      const magnitude = Math.sqrt(
+        vector.reduce((sum, val) => sum + val * val, 0)
+      );
+      return vector.map((val) => val / (magnitude || 1));
+    }
   }
+
 
   cosineSimilarity(a: number[], b: number[]): number {
     const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
@@ -91,21 +123,21 @@ class RedisVectorStore {
         let doc: CategoryVector;
         try {
           // Handle different data types from Redis
-          if (typeof docStr === 'string') {
+          if (typeof docStr === "string") {
             doc = JSON.parse(docStr);
-          } else if (typeof docStr === 'object') {
+          } else if (typeof docStr === "object") {
             doc = docStr as unknown as CategoryVector;
           } else {
-            console.error('Unexpected data type from Redis:', typeof docStr);
+            console.error("Unexpected data type from Redis:", typeof docStr);
             continue;
           }
-          
+
           if (doc.embedding) {
             const score = this.cosineSimilarity(queryEmbedding, doc.embedding);
             similarities.push({ doc, score });
           }
         } catch (error) {
-          console.error('Error parsing vector data:', error);
+          console.error("Error parsing vector data:", error);
           continue;
         }
       }
@@ -129,7 +161,7 @@ class RedisVectorStore {
     return result === 1 || result === "1";
   }
 
-  async removeCategoryVector(categoryId: string , blogId:string) {
+  async removeCategoryVector(categoryId: string, blogId: string) {
     await this.redis.del(`${this.VECTOR_KEY}${categoryId}_${blogId}`);
   }
 
