@@ -117,7 +117,7 @@ export class RAGService {
       userProfile.preferences
     } ${userProfile.viewedCategories.join(" ")}`;
     console.log("Querying for similar categories:", query);
-    const similarCategories = await vectorStore.findSimilarCategories(query, 3);
+    const similarCategories = await vectorStore.findSimilarCategories(query, topK);
     console.log("Found similar categories:", similarCategories);
 
     const recommendedBlogIds: string[] = [];

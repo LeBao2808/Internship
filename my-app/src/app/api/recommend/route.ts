@@ -38,19 +38,16 @@ export async function GET() {
     populate: { path: "category", select: "name" },
   });
 
-  // Khởi tạo vector store nếu chưa có
+
   await ragService.initializeIfNeeded();
 
-  // Build user profile từ lịch sử
+
   const userProfile = ragService.buildUserProfile(histories);
 
-  // Lấy danh sách blog đã xem để loại trừ
   const viewedBlogIds = histories.map(h => (h.blog as any)?._id?.toString()).filter(Boolean);
 
-  // Sử dụng RAG để tìm recommendations
   const recommendedBlogIds = await ragService.getRecommendations(userProfile, viewedBlogIds, 5);
 
-  // Lấy blog data từ database dựa trên recommendations
   const recommendations = await Blog.find({ _id: { $in: recommendedBlogIds } })
     .populate("category", "name")
     .populate("user", "name");

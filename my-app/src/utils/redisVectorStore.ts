@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import { Redis } from "@upstash/redis";
+import { pipeline } from "@xenova/transformers";
 
 interface CategoryVector {
   id: string;
@@ -19,7 +20,6 @@ class RedisVectorStore {
   private readonly VECTOR_KEY = "category_vectors:";
   private readonly INIT_KEY = "vector_store_initialized";
 
-  // Add method to expose Redis client for operations like keys and multi-delete
   getRedisClient(): Redis {
     return this.redis;
   }
@@ -31,13 +31,12 @@ class RedisVectorStore {
     });
   }
 
-  // Helper function for fallback embedding
   hashCode(str: string): number {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
       hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32bit integer
+      hash = hash & hash; 
     }
     return hash;
   }
@@ -53,19 +52,12 @@ class RedisVectorStore {
     try {
       console.log("Using Xenova Transformers for embedding");
 
-      // Import dynamically to avoid server-side issues
-      const { pipeline } = await import("@xenova/transformers");
-
-      // Load the embedding model
       const embedder = await pipeline(
         "feature-extraction",
         "Xenova/all-MiniLM-L6-v2"
       );
-
-      // Generate embedding
       const result = await embedder(text, { pooling: "mean", normalize: true });
 
-      // Convert to array
       const embedding = Array.from(result.data);
       console.log(
         "Successfully generated embedding with shape:",
@@ -78,7 +70,6 @@ class RedisVectorStore {
         error
       );
 
-      // Fallback method
       const words = text
         .toLowerCase()
         .split(/\W+/)
