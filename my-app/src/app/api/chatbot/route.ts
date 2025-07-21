@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     const systemData = await chatbotService.getSystemData();
 
-    const relatedBlogs = await chatbotService.getRelatedBlogs(question, 10);
+    const relatedBlogs = await chatbotService.getRelatedBlogs(question, 3);
     console.log("Related blogs:", relatedBlogs);
 
     const relatedDocs = await redisVectorStore.findSimilarDocuments(
