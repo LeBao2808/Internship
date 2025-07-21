@@ -18,16 +18,13 @@ export async function POST(req: Request) {
     }
 
     const systemData = await chatbotService.getSystemData();
-
     const relatedBlogs = await chatbotService.getRelatedBlogs(question, 3);
     console.log("Related blogs:", relatedBlogs);
-
     const relatedDocs = await redisVectorStore.findSimilarDocuments(
       question,
       2
     );
-    const docContext =
-      relatedDocs.length > 0
+    const docContext = relatedDocs.length > 0
         ? `\n\nThông tin từ tài liệu:\n${relatedDocs
             .map((doc) => doc.content)
             .join("\n\n")}`
@@ -46,7 +43,6 @@ export async function POST(req: Request) {
     let answer = await chatbotService.callGemini(prompt);
 
     answer = chatbotService.convertToClickableLinks(answer, relatedBlogs);
-    // console.log("summaryCheck:", summaryCheck);
     return NextResponse.json({ answer });
   } catch (error) {
     console.error("Chatbot error:", error);

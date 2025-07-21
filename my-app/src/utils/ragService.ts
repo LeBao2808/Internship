@@ -2,6 +2,9 @@ import {
   redisVectorStore as vectorStore,
   CategoryVector,
 } from "./redisVectorStore";
+import Blog from "@/app/api/models/Blog";
+import Category from "@/app/api/models/Category";
+import dbConnect from "@/resources/lib/mongodb";
 
 interface UserProfile {
   viewedCategories: string[];
@@ -25,10 +28,6 @@ export class RAGService {
   }
 
   async indexCategories() {
-    const dbConnect = (await import("@/resources/lib/mongodb")).default;
-    const Blog = (await import("@/app/api/models/Blog")).default;
-    const Category = (await import("@/app/api/models/Category")).default;
-
     await dbConnect();
     const categories = await Category.find();
 
@@ -49,8 +48,7 @@ export class RAGService {
           metadata: {
             categoryName: category.name,
             categoryId: (category._id as any).toString(),
-            blogCount: 1,
-            blogIds: [(blog._id as any).toString()],
+            blogIds: (blog._id as any).toString(),
             blogTitle: blog.title,
           },
         };
@@ -60,15 +58,9 @@ export class RAGService {
   }
 
   async updateCategoryVector(categoryId: string) {
-    const dbConnect = (await import("@/resources/lib/mongodb")).default;
-    const Blog = (await import("@/app/api/models/Blog")).default;
-    const Category = (await import("@/app/api/models/Category")).default;
-
     await dbConnect();
     const category = await Category.findById(categoryId);
     if (!category) return;
-
-    // Delete existing vectors for this category
     const keys = await vectorStore
       .getRedisClient()
       .keys(`${this.VECTOR_KEY}${categoryId}_*`);
@@ -77,7 +69,6 @@ export class RAGService {
         keys.map((key) => vectorStore.getRedisClient().del(key))
       );
     }
-
     const blogs = await Blog.find({ category: categoryId }).populate(
       "user",
       "name"
@@ -94,8 +85,7 @@ export class RAGService {
         metadata: {
           categoryName: category.name,
           categoryId: categoryId,
-          blogCount: 1,
-          blogIds: [(blog._id as any).toString()],
+          blogIds: (blog._id as any).toString(),
           blogTitle: blog.title,
         },
       };

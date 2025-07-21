@@ -1,14 +1,13 @@
 import { createHash } from "crypto";
 import { Redis } from "@upstash/redis";
 import { pipeline } from "@xenova/transformers";
-
+import cosineSimilarity from 'compute-cosine-similarity';
 interface CategoryVector {
   id: string;
   content: string;
   metadata: {
     categoryName: string;
     categoryId: string;
-    blogCount: number;
     blogIds: string[];
     blogTitle?: string;
   };
@@ -93,13 +92,10 @@ class RedisVectorStore {
   }
 
 
-  cosineSimilarity(a: number[], b: number[]): number {
-    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
-  }
-
+ calculateSimilarity(a: number[], b: number[]): number {
+  const result = cosineSimilarity(a, b);
+  return result ?? 0; // fallback nếu có thể trả về null
+}
   async findSimilarCategories(
     queryText: string,
     topK: number = 10
@@ -124,7 +120,7 @@ class RedisVectorStore {
           }
 
           if (doc.embedding) {
-            const score = this.cosineSimilarity(queryEmbedding, doc.embedding);
+            const score = this.calculateSimilarity(queryEmbedding, doc.embedding);
             similarities.push({ doc, score });
           }
         } catch (error) {
@@ -229,7 +225,7 @@ class RedisVectorStore {
 
           if (doc.embedding) {
             // Calculate embedding similarity
-            const embeddingScore = this.cosineSimilarity(
+            const embeddingScore = this.calculateSimilarity(
               queryEmbedding,
               doc.embedding
             );
