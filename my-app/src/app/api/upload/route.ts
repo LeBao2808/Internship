@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import cloudinary from "@/resources/lib/cloudinary"
+import cloudinary from "@/resources/lib/cloudinary";
 const uploadDir = path.join(process.cwd(), "public", "uploads");
 
 // export async function POST(req: NextRequest) {
@@ -56,8 +56,9 @@ export async function POST(req: NextRequest) {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: "ckeditor_uploads", // Thư mục trên Cloudinary
-          use_filename: true,
-          unique_filename: false,
+          use_filename: false, 
+          unique_filename: true, 
+          overwrite: false, 
         },
         (error, result) => {
           if (error) return reject(error);
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
     });
 
     const imageUrl = result.secure_url;
-    console.log("imageURL", imageUrl)
+    console.log("imageURL", imageUrl);
 
     // Trả về đúng format CKEditor mong muốn
     return NextResponse.json({ image_url: imageUrl });
