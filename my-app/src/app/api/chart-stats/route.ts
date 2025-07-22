@@ -2,15 +2,14 @@
 import { NextRequest } from 'next/server';
 import mongoose from "mongoose";
 import Blog from "../models/Blog";
+import dbConnect from "@/resources/lib/mongodb";
 import "../models/User";
 import "../models/Category";
 
 
 export async function GET(request: NextRequest) {
   try {
-    if (mongoose.connections[0].readyState !== 1) {
-      await mongoose.connect(process.env.MONGO_URI as string);
-    }
+   await dbConnect();
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("user");
