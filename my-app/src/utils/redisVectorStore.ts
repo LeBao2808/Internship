@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 import { Redis } from "@upstash/redis";
 import { pipeline } from "@xenova/transformers";
 import cosineSimilarity from 'compute-cosine-similarity';
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 interface CategoryVector {
   id: string;
   content: string;
@@ -152,44 +153,75 @@ class RedisVectorStore {
     await this.redis.del(`${this.VECTOR_KEY}${categoryId}_${blogId}`);
   }
 
+  // async addDocumentVector(doc: any) {
+  //   // Split document into chunks for better search
+  //   const chunks = this.splitIntoChunks(doc.content, 500);
+  //   for (let i = 0; i < chunks.length; i++) {
+  //     const chunkDoc = {
+  //       ...doc,
+  //       id: `${doc.id}_chunk_${i}`,
+  //       content: chunks[i],
+  //       embedding: await this.generateEmbedding(chunks[i]),
+  //       metadata: {
+  //         ...doc.metadata,
+  //         chunkIndex: i,
+  //         originalDocId: doc.id,
+  //       },
+  //     };
+  //     await this.redis.set(
+  //       `document_vectors:${chunkDoc.id}`,
+  //       JSON.stringify(chunkDoc)
+  //     );
+  //   }
+  // }
+
   async addDocumentVector(doc: any) {
-    // Split document into chunks for better search
-    const chunks = this.splitIntoChunks(doc.content, 500);
-    for (let i = 0; i < chunks.length; i++) {
-      const chunkDoc = {
-        ...doc,
-        id: `${doc.id}_chunk_${i}`,
-        content: chunks[i],
-        embedding: await this.generateEmbedding(chunks[i]),
-        metadata: {
-          ...doc.metadata,
-          chunkIndex: i,
-          originalDocId: doc.id,
-        },
-      };
-      await this.redis.set(
-        `document_vectors:${chunkDoc.id}`,
-        JSON.stringify(chunkDoc)
-      );
-    }
+  // Split document into chunks for better search
+  console.log("Splitting document into chunks for vector storage");
+  const chunks = await this.splitIntoChunks(doc.content, 500);
+  for (let i = 0; i < chunks.length; i++) {
+    const chunkDoc = {
+      ...doc,
+      id: `${doc.id}_chunk_${i}`,
+      content: chunks[i],
+      embedding: await this.generateEmbedding(chunks[i]),
+      metadata: {
+        ...doc.metadata,
+        chunkIndex: i,
+        originalDocId: doc.id,
+      },
+    };
+    await this.redis.set(
+      `document_vectors:${chunkDoc.id}`,
+      JSON.stringify(chunkDoc)
+    );
   }
+}
 
-  splitIntoChunks(text: string, chunkSize: number): string[] {
-    const sentences = text.split(/[.!?]+/);
-    const chunks = [];
-    let currentChunk = "";
+  // splitIntoChunks(text: string, chunkSize: number): string[] {
+  //   const sentences = text.split(/[.!?]+/);
+  //   const chunks = [];
+  //   let currentChunk = "";
 
-    for (const sentence of sentences) {
-      if ((currentChunk + sentence).length > chunkSize && currentChunk) {
-        chunks.push(currentChunk.trim());
-        currentChunk = sentence;
-      } else {
-        currentChunk += sentence + ".";
-      }
-    }
-    if (currentChunk) chunks.push(currentChunk.trim());
-    return chunks;
-  }
+  //   for (const sentence of sentences) {
+  //     if ((currentChunk + sentence).length > chunkSize && currentChunk) {
+  //       chunks.push(currentChunk.trim());
+  //       currentChunk = sentence;
+  //     } else {
+  //       currentChunk += sentence + ".";
+  //     }
+  //   }
+  //   if (currentChunk) chunks.push(currentChunk.trim());
+  //   return chunks;
+  // }
+  async splitIntoChunks(text: string, chunkSize: number): Promise<string[]> {
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: chunkSize,
+    chunkOverlap: 50,
+  });
+  
+  return await splitter.splitText(text);
+}
 
   async removeDocumentVector(docId: string) {
     await this.redis.del(`document_vectors:${docId}`);
