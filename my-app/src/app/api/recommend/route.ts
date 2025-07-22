@@ -46,7 +46,7 @@ export async function GET() {
 
   const viewedBlogIds = histories.map(h => (h.blog as any)?._id?.toString()).filter(Boolean);
 
-  const recommendedBlogIds = await ragService.getRecommendations(userProfile, viewedBlogIds, 5);
+  const recommendedBlogIds = await ragService.getRecommendations(userProfile, viewedBlogIds, 3);
 
   const recommendations = await Blog.find({ _id: { $in: recommendedBlogIds } })
     .populate("category", "name")

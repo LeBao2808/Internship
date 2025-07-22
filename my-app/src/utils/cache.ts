@@ -16,7 +16,7 @@ export async function getCachedRecommendation(userId: string) {
 
 export async function setCachedRecommendation(userId: string, recommendations: any[]) {
   try {
-    await redis.setex(`recommendations:${userId}`, 3600, JSON.stringify(recommendations));
+    await redis.setex(`recommendations:${userId}`, 300, JSON.stringify(recommendations));
   } catch (error) {
     console.error('Cache set error:', error);
   }

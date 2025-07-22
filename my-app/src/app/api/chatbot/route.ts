@@ -33,7 +33,6 @@ export async function POST(req: Request) {
     const systemContext =
       chatbotService.buildSystemContext(systemData, relatedBlogs, session) +
       docContext;
-
     const prompt = CHATBOT_PROMPTS.MAIN_ASSISTANT(
       systemContext,
       context,

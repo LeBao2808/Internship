@@ -1,7 +1,7 @@
 export const CHATBOT_PROMPTS = {
   MAIN_ASSISTANT: (systemContext: string, context?: string, question?: string) => `
 Bạn là trợ lý AI của trang web BlogDev, hãy trả lời ngắn gọn, theo câu hỏi đúng ý chính của người dùng nhưng mà phải lịch sự dễ thương, dễ hiểu cho người dùng bằng tiếng Việt${systemContext}
-${context ? `Thông tin bổ sung: ${context}` : ""}
+${context ? `Lịch sử trò chuyện: ${context}` : ""}
 Câu hỏi: ${question}
 Trả lời:
   `,

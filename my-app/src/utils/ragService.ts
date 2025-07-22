@@ -98,28 +98,36 @@ export class RAGService {
     );
   }
 
-  async getRecommendations(
-    userProfile: UserProfile,
-    excludeIds: string[],
-    topK: number = 3
-  ): Promise<string[]> {
-    const query = `${
-      userProfile.preferences
-    } ${userProfile.viewedCategories.join(" ")}`;
-    console.log("Querying for similar categories:", query);
-    const similarCategories = await vectorStore.findSimilarCategories(query, topK);
-    console.log("Found similar categories:", similarCategories);
-
-    const recommendedBlogIds: string[] = [];
-    for (const categoryVector of similarCategories) {
-      const availableBlogIds = categoryVector.metadata.blogIds
-        .filter((blogId) => !excludeIds.includes(blogId))
-        .slice(0, Math.ceil(topK / similarCategories.length));
-      recommendedBlogIds.push(...availableBlogIds);
-    }
-
-    return recommendedBlogIds.slice(0, topK);
+async getRecommendations(
+  userProfile: UserProfile,
+  excludeIds: string[],
+  topK: number = 3
+): Promise<string[]> {
+let query: string = `${userProfile.preferences} ${userProfile.viewedCategories.join(' ')}`;
+  console.log('Querying for similar categories:', query);
+  if (userProfile.viewedCategories.length === 0) {
+    console.log('No viewed categories, using fallback query');
+    query = 'random'; 
   }
+  console.log('Final query:', query);
+  const similarCategories = await vectorStore.findSimilarCategories(query, topK);
+  console.log('Found similar categories:', similarCategories);
+
+  const recommendedBlogIds: string[] = [];
+  for (const categoryVector of similarCategories) {
+    // Ensure blogIds is always an array
+    const blogIdsArray = Array.isArray(categoryVector.metadata.blogIds) 
+      ? categoryVector.metadata.blogIds 
+      : categoryVector.metadata.blogIds ? [categoryVector.metadata.blogIds] : [];
+    
+    const availableBlogIds = blogIdsArray
+      .filter(blogId => !excludeIds.includes(blogId))
+      .slice(0, Math.ceil(topK / similarCategories.length));
+    recommendedBlogIds.push(...availableBlogIds);
+  }
+  
+  return recommendedBlogIds.slice(0, topK);
+}
 
   async findRelatedBlogs(
     question: string,
