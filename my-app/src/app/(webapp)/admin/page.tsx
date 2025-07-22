@@ -127,6 +127,7 @@ export default function AdminHomePage() {
           const categoryCount: Record<string, number> = {};
           histories.forEach((h: any) => {
             const catName =
+              h.blog &&
               typeof h.blog === "object" &&
               h.blog.category &&
               typeof h.blog.category === "object"
@@ -166,6 +167,7 @@ export default function AdminHomePage() {
           const categoryCount: Record<string, number> = {};
           histories.forEach((h: any) => {
             const catName =
+              h.blog &&
               typeof h.blog === "object" &&
               h.blog.category &&
               typeof h.blog.category === "object"
@@ -293,6 +295,7 @@ export default function AdminHomePage() {
         const categoryCount: Record<string, number> = {};
         histories.forEach((h: any) => {
           const catName =
+            h.blog &&
             typeof h.blog === "object" &&
             h.blog.category &&
             typeof h.blog.category === "object"
