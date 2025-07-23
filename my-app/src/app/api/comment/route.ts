@@ -3,7 +3,6 @@ import dbConnect from "@/resources/lib/mongodb";
 import Comment from "@/app/api/models/Comment";
 import User from "@/app/api/models/User"; // nếu cần `populate`
 import { z } from "zod";
-import { getToken } from "next-auth/jwt";
 import { getServerSession } from "next-auth/next";
 // Define Comment validation schema
 const CommentSchema = z.object({
@@ -11,19 +10,16 @@ const CommentSchema = z.object({
   user: z.string().regex(/^[a-f\d]{24}$/i, "Invalid user ID"),
 });
 import Blog from "@/app/api/models/Blog";
-import { NextApiRequest, NextApiResponse } from "next";
 import { authOptions } from "@/resources/lib/auth.config";
-import mongoose from "mongoose";
 require("../../api/models/User");
 
 require("../../api/models/Blog");
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);
-    const isComment = searchParams.get("isComment") === "true";
     const search = searchParams.get("search") || "";
     const sortParam = searchParams.get("sort") || "";
     const page = parseInt(searchParams.get("page") || "1", 10);
@@ -48,13 +44,13 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    console.log("session.user.id", session?.user?.id);
-    const dbUser = await User.findOne({ email: session?.user?.email }).exec();
-    if (!isComment) {
-      if (dbUser && session?.user?.role != "admin") {
-        query.user = dbUser.id;
-      }
-    }
+    // console.log("session.user.id", session?.user?.id);
+    // const dbUser = await User.findOne({ email: session?.user?.email }).exec();
+    // if (!isComment) {
+    //   if (dbUser && session?.user?.role != "admin") {
+    //     query.user = dbUser.id;
+    //   }
+    // }
     let sort: any = {};
     if (sortParam) {
       const [field, direction] = sortParam.split(":");

@@ -36,11 +36,11 @@ export default function CommentSection({ slug }: CommentSectionProps) {
   }, [socket]);
 
   // Fetch danh sách bình luận hiện tại
-  const fetchComments = async () => {
+ const fetchComments = async () => {
     try {
       setLoading(true);
       const res = await fetch(
-    `/api/comment?search=${encodeURIComponent(slug)}&isComment=true`
+        `/api/comment?search=${encodeURIComponent(slug)}`
       );
       const data = await res.json();
       if (res.ok && Array.isArray(data.comments)) {
@@ -100,18 +100,22 @@ export default function CommentSection({ slug }: CommentSectionProps) {
 
   return (
     <div className="max-full mx-auto mt-10 p-4 bg-gray-50 rounded-2xl border border-gray-200 shadow-lg dark:bg-gray-900 dark:border-gray-700">
-      <h2 className="text-xl font-semibold mb-4 dark:text-white">💬 Comments</h2>
+      <h2 className="text-xl font-semibold mb-4 dark:text-white">
+        💬 Comments
+      </h2>
 
       {/* Input */}
       <div className="relative flex mt-4 gap-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 px-4 py-2 rounded-xl mb-3 dark:bg-gray-800 dark:border-gray-700">
         <textarea
-          placeholder="Enter comment..."
+          placeholder={
+            session?.user ? "Enter comment..." : "Please login to comment"
+          }
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           onKeyDown={(e: any) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              setComments((prev) => [ 
+              setComments((prev) => [
                 {
                   user: {
                     name: session?.user?.name || "",
@@ -134,13 +138,18 @@ export default function CommentSection({ slug }: CommentSectionProps) {
               handleSubmit();
             }
           }}
+          disabled={!session?.user}
           rows={4}
           className="flex-1 border-none outline-none bg-transparent resize-none dark:text-white"
         />
         <Send
-          className="cursor-pointer text-blue-500 hover:text-blue-700 transition absolute right-3 bottom-3"
+          className={`${
+            session?.user
+              ? "cursor-pointer text-blue-500 hover:text-blue-700"
+              : "cursor-not-allowed text-gray-400"
+          } transition absolute right-3 bottom-3`}
           size={20}
-          onClick={handleSubmit}
+          onClick={session?.user ? handleSubmit : undefined}
         />
       </div>
 
@@ -149,7 +158,9 @@ export default function CommentSection({ slug }: CommentSectionProps) {
         {loading ? (
           <p className="dark:text-gray-300">Loading Comment...</p>
         ) : comments.length === 0 ? (
-          <p className="text-gray-500 italic dark:text-gray-400">No comments yet.</p>
+          <p className="text-gray-500 italic dark:text-gray-400">
+            No comments yet.
+          </p>
         ) : (
           comments.map((cmt, idx) => (
             <div key={idx} className="flex gap-3 items-start">
@@ -163,14 +174,18 @@ export default function CommentSection({ slug }: CommentSectionProps) {
 
               <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1 dark:bg-gray-800 w-[200px]">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold dark:text-white">{cmt.user.name}</span>
+                  <span className="font-semibold dark:text-white">
+                    {cmt.user.name}
+                  </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDistanceToNow(new Date(cmt.createdAt), {
                       addSuffix: true,
                     })}
                   </span>
                 </div>
-                <div className="break-words dark:text-gray-200">{cmt.content}</div>
+                <div className="break-words dark:text-gray-200">
+                  {cmt.content}
+                </div>
               </div>
             </div>
           ))
