@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Send } from "lucide-react";
 import { useSession } from "next-auth/react";
 import socket from "@/resources/lib/socket";
+import generateSlug from "@/utils/generateSlug";
 
 interface CommentSectionProps {
   slug: string;
@@ -23,8 +24,10 @@ export default function CommentSection({ slug }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
+  const rawSlug = decodeURIComponent(slug);
 
   useEffect(() => {
+    console.log("slug s", rawSlug);
     fetchComments();
   }, [slug]);
   useEffect(() => {
@@ -36,11 +39,12 @@ export default function CommentSection({ slug }: CommentSectionProps) {
   }, [socket]);
 
   // Fetch danh sách bình luận hiện tại
- const fetchComments = async () => {
+  const fetchComments = async () => {
     try {
+      console.log("fetchComments", generateSlug(rawSlug));
       setLoading(true);
       const res = await fetch(
-        `/api/comment?search=${encodeURIComponent(slug)}`
+        `/api/comment?search=${encodeURIComponent(rawSlug)}&isComment=true`
       );
       const data = await res.json();
       if (res.ok && Array.isArray(data.comments)) {
