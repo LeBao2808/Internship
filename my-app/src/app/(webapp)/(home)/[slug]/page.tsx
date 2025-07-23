@@ -27,9 +27,9 @@ export default function BlogDetailPage({
   const [latestBlogs, setLatestBlogs] = useState<Blog[]>([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [toc, setToc] = useState<
-    { id: string; text: string; level: number }[]
-  >([]);
+  const [toc, setToc] = useState<{ id: string; text: string; level: number }[]>(
+    []
+  );
   const { data: session } = useSession();
   const viewedRef = useRef(false);
 
@@ -152,7 +152,10 @@ export default function BlogDetailPage({
 
   if (loading)
     return (
-          <div className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse" style={{ marginTop: "65px" }}>
+      <div
+        className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse"
+        style={{ marginTop: "65px" }}
+      >
         <div className="w-full aspect-[8/5] h-150 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
         <div className="h-4 bg-gray-150 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
@@ -170,7 +173,7 @@ export default function BlogDetailPage({
     );
   if (!blog) return <div className="p-8 text-center">Blog not found.</div>;
 
-   return (
+  return (
     <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
       <div
         className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-6 mb-6 px-2 sm:px-4 md:px-8"
@@ -228,7 +231,7 @@ export default function BlogDetailPage({
               className="prose prose-sm sm:prose-lg max-w-none mt-6 sm:mt-8 text-gray-800 leading-relaxed dark:prose-invert dark:text-gray-200"
               dangerouslySetInnerHTML={{ __html: contentWithIds }}
             />
-         <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent mt-12 mb-8"></div>
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent mt-12 mb-8"></div>
             <div className="max-w-6xl mx-auto mt-8 px-2 sm:px-0 md:px-2">
               <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-blue-600 dark:from-gray-200 dark:to-blue-400 bg-clip-text text-transparent">
                 Related articles
@@ -252,8 +255,18 @@ export default function BlogDetailPage({
                         </div>
                       ) : (
                         <div className="w-full h-32 sm:h-40 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl mb-3 flex items-center justify-center">
-                          <svg className="w-12 h-12 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                          <svg
+                            className="w-12 h-12 text-blue-500 dark:text-blue-400"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 6v6l4 2"
+                            />
                           </svg>
                         </div>
                       )}
@@ -261,7 +274,9 @@ export default function BlogDetailPage({
                         {item.title}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString()
+                          : ""}
                       </p>
                     </a>
                   ))
@@ -281,7 +296,7 @@ export default function BlogDetailPage({
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white p-3 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-200 flex items-center justify-center cursor-pointer"
+          className="fixed bottom-24 right-7 z-50 bg-blue-600 text-white p-3 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-200 flex items-center justify-center cursor-pointer"
           aria-label="Scroll to top"
         >
           <svg

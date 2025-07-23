@@ -25,6 +25,7 @@ export default function CommentSection({ slug }: CommentSectionProps) {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
   const rawSlug = decodeURIComponent(slug);
+  const [visibleComments, setVisibleComments] = useState(10);
 
   useEffect(() => {
     console.log("slug s", rawSlug);
@@ -63,6 +64,11 @@ export default function CommentSection({ slug }: CommentSectionProps) {
       setLoading(false);
     }
   };
+
+  const loadMoreComments = () => {
+    setVisibleComments((prev) => prev + 10);
+  };
+
 
   console.log("comments", comments);
 
@@ -190,33 +196,45 @@ export default function CommentSection({ slug }: CommentSectionProps) {
             No comments yet.
           </p>
         ) : (
-          comments.map((cmt, idx) => (
-            <div key={idx} className="flex gap-3 items-start">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 my-auto dark:bg-gray-700">
-                <img
-                  src={cmt.user.image || "/BlueHead.png"}
-                  alt="avatar"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              </div>
+          <>
+            {comments.slice(0, visibleComments).map((cmt, idx) => (
+              <div key={idx} className="flex gap-3 items-start">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 my-auto dark:bg-gray-700">
+                  <img
+                    src={cmt.user.image || "/BlueHead.png"}
+                    alt="avatar"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </div>
 
-              <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1 dark:bg-gray-800 w-[200px]">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold dark:text-white">
-                    {cmt.user.name}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatDistanceToNow(new Date(cmt.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                </div>
-                <div className="break-words dark:text-gray-200">
-                  {cmt.content}
+                <div className="bg-gray-100 p-3 rounded-xl text-sm flex-1 dark:bg-gray-800 w-[200px]">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-semibold dark:text-white">
+                      {cmt.user.name}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {formatDistanceToNow(new Date(cmt.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </span>
+                  </div>
+                  <div className="break-words dark:text-gray-200">
+                    {cmt.content}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+            {comments.length > visibleComments && (
+              <div className="text-center mt-4">
+                <button
+                  onClick={loadMoreComments}
+                  className="text-blue-500 hover:text-blue-700 font-medium text-sm cursor-pointer"
+                >
+                  Load more comments
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -16,14 +16,15 @@ require("../../api/models/User");
 require("../../api/models/Blog");
 
 export async function GET(request: NextRequest) {
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);
+    const isComment = searchParams.get("isComment") === "true";
     const search = searchParams.get("search") || "";
     const sortParam = searchParams.get("sort") || "";
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const limit = parseInt(searchParams.get("limit") || "0", 10);
     const skip = (page - 1) * limit;
 
     const query: any = {};
@@ -44,13 +45,13 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // console.log("session.user.id", session?.user?.id);
-    // const dbUser = await User.findOne({ email: session?.user?.email }).exec();
-    // if (!isComment) {
-    //   if (dbUser && session?.user?.role != "admin") {
-    //     query.user = dbUser.id;
-    //   }
-    // }
+    console.log("session.user.id", session?.user?.id);
+    const dbUser = await User.findOne({ email: session?.user?.email }).exec();
+    if (!isComment) {
+      if (dbUser && session?.user?.role != "admin") {
+        query.user = dbUser.id;
+      }
+    }
     let sort: any = {};
     if (sortParam) {
       const [field, direction] = sortParam.split(":");

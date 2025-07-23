@@ -30,29 +30,29 @@ export default function CategoryPage({
   const { slug: rawSlug } = use(params);
   const router = useRouter();
   const slug = decodeURIComponent(rawSlug);
-  
+
   const handleSaveBlog = async (blogId: string) => {
     try {
       if (savedBlogs.includes(blogId)) {
-        await fetch('/api/saveblog', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ blogId })
+        await fetch("/api/saveblog", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blogId }),
         });
-        setSavedBlogs(prev => prev.filter(id => id !== blogId));
+        setSavedBlogs((prev) => prev.filter((id) => id !== blogId));
       } else {
-        await fetch('/api/saveblog', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ blogId })
+        await fetch("/api/saveblog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blogId }),
         });
-        setSavedBlogs(prev => [...prev, blogId]);
+        setSavedBlogs((prev) => [...prev, blogId]);
       }
     } catch (error) {
-      console.error('Error saving blog:', error);
+      console.error("Error saving blog:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchCategory();
   }, [slug, searchQuery]);
@@ -72,18 +72,22 @@ export default function CategoryPage({
       // Fetch view status and saved blogs
       if (blogList.length > 0) {
         const blogIds = blogList.map((b: any) => b._id).filter(Boolean);
-        const viewRes = await fetch('/api/view-history', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ blogIds })
+        const viewRes = await fetch("/api/view-history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blogIds }),
         });
         const viewData = await viewRes.json();
         setViewedBlogs(viewData.viewed || []);
-        
+
         // Fetch saved blogs
-        const saveRes = await fetch('/api/saveblog');
+        const saveRes = await fetch("/api/saveblog");
         const saveData = await saveRes.json();
-        setSavedBlogs(saveData.savedBlogs?.map((s: any) => s.blog._id) || []);
+        setSavedBlogs(
+          saveData.savedBlogs
+            ?.filter((s: any) => s?.blog && s.blog._id)
+            .map((s: any) => s.blog._id) || []
+        );
       }
     } finally {
       setLoading(false);
@@ -195,13 +199,15 @@ export default function CategoryPage({
                       }}
                       className={`absolute top-4 right-4 p-3 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
                         savedBlogs.includes(blog._id)
-                          ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25'
-                          : 'bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400'
+                          ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
+                          : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
                       }`}
                     >
-                      <FiBookmark className={`w-5 h-5 transition-all duration-300 ${
-                        savedBlogs.includes(blog._id) ? 'fill-current' : ''
-                      }`} />
+                      <FiBookmark
+                        className={`w-5 h-5 transition-all duration-300 ${
+                          savedBlogs.includes(blog._id) ? "fill-current" : ""
+                        }`}
+                      />
                     </button>
                     {viewedBlogs.includes(blog._id) && (
                       <div className="absolute bottom-4 right-4 flex items-center gap-1 px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white rounded-full text-xs font-semibold shadow-lg">
@@ -209,7 +215,6 @@ export default function CategoryPage({
                         <span>Viewed</span>
                       </div>
                     )}
-              
                   </div>
                   <div className="flex-1 flex flex-col p-6">
                     <div className="flex items-center justify-between mb-4">
