@@ -153,7 +153,31 @@ export default function CommentSection({ slug }: CommentSectionProps) {
               : "cursor-not-allowed text-gray-400"
           } transition absolute right-3 bottom-3`}
           size={20}
-          onClick={session?.user ? handleSubmit : undefined}
+          onClick={() => {
+            if (session?.user) {
+              setComments((prev) => [
+                {
+                  user: {
+                    name: session?.user?.name || "",
+                    image: session?.user?.image || "",
+                  },
+                  content: comment,
+                  createdAt: new Date(),
+                },
+                ...prev,
+              ]);
+              socket.emit("sendComment", {
+                content: comment,
+                slug,
+                user: {
+                  name: session?.user?.name,
+                  image: session?.user?.image,
+                },
+                createdAt: new Date(),
+              });
+              handleSubmit();
+            }
+          }}
         />
       </div>
 
