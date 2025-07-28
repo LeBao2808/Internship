@@ -84,7 +84,6 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const session = await getServerSession(authOptions);
-
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

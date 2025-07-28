@@ -7,6 +7,7 @@ content: string;
 user: mongoose.Schema.Types.ObjectId;
 blog: mongoose.Schema.Types.ObjectId;
 }
+
 const CommentSchema: Schema<IComment> = new Schema({
 content: { type: String, required: true },
 user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

@@ -7,6 +7,7 @@ import "./style.css";
 import { useTranslation } from "react-i18next";
 import { getSession } from "next-auth/react";
 import { FiBookmark, FiEye } from "react-icons/fi";
+import CategoryModal from "../../../components/CategoryModal";
 
 interface Blog {
   _id: string;
@@ -43,6 +44,7 @@ export default function BlogPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [savedBlogs, setSavedBlogs] = useState<string[]>([]);
   const [viewedBlogs, setViewedBlogs] = useState<string[]>([]);
+  const [hasRecommendation, setHasRecommendation] = useState(false);
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -208,6 +210,8 @@ export default function BlogPage() {
     <div
       className={`blog-home-bg min-h-screen dark:bg-[#121618] dark:text-white`}
     >
+    
+      <CategoryModal />
       <Navbar />
       <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5">
         <div className="w-full mb-12">

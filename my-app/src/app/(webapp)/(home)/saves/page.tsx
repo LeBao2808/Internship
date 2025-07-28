@@ -44,7 +44,7 @@ export default function SavedBlogsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ blogId }),
       });
-      setSavedBlogs((prev) => prev.filter((item) => item.blog._id !== blogId));
+      setSavedBlogs((prev) => prev.filter((item) => item.blog?._id !== blogId));
     } catch (error) {
       console.error("Error unsaving blog:", error);
     }
@@ -93,7 +93,7 @@ export default function SavedBlogsPage() {
               </p>
               <button
                 onClick={() => router.push("/")}
-                className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-600 transition-all duration-300"
+                className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-600 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl"
               >
                 Explore Blogs
               </button>
@@ -108,10 +108,10 @@ export default function SavedBlogsPage() {
                   <div className="relative w-full h-56 overflow-hidden">
                     <img
                       src={
-                        item.blog.image_url ||
+                        item.blog?.image_url ||
                         "https://res.cloudinary.com/dso3i79wd/image/upload/v1750145670/users/file.png"
                       }
-                      alt={item.blog.title}
+                      alt={item.blog?.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
@@ -119,29 +119,29 @@ export default function SavedBlogsPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleUnsaveBlog(item.blog._id);
+                        handleUnsaveBlog(item.blog?._id);
                       }}
                       className="absolute top-4 right-4 p-3 rounded-full bg-red-500/90 backdrop-blur-md text-white border border-red-400 transition-all duration-300 hover:bg-red-600 hover:scale-110 shadow-lg cursor-pointer"
                     >
                       <FiTrash2 className="w-4 h-4" />
                     </button>
 
-                    {item.blog.category && (
+                    {item.blog?.category && (
                       <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-blue-700 rounded-full text-xs font-semibold shadow-lg">
-                        {item.blog.category.name}
+                        {item.blog?.category.name}
                       </span>
                     )}
                   </div>
 
                   <div className="flex-1 flex flex-col p-6">
                     <div className="flex items-center justify-between mb-4">
-                      {item.blog.user && (
+                      {item.blog?.user && (
                         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                             <FiUser className="w-4 h-4 text-white" />
                           </div>
                           <span className="font-medium">
-                            {item.blog.user.name}
+                            {item.blog?.user.name}
                           </span>
                         </div>
                       )}
@@ -157,16 +157,16 @@ export default function SavedBlogsPage() {
                     </div>
 
                     <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white group-hover:text-red-500 transition-colors duration-300 line-clamp-2">
-                      {item.blog.title}
+                      {item.blog?.title}
                     </h3>
 
                     <div
                       className="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3 flex-1 leading-relaxed"
                       dangerouslySetInnerHTML={{
                         __html:
-                          item.blog.content && item.blog.content.length > 120
+                          item.blog?.content && item.blog.content.length > 120
                             ? item.blog.content.slice(0, 120) + "..."
-                            : item.blog.content || "",
+                            : item.blog?.content || "",
                       }}
                     />
 
@@ -179,7 +179,7 @@ export default function SavedBlogsPage() {
                         <FiArrowRight className="w-4 h-4" />
                       </button>
                       <div className="text-xs text-gray-400 font-medium">
-                        {Math.ceil((item.blog.content?.length || 0) / 200)} min
+                        {Math.ceil((item.blog?.content?.length || 0) / 200)} min
                         read
                       </div>
                     </div>

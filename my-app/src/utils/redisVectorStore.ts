@@ -99,7 +99,7 @@ class RedisVectorStore {
 }
   async findSimilarCategories(
     queryText: string,
-    topK: number = 10
+    topK: number = 3
   ): Promise<CategoryVector[]> {
     const queryEmbedding = await this.generateEmbedding(queryText);
     const keys = await this.redis.keys(`${this.VECTOR_KEY}*`);
@@ -126,6 +126,51 @@ class RedisVectorStore {
           }
         } catch (error) {
           console.error("Error parsing vector data:", error);
+          continue;
+        }
+      }
+    }
+
+    return similarities
+      .sort((a, b) => b.score - a.score)
+      .slice(0, topK)
+      .map((item) => item.doc);
+  }
+
+  async findSimilarCategoriesExcluding(
+    queryText: string,
+    excludeIds: string[],
+    topK: number = 3
+  ): Promise<CategoryVector[]> {
+    const queryEmbedding = await this.generateEmbedding(queryText);
+    const keys = await this.redis.keys(`${this.VECTOR_KEY}*`);
+    const similarities: Array<{ doc: CategoryVector; score: number }> = [];
+
+    for (const key of keys) {
+      const docStr = await this.redis.get(key);
+      if (docStr) {
+        let doc: CategoryVector;
+        try {
+          if (typeof docStr === "string") {
+            doc = JSON.parse(docStr);
+          } else if (typeof docStr === "object") {
+            doc = docStr as unknown as CategoryVector;
+          } else {
+            continue;
+          }
+
+          const blogIdsArray = Array.isArray(doc.metadata.blogIds)
+            ? doc.metadata.blogIds
+            : [doc.metadata.blogIds];
+          
+          const hasExcludedBlog = blogIdsArray.some(blogId => excludeIds.includes(blogId));
+          if (hasExcludedBlog) continue;
+
+          if (doc.embedding) {
+            const score = this.calculateSimilarity(queryEmbedding, doc.embedding);
+            similarities.push({ doc, score });
+          }
+        } catch (error) {
           continue;
         }
       }
@@ -176,7 +221,6 @@ class RedisVectorStore {
   // }
 
   async addDocumentVector(doc: any) {
-  // Split document into chunks for better search
   console.log("Splitting document into chunks for vector storage");
   const chunks = await this.splitIntoChunks(doc.content, 500);
   for (let i = 0; i < chunks.length; i++) {
@@ -256,7 +300,6 @@ class RedisVectorStore {
           }
 
           if (doc.embedding) {
-            // Calculate embedding similarity
             const embeddingScore = this.calculateSimilarity(
               queryEmbedding,
               doc.embedding
@@ -265,18 +308,15 @@ class RedisVectorStore {
             let exactMatchBonus = 0;
             const contentLower = doc.content.toLowerCase();
 
-            // Check for exact phrase match
             if (contentLower.includes(queryLower)) {
-              exactMatchBonus += 0.3; // Big bonus for exact phrase
+              exactMatchBonus += 0.3; 
             }
 
-            // Check for individual keywords
             const matchedWords = queryWords.filter((word) =>
               contentLower.includes(word)
             );
             exactMatchBonus += (matchedWords.length / queryWords.length) * 0.2;
 
-            // Combined score with both semantic and exact matching
             const finalScore = embeddingScore + exactMatchBonus;
 
             similarities.push({

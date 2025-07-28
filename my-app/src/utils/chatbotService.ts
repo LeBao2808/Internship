@@ -74,7 +74,7 @@ export class ChatbotService {
       }).populate('category', 'name').populate('user', 'name');
       
       if (exactMatch) {
-        console.log('Found exact title match:', exactMatch.title);
+        // console.log('Found exact title match:', exactMatch.title);
         const summary = exactMatch.content.length > 300
           ? exactMatch.content.substring(0, 300) + '...'
           : exactMatch.content;

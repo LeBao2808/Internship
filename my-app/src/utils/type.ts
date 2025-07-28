@@ -1,5 +1,5 @@
-import { IBlog } from "@/app/api/models/Blog";
-import { IUser } from "@/app/api/models/User";
+import { EXPORT_DETAIL } from "next/dist/shared/lib/constants";
+
 
 export interface Comment {
   _id?: number;
@@ -52,4 +52,25 @@ export interface SaveBlog {
   _id?: string;
   user: User
   blog: Blog
+}
+
+export interface IBlog {
+  _id?: string;
+  title: string;
+  content: string;
+  user: User;
+  image_url: string;
+  category: Category;
+  createdAt?: string;
+  namecategory?: string;
+  nameuser?: string;
+  updatedAt?: string;
+  featured?: boolean;
+  slug?: string;
+}
+
+export interface IViewHistory {
+  _id?: string;
+  user: User;
+  blog: Blog;
 }

@@ -23,11 +23,10 @@ export async function GET() {
 
 
   const cached = await getCachedRecommendation(userId);
-  // console.log("Cache:", cached);
 
   if (cached) {
-    console.log("Cache hit for user:", userId);
-    console.log("Cached recommendations:", cached);
+    // console.log("Cache hit for user:", userId);
+    // console.log("Cached recommendations:", cached);
     return NextResponse.json({ recommendations: cached });
   }
 
@@ -41,8 +40,7 @@ export async function GET() {
 
   await ragService.initializeIfNeeded();
 
-
-  const userProfile = ragService.buildUserProfile(histories);
+  const userProfile = await ragService.buildUserProfile(histories, user?._id as string);
 
   const viewedBlogIds = histories.map(h => (h.blog as any)?._id?.toString()).filter(Boolean);
 
@@ -52,8 +50,9 @@ export async function GET() {
     .populate("category", "name")
     .populate("user", "name");
 
-  // Fallback nếu không đủ recommendations
+  
   if (recommendations.length < 3) {
+    console.log("Not enough recommendations, adding fallback blogs");
     const fallbackBlogs = await Blog.find({ 
       _id: { $nin: [...viewedBlogIds, ...recommendedBlogIds] } 
     })
@@ -62,7 +61,7 @@ export async function GET() {
     .limit(5 - recommendations.length);
     recommendations.push(...fallbackBlogs);
   }
-  console.log("Recommendations:", recommendations);
+  // console.log("Recommendations:", recommendations);
   await setCachedRecommendation(userId, recommendations);
 
   return NextResponse.json({ recommendations });

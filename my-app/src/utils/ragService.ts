@@ -5,11 +5,14 @@ import {
 import Blog from "@/app/api/models/Blog";
 import Category from "@/app/api/models/Category";
 import dbConnect from "@/resources/lib/mongodb";
+import { IBlog } from "./type";
+import RecomendationCategory from "@/app/api/models/RecomendationCategory";
 
 interface UserProfile {
   viewedCategories: string[];
   viewedTitles: string[];
   preferences: string;
+  see: string;
 }
 
 export class RAGService {
@@ -98,36 +101,46 @@ export class RAGService {
     );
   }
 
-async getRecommendations(
-  userProfile: UserProfile,
-  excludeIds: string[],
-  topK: number = 3
-): Promise<string[]> {
-let query: string = `${userProfile.preferences} ${userProfile.viewedCategories.join(' ')}`;
-  console.log('Querying for similar categories:', query);
-  if (userProfile.viewedCategories.length === 0) {
-    console.log('No viewed categories, using fallback query');
-    query = 'random'; 
-  }
-  console.log('Final query:', query);
-  const similarCategories = await vectorStore.findSimilarCategories(query, topK);
-  console.log('Found similar categories:', similarCategories);
+  async findSimilarCategoriesForRecommendation(
+    queryText: string,
+    excludeIds: string[],
+    topK: number = 3
+  ): Promise<string[]> {
+    const similarCategories = await vectorStore.findSimilarCategoriesExcluding(queryText, excludeIds, topK );
+    console.log("similarCategories", similarCategories)
+    const recommendedBlogIds: string[] = [];
+    for (const categoryVector of similarCategories) {
+      const blogIdsArray = Array.isArray(categoryVector.metadata.blogIds)
+        ? categoryVector.metadata.blogIds
+        : [categoryVector.metadata.blogIds];
 
-  const recommendedBlogIds: string[] = [];
-  for (const categoryVector of similarCategories) {
-    // Ensure blogIds is always an array
-    const blogIdsArray = Array.isArray(categoryVector.metadata.blogIds) 
-      ? categoryVector.metadata.blogIds 
-      : categoryVector.metadata.blogIds ? [categoryVector.metadata.blogIds] : [];
+      recommendedBlogIds.push(...blogIdsArray);
+      
+      if (recommendedBlogIds.length >= topK) break;
+    }
     
-    const availableBlogIds = blogIdsArray
-      .filter(blogId => !excludeIds.includes(blogId))
-      .slice(0, Math.ceil(topK / similarCategories.length));
-    recommendedBlogIds.push(...availableBlogIds);
+    return recommendedBlogIds.slice(0, topK);
   }
-  
-  return recommendedBlogIds.slice(0, topK);
-}
+
+  async getRecommendations(
+    userProfile: UserProfile,
+    excludeIds: string[],
+    topK: number = 3
+  ): Promise<string[]> {
+    let query: string = `${userProfile.preferences}
+ ${userProfile.see}`;
+    
+    if (userProfile.viewedCategories.length === 0) {
+      console.log("No viewed categories, using fallback query");
+      query = "random";
+    }
+    
+    console.log("Final query:", query);
+    const recommendedBlogIds = await this.findSimilarCategoriesForRecommendation(query, excludeIds, topK);
+    console.log("recommendation", recommendedBlogIds);
+    
+    return recommendedBlogIds;
+  }
 
   async findRelatedBlogs(
     question: string,
@@ -145,12 +158,16 @@ let query: string = `${userProfile.preferences} ${userProfile.viewedCategories.j
     return relatedBlogIds;
   }
 
-  buildUserProfile(histories: any[]): UserProfile {
+  async buildUserProfile(
+    histories: any[],
+    userId: string
+  ): Promise<UserProfile> {
     const categories = histories
-      .map((h) => (h.blog as any)?.category?.name)
+      .map((h) => (h.blog as IBlog)?.category?.name)
       .filter(Boolean);
-    const titles = histories.map((h) => (h.blog as any)?.title).filter(Boolean);
-
+    const titles = histories
+      .map((h) => (h.blog as IBlog)?.title)
+      .filter(Boolean);
     const categoryCount: Record<string, number> = {};
     categories.forEach((cat) => {
       categoryCount[cat] = (categoryCount[cat] || 0) + 1;
@@ -160,11 +177,24 @@ let query: string = `${userProfile.preferences} ${userProfile.viewedCategories.j
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([cat]) => cat);
+    // Lấy thông tin từ RecomendationCategory
+    const recommendationCategory = await RecomendationCategory.findOne({
+      user: userId,
+    }).populate("categories", "name");
+    const recommendedCategories =
+      recommendationCategory?.categories?.map((cat: any) => cat.name) || [];
+
+    // Kết hợp cả hai loại categories
+
+    console.log("topCategories", topCategories);
 
     return {
       viewedCategories: topCategories,
       viewedTitles: titles.slice(-5),
-      preferences: `Người dùng quan tâm đến ${topCategories.join(", ")}`,
+      preferences: `Người dùng quan tâm đến ${recommendedCategories.join(
+        ", "
+      )}`,
+      see: `Thể loại người dùng hay xem nhất ${topCategories.join(", ")}`,
     };
   }
 }
