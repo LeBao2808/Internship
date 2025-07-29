@@ -44,7 +44,7 @@ export default function BlogPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [savedBlogs, setSavedBlogs] = useState<string[]>([]);
   const [viewedBlogs, setViewedBlogs] = useState<string[]>([]);
-  const [hasRecommendation, setHasRecommendation] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -63,17 +63,25 @@ export default function BlogPage() {
 
   useEffect(() => {
     setLoadingFeatures(true);
-    getSession().then((session) => {
+    getSession().then(async (session) => {
       console.log("Session data:", session);
       if (!session) {
         fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       } else {
-        fetch("/api/recommend")
-          .then((res) => res.json())
-          .then((data) => setBlogFeatureds(data.recommendations || []))
-          .catch(() => setBlogFeatureds([]))
-          .finally(() => setLoadingFeatures(false));
-        // fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
+        // Check if user has recommendation
+        const recResponse = await fetch("/api/recommendation-category");
+        const recData = await recResponse.json();
+        
+        if (recData.recommendation) {
+          fetch("/api/recommend")
+            .then((res) => res.json())
+            .then((data) => setBlogFeatureds(data.recommendations || []))
+            .catch(() => setBlogFeatureds([]))
+            .finally(() => setLoadingFeatures(false));
+        } else {
+          setShowCategoryModal(true);
+          // Keep loadingFeatures true until category selection is done
+        }
       }
 
       // Fetch saved blogs and viewed status
@@ -206,12 +214,21 @@ export default function BlogPage() {
 
   const totalPages = Math.ceil(total / limit);
 
+  const handleCategoryModalComplete = () => {
+    setShowCategoryModal(false);
+    // Fetch recommendations after category selection
+    fetch("/api/recommend")
+      .then((res) => res.json())
+      .then((data) => setBlogFeatureds(data.recommendations || []))
+      .catch(() => setBlogFeatureds([]))
+      .finally(() => setLoadingFeatures(false));
+  };
+
   return (
     <div
       className={`blog-home-bg min-h-screen dark:bg-[#121618] dark:text-white`}
     >
-    
-      <CategoryModal />
+      {showCategoryModal && <CategoryModal onComplete={handleCategoryModalComplete} />}
       <Navbar />
       <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5">
         <div className="w-full mb-12">

@@ -106,8 +106,12 @@ export class RAGService {
     excludeIds: string[],
     topK: number = 3
   ): Promise<string[]> {
-    const similarCategories = await vectorStore.findSimilarCategoriesExcluding(queryText, excludeIds, topK );
-    console.log("similarCategories", similarCategories)
+    const similarCategories = await vectorStore.findSimilarCategoriesExcluding(
+      queryText,
+      excludeIds,
+      topK
+    );
+    console.log("similarCategories", similarCategories);
     const recommendedBlogIds: string[] = [];
     for (const categoryVector of similarCategories) {
       const blogIdsArray = Array.isArray(categoryVector.metadata.blogIds)
@@ -115,10 +119,10 @@ export class RAGService {
         : [categoryVector.metadata.blogIds];
 
       recommendedBlogIds.push(...blogIdsArray);
-      
+
       if (recommendedBlogIds.length >= topK) break;
     }
-    
+
     return recommendedBlogIds.slice(0, topK);
   }
 
@@ -127,18 +131,18 @@ export class RAGService {
     excludeIds: string[],
     topK: number = 3
   ): Promise<string[]> {
-    let query: string = `${userProfile.preferences}
+    const query: string = `${userProfile.preferences}
  ${userProfile.see}`;
-    
-    if (userProfile.viewedCategories.length === 0) {
-      console.log("No viewed categories, using fallback query");
-      query = "random";
-    }
-    
+
     console.log("Final query:", query);
-    const recommendedBlogIds = await this.findSimilarCategoriesForRecommendation(query, excludeIds, topK);
+    const recommendedBlogIds =
+      await this.findSimilarCategoriesForRecommendation(
+        query,
+        excludeIds,
+        topK
+      );
     console.log("recommendation", recommendedBlogIds);
-    
+
     return recommendedBlogIds;
   }
 
@@ -150,10 +154,13 @@ export class RAGService {
       question,
       topK
     );
-
+console.log("similarCategories", similarCategories);
     const relatedBlogIds: string[] = [];
-    for (const categoryVector of similarCategories) {
-      relatedBlogIds.push(...categoryVector.metadata.blogIds);
+  for (const categoryVector of similarCategories) {
+      const blogIdsArray = Array.isArray(categoryVector.metadata.blogIds)
+        ? categoryVector.metadata.blogIds
+        : [categoryVector.metadata.blogIds];
+      relatedBlogIds.push(...blogIdsArray);
     }
     return relatedBlogIds;
   }

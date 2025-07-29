@@ -4,7 +4,11 @@ import "./css/CategoryModal.css";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
-export default function CategoryModal() {
+interface CategoryModalProps {
+  onComplete?: () => void;
+}
+
+export default function CategoryModal({ onComplete }: CategoryModalProps) {
   const { data: session } = useSession();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -32,7 +36,7 @@ export default function CategoryModal() {
       });
 
       if (response.ok) {
-        document.getElementById("categoryModal")?.remove();
+        onComplete?.();
       }
     } catch (error) {
       console.error("Error saving categories:", error);

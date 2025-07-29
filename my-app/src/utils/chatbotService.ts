@@ -7,6 +7,7 @@ import User from "@/app/api/models/User";
 import Comment from "@/app/api/models/Comment";
 import { getCachedChatBot, setCachedChatBot } from "./cache";
 import { ragService } from "./ragService";
+import mongoose from "mongoose";
 
 interface SystemData {
   categories: any[];
@@ -30,8 +31,12 @@ export class ChatbotService {
   async getRelatedBlogs(question: string, topK: number = 3) {
     await ragService.initializeIfNeeded();
     const relatedBlogIds = await ragService.findRelatedBlogs(question, topK);
-    return relatedBlogIds.length > 0
-      ? await Blog.find({ _id: { $in: relatedBlogIds } })
+    console.log("Related blog IDs:", relatedBlogIds);
+    // Filter valid ObjectIds
+    const validIds = relatedBlogIds.filter(id => mongoose.Types.ObjectId.isValid(id));
+    
+    return validIds.length > 0
+      ? await Blog.find({ _id: { $in: validIds } })
           .populate("category", "name")
           .populate("user", "name")
       : [];
@@ -139,7 +144,6 @@ Các danh mục: ${
   async callGemini(prompt: string): Promise<string> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
     try {
       const response = await fetch(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBLhFqhZHJqaOcF1ogQcVLmctB9qw5shBM",
