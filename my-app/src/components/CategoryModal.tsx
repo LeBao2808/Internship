@@ -1,6 +1,6 @@
 "use client";
 import { Category } from "@/utils/type";
-import "./css/CategoryModal.css";
+import "./css/categoryModal.css";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
