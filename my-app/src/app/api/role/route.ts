@@ -5,7 +5,8 @@ import { z } from 'zod';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/resources/lib/auth.config"; 
 
-
+import "../../api/models/Category";
+import "../../api/models/User";
 const RoleSchema = z.object({
   name: z.string().min(3, 'name limit 3 characters')
   .regex(/^[\p{L}0-9\s]+$/u, 'Name must not contain special characters'),

@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import UserButton from "./UserButton";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Navbar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,29 +71,31 @@ export default function Navbar() {
                     Category
                   </span>
                 </Link>
-                <Link
-                  href="/saves"
-                  className="relative overflow-hidden group px-8 py-4 text-gray-800 dark:text-gray-200 font-semibold text-lg transition-all duration-500 hover:text-white dark:hover:text-white rounded-2xl"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-2xl"></span>
-                  {/* <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl blur-sm"></span> */}
-                  <span className="relative z-10 flex items-center gap-2">
-                    <svg
-                      className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                    Saves
-                  </span>
-                </Link>
+                {session ? (
+                  <Link
+                    href="/saves"
+                    className="relative overflow-hidden group px-8 py-4 text-gray-800 dark:text-gray-200 font-semibold text-lg transition-all duration-500 hover:text-white dark:hover:text-white rounded-2xl"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-2xl"></span>
+                    {/* <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl blur-sm"></span> */}
+                    <span className="relative z-10 flex items-center gap-2">
+                      <svg
+                        className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
+                      </svg>
+                      Saves
+                    </span>
+                  </Link>
+                ) : null}
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
+import { useSession } from "next-auth/react";
 import {
   FiSearch,
   FiUser,
@@ -30,6 +31,7 @@ export default function CategoryPage({
   const { slug: rawSlug } = use(params);
   const router = useRouter();
   const slug = decodeURIComponent(rawSlug);
+  const { data: session } = useSession();
 
   const handleSaveBlog = async (blogId: string) => {
     try {
@@ -192,23 +194,27 @@ export default function CategoryPage({
                         {blog.category.name}
                       </span>
                     )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSaveBlog(blog._id);
-                      }}
-                      className={`absolute top-4 right-4 p-3 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
-                        savedBlogs.includes(blog._id)
-                          ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
-                          : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
-                      }`}
-                    >
-                      <FiBookmark
-                        className={`w-5 h-5 transition-all duration-300 ${
-                          savedBlogs.includes(blog._id) ? "fill-current" : ""
+
+                    {session ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveBlog(blog._id);
+                        }}
+                        className={`absolute top-4 right-4 p-3 rounded-full backdrop-blur-md border transition-all duration-500 transform hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer ${
+                          savedBlogs.includes(blog._id)
+                            ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400 shadow-red-500/25"
+                            : "bg-white/90 text-gray-700 border-white/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-pink-500 hover:text-white hover:border-red-400"
                         }`}
-                      />
-                    </button>
+                      >
+                        <FiBookmark
+                          className={`w-5 h-5 transition-all duration-300 ${
+                            savedBlogs.includes(blog._id) ? "fill-current" : ""
+                          }`}
+                        />
+                      </button>
+                    ) : null}
+
                     {viewedBlogs.includes(blog._id) && (
                       <div className="absolute bottom-4 right-4 flex items-center gap-1 px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white rounded-full text-xs font-semibold shadow-lg">
                         <FiEye className="w-3 h-3" />

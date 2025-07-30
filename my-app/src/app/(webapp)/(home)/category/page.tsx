@@ -6,6 +6,7 @@ import Navbar from "../../../../components/Navbar";
 import { useTranslation } from "react-i18next";
 import { Category } from "@/utils/type";
 import { FiSearch, FiTrendingUp, FiBookOpen } from "react-icons/fi";
+import { useSession } from "next-auth/react";
 
 export default function CategoryPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function CategoryPage() {
   const { t } = useTranslation();
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetchCategories();
@@ -128,21 +130,25 @@ export default function CategoryPage() {
                   )}
                   {/* Overlay chỉ hiện khi chưa hover */}
                 </div>
+                {session ? (
+                  <>
+                    <div className="absolute top-4 left-4 z-10">
+                      <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-2 rounded-full">
+                        <FiBookOpen className="w-4 h-4 text-white" />
+                        <span className="text-white font-medium text-sm">
+                          {progress[String(category._id)] ?? 0}% complete
+                        </span>
+                      </div>
+                    </div>
 
-                <div className="absolute top-4 left-4 z-10">
-                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-2 rounded-full">
-                    <FiBookOpen className="w-4 h-4 text-white" />
-                    <span className="text-white font-medium text-sm">
-                      {progress[String(category._id)] ?? 0}% complete
-                    </span>
-                  </div>
-                </div>
-
-                <div className="absolute top-4 right-4 z-10">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all duration-300">
-                    <FiTrendingUp className="w-5 h-5 text-white" />
-                  </div>
-                </div>
+                    <div className="absolute top-4 right-4 z-10">
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all duration-300">
+                        <FiTrendingUp className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                  </>
+                ) : null}
+         
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
                   <h3 className="text-xl font-bold text-white mb-2 group-hover:text-yellow-300 transition-colors duration-300">
