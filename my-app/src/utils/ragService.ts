@@ -43,7 +43,7 @@ export class RAGService {
       for (const blog of blogs) {
         const content = `Category: ${category.name}. Author: ${
           (blog.user as any)?.name || "Unknown"
-        }.  View: ${blog.view}.  Title: ${blog.title} ${blog.content}`;
+        }.  View: bài viết này có ${blog.view} lượt xem.  Title: ${blog.title} ${blog.content}`;
 
         const categoryVector: CategoryVector = {
           id: `${category._id}_${blog._id}`,
@@ -80,7 +80,7 @@ export class RAGService {
     for (const blog of blogs) {
       const content = `Category: ${category.name}. Author: ${
         (blog.user as any)?.name || "Unknown"
-      }.  View: ${blog.view}. Title: ${blog.title} ${blog.content}`;
+      }.  View: bài viết này có ${blog.view} lượt xem. Title: ${blog.title} ${blog.content}`;
 
       const categoryVector: CategoryVector = {
         id: `${categoryId}_${blog._id}`,
