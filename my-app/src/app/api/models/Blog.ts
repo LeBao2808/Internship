@@ -11,6 +11,7 @@ export interface IBlog extends Document, IBaseTimestamps {
   category: mongoose.Schema.Types.ObjectId;
   slug: string;
   featured : boolean;
+  view: number;
 }
 
 const BlogSchema: Schema<IBlog> = new Schema({
@@ -24,6 +25,7 @@ const BlogSchema: Schema<IBlog> = new Schema({
     unique: true,
   },
   featured: {type: Boolean},
+  view: {type: Number, default: 0},
   ...baseTimestamps
 });
 

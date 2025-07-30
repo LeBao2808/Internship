@@ -13,6 +13,7 @@ interface Blog {
   createdAt?: string;
   updatedAt?: string;
   slug?: string;
+  view?: number;
 }
 
 export default function BlogDetailPage({
@@ -127,6 +128,12 @@ export default function BlogDetailPage({
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user: userId, blog: blog._id }),
+          });
+          console.log("use API put")
+          await fetch("/api/blog", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({...blog, view: (blog.view || 0) + 1}),
           });
         }
       };

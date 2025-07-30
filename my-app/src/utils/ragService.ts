@@ -43,7 +43,7 @@ export class RAGService {
       for (const blog of blogs) {
         const content = `Category: ${category.name}. Author: ${
           (blog.user as any)?.name || "Unknown"
-        }. Title: ${blog.title} ${blog.content}`;
+        }.  View: ${blog.view}.  Title: ${blog.title} ${blog.content}`;
 
         const categoryVector: CategoryVector = {
           id: `${category._id}_${blog._id}`,
@@ -80,7 +80,7 @@ export class RAGService {
     for (const blog of blogs) {
       const content = `Category: ${category.name}. Author: ${
         (blog.user as any)?.name || "Unknown"
-      }. Title: ${blog.title} ${blog.content}`;
+      }.  View: ${blog.view}. Title: ${blog.title} ${blog.content}`;
 
       const categoryVector: CategoryVector = {
         id: `${categoryId}_${blog._id}`,
@@ -132,7 +132,9 @@ export class RAGService {
     topK: number = 3
   ): Promise<string[]> {
     const query: string = `${userProfile.preferences}
- ${userProfile.see}`;
+ ${userProfile.see}  
+ ưu tiên sắp xếp theo số lượt xem (view) giảm dần.
+Tức là các blog có cùng điều kiện thì blog nào có lượt xem cao hơn sẽ được hiển thị trước.`;
 
     console.log("Final query:", query);
     const recommendedBlogIds =
@@ -154,9 +156,9 @@ export class RAGService {
       question,
       topK
     );
-console.log("similarCategories", similarCategories);
+    console.log("similarCategories", similarCategories);
     const relatedBlogIds: string[] = [];
-  for (const categoryVector of similarCategories) {
+    for (const categoryVector of similarCategories) {
       const blogIdsArray = Array.isArray(categoryVector.metadata.blogIds)
         ? categoryVector.metadata.blogIds
         : [categoryVector.metadata.blogIds];
@@ -191,17 +193,17 @@ console.log("similarCategories", similarCategories);
     const recommendedCategories =
       recommendationCategory?.categories?.map((cat: any) => cat.name) || [];
 
-    // Kết hợp cả hai loại categories
-
     console.log("topCategories", topCategories);
-
+    const isTopCategoriesEmpty = topCategories.length === 0;
     return {
       viewedCategories: topCategories,
       viewedTitles: titles.slice(-5),
       preferences: `Người dùng quan tâm đến ${recommendedCategories.join(
         ", "
       )}`,
-      see: `Thể loại người dùng hay xem nhất ${topCategories.join(", ")}`,
+      see: isTopCategoriesEmpty
+        ? ""
+        : `Thể loại người dùng hay xem nhất ${topCategories.join(", ")}`,
     };
   }
 }

@@ -10,6 +10,7 @@ import generateSlug from "@/utils/generateSlug";
 import Category from "../models/Category";
 import { ragService } from "@/utils/ragService";
 import { redisVectorStore } from "@/utils/redisVectorStore";
+import { console } from "inspector";
 
 const BlogSchema = z.object({
   title: z.string().trim().min(5).optional(),
@@ -116,7 +117,7 @@ export async function PUT(request: Request) {
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
+   console.log("use Put api") ;
   const body = await request.json();
   const parsed = BlogSchema.safeParse(body);
 
@@ -133,10 +134,10 @@ export async function PUT(request: Request) {
     const slug = generateSlug(body.title);
 
     const updatedBlog = await Blog.findByIdAndUpdate(
-      body.id,
+      body.id || body._id,
       {
         ...body,
-        user: dbUser._id,
+        // user: dbUser._id,
         updatedAt: new Date(),
         slug,
       },
@@ -146,8 +147,10 @@ export async function PUT(request: Request) {
     if (!updatedBlog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
-    await ragService.updateCategoryVector(body.category._id.toString());
-    console.log("Updated blog:", body.category._id.toString());
+    if (body.category?._id) {
+      await ragService.updateCategoryVector(body.category._id.toString());
+      console.log("Updated blog:", body.category._id.toString());
+    }
     return NextResponse.json(updatedBlog);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

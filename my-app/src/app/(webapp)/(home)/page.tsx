@@ -71,7 +71,7 @@ export default function BlogPage() {
         // Check if user has recommendation
         const recResponse = await fetch("/api/recommendation-category");
         const recData = await recResponse.json();
-        
+
         if (recData.recommendation) {
           fetch("/api/recommend")
             .then((res) => res.json())
@@ -153,7 +153,7 @@ export default function BlogPage() {
 
   const fetchFeaturedBlog = async () => {
     try {
-      const res = await fetch("/api/blog/featured");
+      const res = await fetch("/api/blog/top-views");
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -176,6 +176,8 @@ export default function BlogPage() {
       console.error("Failed to fetch featured blogs:", error);
     }
   };
+
+  console.log("features", blogFeatureds);
 
   const fetchBlogs = async () => {
     try {
@@ -228,7 +230,9 @@ export default function BlogPage() {
     <div
       className={`blog-home-bg min-h-screen dark:bg-[#121618] dark:text-white`}
     >
-      {showCategoryModal && <CategoryModal onComplete={handleCategoryModalComplete} />}
+      {showCategoryModal && (
+        <CategoryModal onComplete={handleCategoryModalComplete} />
+      )}
       <Navbar />
       <div className="max-w-7xl mx-auto pt-20 px-8 sm:px-5 md:px-5">
         <div className="w-full mb-12">
