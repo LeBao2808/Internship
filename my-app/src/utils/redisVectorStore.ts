@@ -144,7 +144,7 @@ class RedisVectorStore {
   ): Promise<CategoryVector[]> {
     const queryEmbedding = await this.generateEmbedding(queryText);
     const keys = await this.redis.keys(`${this.VECTOR_KEY}*`);
-    const similarities: Array<{ doc: CategoryVector; score: number }> = [];
+    const similarities: Array<{ doc: CategoryVector; score: number; viewCount: number; finalScore: number }> = [];
 
     for (const key of keys) {
       const docStr = await this.redis.get(key);
@@ -167,8 +167,19 @@ class RedisVectorStore {
           if (hasExcludedBlog) continue;
 
           if (doc.embedding) {
-            const score = this.calculateSimilarity(queryEmbedding, doc.embedding);
-            similarities.push({ doc, score });
+            const similarityScore = this.calculateSimilarity(queryEmbedding, doc.embedding);
+            
+            // Extract view count from content
+            const viewMatch = doc.content.match(/có (\d+) lượt xem/);
+            const viewCount = viewMatch ? parseInt(viewMatch[1]) : 0;
+            
+            // Normalize view count (log scale to prevent dominance)
+            const normalizedViewScore = Math.log(viewCount + 1) / 10;
+            
+            // Combine similarity (70%) with view popularity (30%)
+            const finalScore = (similarityScore * 0.7) + (normalizedViewScore * 0.3);
+            
+            similarities.push({ doc, score: similarityScore, viewCount, finalScore });
           }
         } catch (error) {
           continue;
@@ -177,7 +188,13 @@ class RedisVectorStore {
     }
 
     return similarities
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => {
+        // Primary sort by final score, secondary by view count
+        if (Math.abs(a.finalScore - b.finalScore) < 0.01) {
+          return b.viewCount - a.viewCount;
+        }
+        return b.finalScore - a.finalScore;
+      })
       .slice(0, topK)
       .map((item) => item.doc);
   }

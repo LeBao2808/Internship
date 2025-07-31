@@ -160,23 +160,54 @@ export default function BlogDetailPage({
 
   if (loading)
     return (
-      <div
-        className="max-w-7xl mx-auto min-h-screen mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-pulse"
-        style={{ marginTop: "89px" }}
-      >
-
-        <div className="w-full aspect-[8/5] h-150 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
-        <div className="h-4 bg-gray-150 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
-        <div className="flex gap-4">
-          <div className="h-32 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-          <div className="h-32 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-          <div className="h-32 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+      <div className="bg-gray-100 dark:bg-[#121618] min-h-screen">
+        <div
+          className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 mt-8 mb-6 px-2 sm:px-4 md:px-8 animate-pulse"
+          style={{ marginTop: "65px" }}
+        >
+          <div className="flex-1 mt-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 md:p-12">
+              {/* Image skeleton */}
+              <div className="w-full h-150 aspect-[8/5] bg-gray-200 dark:bg-gray-700 rounded-lg mb-6 sm:mb-8"></div>
+              
+              {/* Title skeleton */}
+              <div className="h-8 sm:h-10 md:h-12 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+              
+              {/* Author and date badges skeleton */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mb-8">
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-full w-32"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-full w-40"></div>
+              </div>
+              
+              {/* Content skeleton */}
+              <div className="space-y-3 mt-6 sm:mt-8">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+              </div>
+              
+              {/* Divider */}
+              <div className="w-full h-px bg-gray-200 dark:bg-gray-700 mt-12 mb-8"></div>
+              
+              {/* Related articles section */}
+              <div className="mt-8">
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-6"></div>
+                <div className="flex overflow-x-auto gap-4 sm:gap-6 pb-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="min-w-[220px] sm:min-w-[280px] bg-gray-200 dark:bg-gray-700 rounded-2xl p-4 sm:p-5 flex-shrink-0">
+                      <div className="h-32 bg-gray-300 dark:bg-gray-600 rounded-lg mb-3"></div>
+                      <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

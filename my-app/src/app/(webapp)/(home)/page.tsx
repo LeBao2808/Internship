@@ -64,7 +64,6 @@ export default function BlogPage() {
   useEffect(() => {
     setLoadingFeatures(true);
     getSession().then(async (session) => {
-      console.log("Session data:", session);
       if (!session) {
         fetchFeaturedBlog().finally(() => setLoadingFeatures(false));
       } else {
@@ -80,11 +79,9 @@ export default function BlogPage() {
             .finally(() => setLoadingFeatures(false));
         } else {
           setShowCategoryModal(true);
-          // Keep loadingFeatures true until category selection is done
         }
       }
 
-      // Fetch saved blogs and viewed status
       fetchSavedAndViewedBlogs();
     });
   }, []);
@@ -177,7 +174,6 @@ export default function BlogPage() {
     }
   };
 
-  console.log("features", blogFeatureds);
 
   const fetchBlogs = async () => {
     try {
