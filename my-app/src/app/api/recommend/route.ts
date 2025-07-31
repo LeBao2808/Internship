@@ -50,16 +50,37 @@ export async function GET() {
     .populate("category", "name")
     .populate("user", "name");
 
-  
+  console.log("Recommendations:", recommendations.length);
   if (recommendations.length < 3) {
     console.log("Not enough recommendations, adding fallback blogs");
-    const fallbackBlogs = await Blog.find({ 
-      _id: { $nin: [...viewedBlogIds, ...recommendedBlogIds] } 
-    })
-    .populate("category", "name")
-    .populate("user", "name")
-    .limit(5 - recommendations.length);
-    recommendations.push(...fallbackBlogs);
+    console.log("viewedBlogIds:", viewedBlogIds.length);
+    console.log("recommendedBlogIds:", recommendedBlogIds.length);
+    
+    // const excludeIds = [...viewedBlogIds, ...recommendedBlogIds];
+    // console.log("Total excluded IDs:", excludeIds.length);
+    
+    // const fallbackBlogs = await Blog.find({ 
+    //   _id: { $nin: excludeIds },
+    //   isDelete: { $ne: true }
+    // })
+    // .populate("category", "name")
+    // .populate("user", "name")
+    // .limit(3 - recommendations.length);
+    
+    // console.log("Fallback blogs found:", fallbackBlogs.length);
+    // recommendations.push(...fallbackBlogs);
+
+      console.log("Getting popular blogs from viewed ones");
+      const popularBlogs = await Blog.find({ 
+        _id: { $in: viewedBlogIds },
+        isDelete: { $ne: true }
+      })
+      .populate("category", "name")
+      .populate("user", "name")
+      .sort({ view: -1 })
+      .limit(3 - recommendations.length);
+      
+      recommendations.push(...popularBlogs);
   }
   // console.log("Recommendations:", recommendations);
   await setCachedRecommendation(userId, recommendations);
